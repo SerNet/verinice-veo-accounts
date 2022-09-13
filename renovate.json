@@ -1,0 +1,17 @@
+{
+  "$schema" : "https://docs.renovatebot.com/renovate-schema.json",
+  "assignAutomerge" : true,
+  "automerge" : true,
+  "automergeType" : "pr",
+  "reviewers" : [
+    "jj"
+  ],
+  "packageRules" : [
+    {
+      "matchPackagePatterns" : [
+        "^org.jetbrains.kotlin"
+      ],
+      "groupName" : "Kotlin"
+    }
+  ]
+}
