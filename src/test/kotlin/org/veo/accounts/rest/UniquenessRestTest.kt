@@ -37,6 +37,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
+                "firstName" to "Snowy",
+                "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>()
             )
@@ -48,6 +50,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
+                "firstName" to "Copy",
+                "lastName" to "Kitty",
                 "emailAddress" to "$prefix-copy@cat.test",
                 "groups" to emptyList<String>()
             ),
@@ -64,6 +68,8 @@ class UniquenessRestTest : AbstractRestTest() {
             mapOf(
                 "username" to "$prefix-snowflake",
                 "emailAddress" to "$prefix-special@snowflake.test",
+                "firstName" to "Snowy",
+                "lastName" to "Flaky",
                 "groups" to emptyList<String>()
             )
         )
@@ -74,6 +80,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-copycat",
+                "firstName" to "Copy",
+                "lastName" to "Kitty",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>()
             ),
@@ -89,6 +97,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
+                "firstName" to "Snowy",
+                "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>()
             )
@@ -98,6 +108,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-glowcake",
+                "firstName" to "Glowy",
+                "lastName" to "Cakey",
                 "emailAddress" to "$prefix-special@glowcake.test",
                 "groups" to emptyList<String>()
             )
@@ -109,6 +121,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "emailAddress" to "$prefix-special@snowflake.test",
+                "firstName" to "Glowy",
+                "lastName" to "Cakey",
                 "groups" to emptyList<String>()
             ),
             409

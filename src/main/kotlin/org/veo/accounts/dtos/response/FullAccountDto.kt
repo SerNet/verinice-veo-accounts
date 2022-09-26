@@ -22,6 +22,8 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
 
 @Schema(description = "Veo user account that is a member of the authenticated user's veo client group")
@@ -29,12 +31,16 @@ class FullAccountDto(
     val id: AccountId,
     val username: Username,
     val emailAddress: EmailAddress?,
+    val firstName: FirstName?,
+    val lastName: LastName?,
     val groups: AssignableGroupSet
 ) {
     constructor(user: UserRepresentation) : this(
         AccountId(user.id),
         Username(user.username),
         user.email?.let { EmailAddress(it) },
+        user.firstName?.let { FirstName(it) },
+        user.lastName?.let { LastName(it) },
         AssignableGroupSet.byGroupNames(user.groups)
     )
 }

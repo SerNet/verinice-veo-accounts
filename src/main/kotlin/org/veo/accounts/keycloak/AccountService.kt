@@ -106,6 +106,8 @@ class AccountService(
     private fun CreateAccountDto.toUser(authAccount: AuthenticatedAccount) = UserRepresentation().also { user ->
         user.username = username.value
         user.email = emailAddress.value
+        user.firstName = firstName.value
+        user.lastName = lastName.value
         user.groups = groups.groupNames.map(::getUserGroupPath) +
             getUserGroupPath("veo-user") +
             authAccount.veoClient.groupName
@@ -119,6 +121,8 @@ class AccountService(
                     isEmailVerified = false
                 }
             }
+        firstName = dto.firstName.value
+        lastName = dto.lastName.value
     }
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"

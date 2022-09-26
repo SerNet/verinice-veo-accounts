@@ -21,17 +21,23 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
 
 @Schema(description = "Summary of a veo user account")
 class ListAccountDto(
     val id: AccountId,
     val username: Username,
-    val emailAddress: EmailAddress?
+    val emailAddress: EmailAddress?,
+    val firstName: FirstName?,
+    val lastName: LastName?
 ) {
     constructor(user: UserRepresentation) : this(
         AccountId(user.id),
         Username(user.username),
-        user.email?.let { EmailAddress(it) }
+        user.email?.let { EmailAddress(it) },
+        user.firstName?.let { FirstName(it) },
+        user.lastName?.let { LastName(it) }
     )
 }

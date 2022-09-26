@@ -30,13 +30,25 @@ class AccountDtoValidationTest {
     }
 
     @Test
-    fun `empty username is not ok`() {
+    fun `empty strings are not ok`() {
+        shouldThrow<ConstraintViolationException> { createAccountDto(firstName = "") }
+        shouldThrow<ConstraintViolationException> { createAccountDto(lastName = "") }
         shouldThrow<ConstraintViolationException> { createAccountDto(username = "") }
+
+        shouldThrow<ConstraintViolationException> { updateAccountDto(firstName = "") }
+        shouldThrow<ConstraintViolationException> { updateAccountDto(lastName = "") }
     }
 
     @Test
-    fun `overly long username is not ok`() {
-        shouldThrow<ConstraintViolationException> { createAccountDto(username = "u".repeat(300)) }
+    fun `overly long strings are not ok`() {
+        val longText = "u".repeat(300)
+
+        shouldThrow<ConstraintViolationException> { createAccountDto(firstName = longText) }
+        shouldThrow<ConstraintViolationException> { createAccountDto(lastName = longText) }
+        shouldThrow<ConstraintViolationException> { createAccountDto(username = longText) }
+
+        shouldThrow<ConstraintViolationException> { updateAccountDto(firstName = longText) }
+        shouldThrow<ConstraintViolationException> { updateAccountDto(lastName = longText) }
     }
 
     @Test

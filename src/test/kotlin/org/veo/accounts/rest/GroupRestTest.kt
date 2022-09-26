@@ -37,6 +37,8 @@ class GroupRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
+                "firstName" to "Hans",
+                "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to emptyList<String>()
             )
@@ -71,6 +73,8 @@ class GroupRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
+                "firstName" to "Hans",
+                "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-write-access")
             )
@@ -90,6 +94,8 @@ class GroupRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
+                "firstName" to "Hans",
+                "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-admin")
             ),
@@ -105,6 +111,8 @@ class GroupRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
+                "firstName" to "Hans",
+                "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to emptyList<String>()
             )
@@ -115,6 +123,8 @@ class GroupRestTest : AbstractRestTest() {
             "/$accountId",
             managerId,
             mapOf(
+                "firstName" to "Hans",
+                "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-admin")
             ),

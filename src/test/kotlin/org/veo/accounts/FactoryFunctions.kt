@@ -20,6 +20,8 @@ package org.veo.accounts
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
@@ -30,28 +32,38 @@ fun fullAccountDto(
     id: AccountId = AccountId(randomUUID().toString()),
     username: String = "katie",
     emailAddress: String = "katie@test.test",
+    firstName: String = "Katie",
+    lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet()
 ) =
     FullAccountDto(
         id,
         Username(username),
         EmailAddress(emailAddress),
+        FirstName(firstName),
+        LastName(lastName),
         AssignableGroupSet(groups)
     )
 
 fun createAccountDto(
     emailAddress: String = "katie@test.test",
     username: String = "katie",
+    firstName: String = "Katie",
+    lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet()
 ) =
     CreateAccountDto(
         Username(username),
         EmailAddress(emailAddress),
+        FirstName(firstName),
+        LastName(lastName),
         AssignableGroupSet(groups)
     )
 
 fun updateAccountDto(
     emailAddress: String = "katie@test.test",
+    firstName: String = "Katie",
+    lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet()
 ) =
-    UpdateAccountDto(EmailAddress(emailAddress), AssignableGroupSet(groups))
+    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), AssignableGroupSet(groups))

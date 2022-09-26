@@ -40,6 +40,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
             client1ManagerId,
             mapOf(
                 "username" to "$prefix-louis",
+                "firstName" to "Louis",
+                "lastName" to "King",
                 "emailAddress" to "$prefix-louis@client1.test",
                 "groups" to emptyList<String>()
             )
@@ -60,6 +62,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
             client2ManagerId,
             mapOf(
                 "emailAddress" to "$prefix-evil@string.test",
+                "firstName" to "Louis",
+                "lastName" to "King",
                 "groups" to emptyList<String>()
             ),
             404

@@ -15,18 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.dtos.request
+package org.veo.accounts.dtos
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.dtos.AssignableGroupSet
-import org.veo.accounts.dtos.EmailAddress
-import org.veo.accounts.dtos.FirstName
-import org.veo.accounts.dtos.LastName
+import org.veo.accounts.validate
+import javax.validation.constraints.Size
 
-@Schema(description = "Subset of veo user account data for update operations. Immutable properties are absent.")
-class UpdateAccountDto(
-    val emailAddress: EmailAddress,
-    val firstName: FirstName,
-    val lastName: LastName,
-    val groups: AssignableGroupSet
+private const val minLength = 1
+private const val maxLength = 256
+
+@Schema(
+    description = "User's given name",
+    type = "string",
+    minLength = minLength,
+    maxLength = maxLength,
+    example = "Katie"
 )
+data class FirstName(
+    @field:Size(min = minLength, max = maxLength)
+    @get:JsonValue
+    val value: String
+) {
+    init {
+        validate()
+    }
+}
