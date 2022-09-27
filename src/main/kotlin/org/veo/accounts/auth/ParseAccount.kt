@@ -20,7 +20,7 @@ package org.veo.accounts.auth
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.veo.accounts.AccountId
+import org.veo.accounts.dtos.AccountId
 import java.util.UUID
 
 private const val uuidPattern = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""

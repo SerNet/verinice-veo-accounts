@@ -19,9 +19,9 @@ package org.veo.accounts.dtos.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
-import org.veo.accounts.AccountId
-import org.veo.accounts.EmailAddress
-import org.veo.accounts.Username
+import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.Username
 
 @Schema(description = "Veo user account that is a member of the authenticated user's veo client group")
 class FullAccountDto(

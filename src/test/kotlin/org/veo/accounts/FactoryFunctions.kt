@@ -17,6 +17,9 @@
  */
 package org.veo.accounts
 
+import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.FullAccountDto

@@ -15,15 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts
+package org.veo.accounts.dtos
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.validation.constraints.Email
+import org.springframework.validation.annotation.Validated
+import org.veo.accounts.validate
+import javax.validation.constraints.Size
 
-@Schema(description = "Email address", type = "string", minLength = 1, example = "katie@test.test")
-data class EmailAddress(
-    @field:Email
+private const val minLength = 1
+private const val maxLength = 256
+
+@Schema(
+    description = "Unique user account identifier, but not be confused with the generated account ID. Once chosen, usernames cannot be changed.",
+    type = "string",
+    minLength = minLength,
+    maxLength = maxLength,
+    example = "katie"
+)
+@Validated
+data class Username(
+    @field:Size(min = minLength, max = maxLength)
     @get:JsonValue
     val value: String
 ) {

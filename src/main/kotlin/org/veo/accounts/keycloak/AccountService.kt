@@ -20,9 +20,9 @@ package org.veo.accounts.keycloak
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.stereotype.Component
-import org.veo.accounts.AccountId
 import org.veo.accounts.auth.AuthenticatedAccount
 import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException

@@ -18,7 +18,7 @@
 package org.veo.accounts.dtos.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.EmailAddress
+import org.veo.accounts.dtos.EmailAddress
 
 @Schema(description = "Subset of veo user account data for update operations. Immutable properties are absent.")
 class UpdateAccountDto(val emailAddress: EmailAddress)

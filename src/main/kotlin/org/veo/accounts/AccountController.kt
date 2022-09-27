@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.veo.accounts.auth.parseAccount
+import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.FullAccountDto

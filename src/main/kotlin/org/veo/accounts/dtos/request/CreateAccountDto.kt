@@ -18,8 +18,8 @@
 package org.veo.accounts.dtos.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.EmailAddress
-import org.veo.accounts.Username
+import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.Username
 
 @Schema(description = "Subset of veo user account data for account creation. Account ID is absent because it is generated.")
 class CreateAccountDto(val username: Username, val emailAddress: EmailAddress)

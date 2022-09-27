@@ -23,7 +23,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.veo.accounts.AccountId
+import org.veo.accounts.dtos.AccountId
 import java.util.UUID
 
 class ParseAccountUnitTest {
