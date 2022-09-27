@@ -15,12 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.dtos.request
+package org.veo.accounts.dtos.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.dtos.AssignableGroupSet
+import org.keycloak.representations.idm.UserRepresentation
+import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Username
 
-@Schema(description = "Subset of veo user account data for account creation. Account ID is absent because it is generated.")
-class CreateAccountDto(val username: Username, val emailAddress: EmailAddress, val groups: AssignableGroupSet)
+@Schema(description = "Summary of a veo user account")
+class ListAccountDto(
+    val id: AccountId,
+    val username: Username,
+    val emailAddress: EmailAddress?
+) {
+    constructor(user: UserRepresentation) : this(
+        AccountId(user.id),
+        Username(user.username),
+        user.email?.let { EmailAddress(it) }
+    )
+}

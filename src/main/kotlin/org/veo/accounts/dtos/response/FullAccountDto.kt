@@ -20,6 +20,7 @@ package org.veo.accounts.dtos.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Username
 
@@ -27,11 +28,13 @@ import org.veo.accounts.dtos.Username
 class FullAccountDto(
     val id: AccountId,
     val username: Username,
-    val emailAddress: EmailAddress?
+    val emailAddress: EmailAddress?,
+    val groups: AssignableGroupSet
 ) {
     constructor(user: UserRepresentation) : this(
         AccountId(user.id),
         Username(user.username),
-        user.email?.let { EmailAddress(it) }
+        user.email?.let { EmailAddress(it) },
+        AssignableGroupSet.byGroupNames(user.groups)
     )
 }

@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.dtos.request
+package org.veo.accounts
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.dtos.AssignableGroupSet
-import org.veo.accounts.dtos.EmailAddress
-import org.veo.accounts.dtos.Username
+import com.fasterxml.jackson.annotation.JsonValue
 
-@Schema(description = "Subset of veo user account data for account creation. Account ID is absent because it is generated.")
-class CreateAccountDto(val username: Username, val emailAddress: EmailAddress, val groups: AssignableGroupSet)
+enum class AssignableGroup(@get:JsonValue val groupName: String) {
+    VEO_WRITE_ACCESS("veo-write-access");
+
+    companion object {
+        /** Returns [AssignableGroup] with given group name or null if none was found.*/
+        fun byGroupNameOrNull(groupName: String): AssignableGroup? = values()
+            .firstOrNull { it.groupName == groupName }
+    }
+}

@@ -37,7 +37,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-special@snowflake.test"
+                "emailAddress" to "$prefix-special@snowflake.test",
+                "groups" to emptyList<String>()
             )
         )
 
@@ -47,7 +48,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-copy@cat.test"
+                "emailAddress" to "$prefix-copy@cat.test",
+                "groups" to emptyList<String>()
             ),
             409
         ).rawBody shouldBe "Username or email address already taken"
@@ -61,7 +63,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-special@snowflake.test"
+                "emailAddress" to "$prefix-special@snowflake.test",
+                "groups" to emptyList<String>()
             )
         )
 
@@ -71,7 +74,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-copycat",
-                "emailAddress" to "$prefix-special@snowflake.test"
+                "emailAddress" to "$prefix-special@snowflake.test",
+                "groups" to emptyList<String>()
             ),
             409
         ).rawBody shouldBe "Username or email address already taken"
@@ -85,7 +89,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-special@snowflake.test"
+                "emailAddress" to "$prefix-special@snowflake.test",
+                "groups" to emptyList<String>()
             )
         )
         val secondAccountId = post(
@@ -93,7 +98,8 @@ class UniquenessRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-glowcake",
-                "emailAddress" to "$prefix-special@glowcake.test"
+                "emailAddress" to "$prefix-special@glowcake.test",
+                "groups" to emptyList<String>()
             )
         ).rawBody!!
 
@@ -102,7 +108,8 @@ class UniquenessRestTest : AbstractRestTest() {
             "/$secondAccountId",
             managerId,
             mapOf(
-                "emailAddress" to "$prefix-special@snowflake.test"
+                "emailAddress" to "$prefix-special@snowflake.test",
+                "groups" to emptyList<String>()
             ),
             409
         ).rawBody shouldBe "Email address already taken"

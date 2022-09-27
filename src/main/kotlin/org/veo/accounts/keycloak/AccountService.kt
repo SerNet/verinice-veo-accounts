@@ -19,10 +19,11 @@ package org.veo.accounts.keycloak
 
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.UserRepresentation
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.auth.AuthenticatedAccount
-import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
@@ -34,11 +35,13 @@ import javax.ws.rs.NotFoundException
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
 @Component
 class AccountService(
+    @Value("\${veo.accounts.keycloak.userSuperGroupName}")
+    private val userSuperGroupName: String,
     private val facade: KeycloakFacade
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> = facade.perform {
         groups()
-            .group(getGroupId(authAccount.veoClient))
+            .group(getGroupId(authAccount.veoClient.groupName))
             .members()
     }
 
@@ -58,8 +61,7 @@ class AccountService(
 
     fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): String = facade.perform {
         dto
-            .toUser()
-            .apply { groups = listOf("veo-userclass/veo-user", authAccount.veoClient.groupName) }
+            .toUser(authAccount)
             .let { users().create(it) }
             .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
             .apply { check(status == 201) { "Unexpected user creation response $status" } }
@@ -70,7 +72,7 @@ class AccountService(
         facade.perform {
             getAccount(id, authAccount)
                 .apply { update(dto) }
-                .let {
+                .also {
                     try {
                         users().get(id.toString()).update(it)
                     } catch (ex: ClientErrorException) {
@@ -79,6 +81,18 @@ class AccountService(
                         }
                         throw ex
                     }
+                }
+                .also { user ->
+                    dto.groups
+                        .groupNames
+                        .filter { !user.groups.contains(it) }
+                        .forEach { users().get(user.id).joinGroup(getGroupId(it)) }
+                }
+                .also { user ->
+                    AssignableGroupSet.byGroupNames(user.groups)
+                        .values
+                        .filter { !dto.groups.values.contains(it) }
+                        .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
                 }
         }
 
@@ -89,9 +103,12 @@ class AccountService(
             .run { }
     }
 
-    private fun CreateAccountDto.toUser() = UserRepresentation().also {
-        it.username = username.value
-        it.email = emailAddress.value
+    private fun CreateAccountDto.toUser(authAccount: AuthenticatedAccount) = UserRepresentation().also { user ->
+        user.username = username.value
+        user.email = emailAddress.value
+        user.groups = groups.groupNames.map(::getUserGroupPath) +
+            getUserGroupPath("veo-user") +
+            authAccount.veoClient.groupName
     }
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
@@ -104,9 +121,13 @@ class AccountService(
             }
     }
 
-    private fun RealmResource.getGroupId(client: VeoClient): String = groups()
-        .groups(client.groupName, 0, 1)
+    private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"
+
+    private fun RealmResource.getGroupId(groupName: String): String = groups()
+        .groups(groupName, 0, 1)
         .first()
-        .apply { assert(name == client.groupName) }
-        .id
+        .let { listOf(it) + it.subGroups }
+        .firstOrNull { it.name == groupName }
+        ?.id
+        ?: throw IllegalStateException("Group with name '$groupName' not found")
 }

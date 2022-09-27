@@ -41,7 +41,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
-                "emailAddress" to "$prefix-hans@test.test"
+                "emailAddress" to "$prefix-hans@test.test",
+                "groups" to listOf("veo-write-access")
             )
         ).rawBody
         accountId shouldNotBe null
@@ -50,6 +51,7 @@ class AccountManagementRestTest : AbstractRestTest() {
         get("/$accountId", managerId).bodyAsMap.apply {
             get("username") shouldBe "$prefix-hans"
             get("emailAddress") shouldBe "$prefix-hans@test.test"
+            get("groups") shouldBe listOf("veo-write-access")
         }
 
         // and found in the list
@@ -65,12 +67,14 @@ class AccountManagementRestTest : AbstractRestTest() {
             "/$accountId",
             managerId,
             mapOf(
-                "emailAddress" to "$prefix-hansi@test.test"
+                "emailAddress" to "$prefix-hansi@test.test",
+                "groups" to listOf("veo-write-access")
             )
         )
         get("/$accountId", managerId).bodyAsMap.apply {
             get("username") shouldBe "$prefix-hans"
             get("emailAddress") shouldBe "$prefix-hansi@test.test"
+            get("groups") shouldBe listOf("veo-write-access")
         }
 
         // and deleted
@@ -89,7 +93,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-paula",
-                "emailAddress" to "$prefix-pla@test.test"
+                "emailAddress" to "$prefix-pla@test.test",
+                "groups" to emptyList<String>()
             )
         )
         post(
@@ -97,7 +102,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hubert",
-                "emailAddress" to "$prefix-hub@test.test"
+                "emailAddress" to "$prefix-hub@test.test",
+                "groups" to emptyList<String>()
             )
         )
 
@@ -121,7 +127,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             "/$managerId",
             managerId,
             mapOf(
-                "emailAddress" to "$prefix-manager@test.test"
+                "emailAddress" to "$prefix-manager@test.test",
+                "groups" to emptyList<String>()
             )
         )
         get("/$managerId", managerId).bodyAsMap["emailAddress"] shouldBe "$prefix-manager@test.test"
@@ -141,7 +148,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-power-user",
-                "emailAddress" to "$prefix-user@power.test"
+                "emailAddress" to "$prefix-user@power.test",
+                "groups" to emptyList<String>()
             )
         ).rawBody!!
 
@@ -151,7 +159,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-power-loser",
-                "emailAddress" to "$prefix-user@power.test"
+                "emailAddress" to "$prefix-user@power.test",
+                "groups" to emptyList<String>()
             )
         )
 
@@ -170,7 +179,8 @@ class AccountManagementRestTest : AbstractRestTest() {
             "/$randId",
             managerId,
             mapOf(
-                "emailAddress" to "$prefix-randy@test.test"
+                "emailAddress" to "$prefix-randy@test.test",
+                "groups" to emptyList<String>()
             ),
             404
         )

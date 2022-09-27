@@ -36,6 +36,7 @@ import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.FullAccountDto
+import org.veo.accounts.dtos.response.ListAccountDto
 import org.veo.accounts.keycloak.AccountService
 import javax.validation.Valid
 
@@ -48,10 +49,10 @@ class AccountController(
 
     @Operation(description = "Get all accounts.")
     @GetMapping
-    fun getAccounts(auth: Authentication): List<FullAccountDto> =
+    fun getAccounts(auth: Authentication): List<ListAccountDto> =
         accountService
             .findAllAccounts(auth.parseAccount())
-            .map { FullAccountDto(it) }
+            .map { ListAccountDto(it) }
 
     @Operation(description = "Get a single account.")
     @GetMapping("{id}")

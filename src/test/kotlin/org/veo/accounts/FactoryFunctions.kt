@@ -18,6 +18,7 @@
 package org.veo.accounts
 
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.request.CreateAccountDto
@@ -25,11 +26,32 @@ import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.FullAccountDto
 import java.util.UUID.randomUUID
 
-fun fullAccountDto(id: AccountId = AccountId(randomUUID().toString()), username: String = "katie", emailAddress: String = "katie@test.test") =
-    FullAccountDto(id, Username(username), EmailAddress(emailAddress))
+fun fullAccountDto(
+    id: AccountId = AccountId(randomUUID().toString()),
+    username: String = "katie",
+    emailAddress: String = "katie@test.test",
+    groups: Set<AssignableGroup> = emptySet()
+) =
+    FullAccountDto(
+        id,
+        Username(username),
+        EmailAddress(emailAddress),
+        AssignableGroupSet(groups)
+    )
 
-fun createAccountDto(emailAddress: String = "katie@test.test", username: String = "katie") =
-    CreateAccountDto(Username(username), EmailAddress(emailAddress))
+fun createAccountDto(
+    emailAddress: String = "katie@test.test",
+    username: String = "katie",
+    groups: Set<AssignableGroup> = emptySet()
+) =
+    CreateAccountDto(
+        Username(username),
+        EmailAddress(emailAddress),
+        AssignableGroupSet(groups)
+    )
 
-fun updateAccountDto(emailAddress: String = "katie@test.test") =
-    UpdateAccountDto(EmailAddress(emailAddress))
+fun updateAccountDto(
+    emailAddress: String = "katie@test.test",
+    groups: Set<AssignableGroup> = emptySet()
+) =
+    UpdateAccountDto(EmailAddress(emailAddress), AssignableGroupSet(groups))
