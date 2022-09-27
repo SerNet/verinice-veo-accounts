@@ -17,17 +17,17 @@
  */
 package org.veo.accounts
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.validation.constraints.Email
 
 @Schema(description = "Email address", type = "string", minLength = 1, example = "katie@test.test")
 data class EmailAddress(
     @field:Email
-    private val value: String
+    @get:JsonValue
+    val value: String
 ) {
     init {
         validate()
     }
-
-    override fun toString() = value
 }

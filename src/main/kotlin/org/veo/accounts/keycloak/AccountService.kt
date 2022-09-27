@@ -90,12 +90,12 @@ class AccountService(
     }
 
     private fun CreateAccountDto.toUser() = UserRepresentation().also {
-        it.username = username.toString()
-        it.email = emailAddress.toString()
+        it.username = username.value
+        it.email = emailAddress.value
     }
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
-        dto.emailAddress.toString()
+        dto.emailAddress.value
             .let {
                 if (it != email) {
                     email = it

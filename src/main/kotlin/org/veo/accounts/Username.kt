@@ -17,6 +17,7 @@
  */
 package org.veo.accounts
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.validation.annotation.Validated
 import javax.validation.constraints.Size
@@ -34,11 +35,10 @@ private const val maxLength = 256
 @Validated
 data class Username(
     @field:Size(min = minLength, max = maxLength)
-    private val value: String
+    @get:JsonValue
+    val value: String
 ) {
     init {
         validate()
     }
-
-    override fun toString() = value
 }

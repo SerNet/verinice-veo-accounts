@@ -17,13 +17,17 @@
  */
 package org.veo.accounts
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.core.convert.converter.Converter
 import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Schema(description = "Generated ID for an account. Not to be confused with username.", type = "text", example = "2505d684-5f19-4615-9c9b-a24eeea96ea0")
-data class AccountId(val value: UUID) {
+data class AccountId(
+    @get:JsonValue
+    val value: UUID
+) {
     constructor(str: String) : this(UUID.fromString(str))
 
     override fun toString() = value.toString()

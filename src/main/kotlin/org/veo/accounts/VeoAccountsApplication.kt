@@ -64,7 +64,8 @@ const val SECURITY_SCHEME_OAUTH = "OAuth2"
 class VeoAccountsApplication {
     @Bean
     @Primary
-    fun objectMapper(): ObjectMapper = CustomObjectMapper()
+    fun objectMapper(): ObjectMapper = ObjectMapper()
+        .findAndRegisterModules()
         .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
 }
 
