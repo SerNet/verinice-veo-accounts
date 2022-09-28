@@ -18,9 +18,5 @@
 package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.web.bind.annotation.ResponseStatus
 
-@ResponseStatus(NOT_FOUND)
-class ResourceNotFoundException(message: String) : AbstractMappedException(message) {
-    constructor() : this("Resource not found")
-}
+class ResourceNotFoundException(message: String = "Resource not found") : AbstractMappedException(message, NOT_FOUND)

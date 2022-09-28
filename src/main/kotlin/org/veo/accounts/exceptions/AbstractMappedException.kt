@@ -17,8 +17,10 @@
  */
 package org.veo.accounts.exceptions
 
+import org.springframework.http.HttpStatus
+
 /**
  * Supertype for exceptions which are mapped with an HTTP status code. Messages are supposed to be presented to the
  * HTTP client, so this exception should not contain confidential information.
  */
-abstract class AbstractMappedException(msg: String) : Exception(msg)
+abstract class AbstractMappedException(msg: String, val status: HttpStatus) : Exception(msg)

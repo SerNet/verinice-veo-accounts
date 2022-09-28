@@ -127,7 +127,7 @@ class AccountManagementRestTest : AbstractRestTest() {
         get("/$managerId", managerId).bodyAsMap["emailAddress"] shouldBe "$prefix-manager@test.test"
 
         // and it cannot be deleted
-        delete("/$managerId", managerId, 403)
+        delete("/$managerId", managerId, 403).rawBody shouldBe "Account cannot self-destruct"
 
         // and it still works after deletion attempt
         get("/$managerId", managerId)

@@ -18,7 +18,5 @@
 package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.CONFLICT
-import org.springframework.web.bind.annotation.ResponseStatus
 
-@ResponseStatus(CONFLICT)
-class UsernameTakenException : AbstractMappedException("Username is already used by an existing account")
+class UsernameTakenException(msg: String) : AbstractMappedException(msg, CONFLICT)

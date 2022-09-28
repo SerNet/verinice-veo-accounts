@@ -17,21 +17,24 @@
  */
 package org.veo.accounts
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import javax.servlet.http.HttpServletRequest
+import org.veo.accounts.exceptions.AbstractMappedException
 
 @ControllerAdvice
 class ExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class, MethodArgumentNotValidException::class)
-    fun handleException(
-        exception: Exception,
-        request: HttpServletRequest
-    ): ResponseEntity<String> {
-        return ResponseEntity<String>(exception.message, BAD_REQUEST)
+    fun handle(exception: Exception): ResponseEntity<String> = handle(exception, BAD_REQUEST)
+
+    @ExceptionHandler(AbstractMappedException::class)
+    fun handle(ex: AbstractMappedException) = handle(ex, ex.status)
+
+    private fun handle(exception: Exception, status: HttpStatus): ResponseEntity<String> {
+        return ResponseEntity<String>(exception.message, status)
     }
 }
