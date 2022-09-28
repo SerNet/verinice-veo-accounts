@@ -160,30 +160,6 @@ class AccountManagementRestTest : AbstractRestTest() {
     }
 
     @Test
-    fun `usernames must be unique`() {
-        // given an existing user
-        post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-special@snowflake.test"
-            )
-        )
-
-        // expect that creating another account with the same username will fail
-        post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-snowflake",
-                "emailAddress" to "$prefix-special@snowflake.test"
-            ),
-            409
-        )
-    }
-
-    @Test
     fun `operations on absent account produce 404s`() {
         // given a random account ID
         val randId = randomUUID()

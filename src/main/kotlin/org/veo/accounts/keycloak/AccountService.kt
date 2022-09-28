@@ -25,9 +25,10 @@ import org.veo.accounts.auth.AuthenticatedAccount
 import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
+import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ForbiddenOperationException
 import org.veo.accounts.exceptions.ResourceNotFoundException
-import org.veo.accounts.exceptions.UsernameTakenException
+import javax.ws.rs.ClientErrorException
 import javax.ws.rs.NotFoundException
 
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
@@ -60,7 +61,7 @@ class AccountService(
             .toUser()
             .apply { groups = listOf("veo-userclass/veo-user", authAccount.veoClient.groupName) }
             .let { users().create(it) }
-            .apply { if (status == 409) throw UsernameTakenException() }
+            .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
             .apply { check(status == 201) { "Unexpected user creation response $status" } }
             .let(facade::parseResourceId)
     }
@@ -69,7 +70,16 @@ class AccountService(
         facade.perform {
             getAccount(id, authAccount)
                 .apply { update(dto) }
-                .let { users().get(id.toString()).update(it) }
+                .let {
+                    try {
+                        users().get(id.toString()).update(it)
+                    } catch (ex: ClientErrorException) {
+                        if (ex.response.status == 409) {
+                            throw ConflictException("Email address already taken")
+                        }
+                        throw ex
+                    }
+                }
         }
 
     fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = facade.perform {
