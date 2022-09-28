@@ -17,6 +17,7 @@
  */
 package org.veo.accounts.keycloak
 
+import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
@@ -31,12 +32,16 @@ import org.veo.accounts.exceptions.ResourceNotFoundException
 import javax.ws.rs.ClientErrorException
 import javax.ws.rs.NotFoundException
 
+private val log = logger {}
+
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
 @Component
 class AccountService(
     @Value("\${veo.accounts.keycloak.userSuperGroupName}")
     private val userSuperGroupName: String,
-    private val facade: KeycloakFacade
+    private val facade: KeycloakFacade,
+    @Value("\${veo.accounts.keycloak.mailing.enabled}")
+    private val mailingEnabled: Boolean
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> = facade.perform {
         groups()
@@ -69,6 +74,7 @@ class AccountService(
             .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
             .apply { check(status == 201) { "Unexpected user creation response $status" } }
             .let(facade::parseResourceId)
+            .also { sendEmail(it) }
     }
 
     fun updateAccount(id: AccountId, dto: UpdateAccountDto, authAccount: AuthenticatedAccount) =
@@ -97,6 +103,7 @@ class AccountService(
                         .filter { !dto.groups.values.contains(it) }
                         .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
                 }
+                .run { if (!isEmailVerified) sendEmail(id.toString()) }
         }
 
     fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = facade.perform {
@@ -138,4 +145,11 @@ class AccountService(
         .firstOrNull { it.name == groupName }
         ?.id
         ?: throw IllegalStateException("Group with name '$groupName' not found")
+
+    private fun RealmResource.sendEmail(accountId: String) = accountId
+        .let { users().get(accountId).toRepresentation() }
+        .apply { if (!isEnabled) return }
+        .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
+        .also { log.debug { "Determined email actions for user $accountId: $it" } }
+        .let { if (mailingEnabled) users().get(accountId).executeActionsEmail(it) }
 }

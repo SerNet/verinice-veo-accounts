@@ -34,3 +34,9 @@ The following rules are imposed on account management by veo-accounts:
 * once an account has been created, the username cannot be changed
 * accounts can only be created or updated with an email address
 * no self-management: the authenticated user cannot view, update or delete their own account
+
+### Mailing
+Veo-accounts makes keycloak send an email with a link for required actions (email verification and/or password update)
+when:
+* An account is created
+* An account is updated with a new email address

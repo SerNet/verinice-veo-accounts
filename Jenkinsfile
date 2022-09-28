@@ -126,6 +126,7 @@ pipeline {
                 -m 1g\
                 -e VEO_ACCOUNTS_KEYCLOAK_PROXYHOST=${env.KEYCLOAK_SERVICE_PROXY_HOST}\
                 -e VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=${env.KEYCLOAK_SERVICE_CLIENT_SECRET}\
+                -e VEO_ACCOUNTS_KEYCLOAK_MAILING_ENABLED=false\
                 -e 'VEO_CORS_ORIGINS=https://*.verinice.example, https://frontend.somewhereelse.example'\
                 -e 'JDK_JAVA_OPTIONS=-Dhttp.proxyHost=${env.KEYCLOAK_SERVICE_PROXY_HOST} -Dhttp.proxyPort=3128 -Dhttps.proxyHost=${env.KEYCLOAK_SERVICE_PROXY_HOST} -Dhttps.proxyPort=3128 -Dhttps.proxySet=true -Dhttp.proxySet=true'") { veoAccounts ->
                             docker.image(imageForGradleStages).inside("${dockerArgsForGradleStages}\
