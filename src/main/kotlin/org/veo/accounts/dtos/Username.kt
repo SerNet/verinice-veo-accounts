@@ -31,7 +31,7 @@ private const val maxLength = 256
     type = "string",
     minLength = minLength,
     maxLength = maxLength,
-    example = "katie"
+    example = "ksmith"
 )
 @Validated
 data class Username(

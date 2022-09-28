@@ -30,7 +30,7 @@ import java.util.UUID.randomUUID
 
 fun fullAccountDto(
     id: AccountId = AccountId(randomUUID().toString()),
-    username: String = "katie",
+    username: String = "ksmith",
     emailAddress: String = "katie@test.test",
     firstName: String = "Katie",
     lastName: String = "Smith",
@@ -47,7 +47,7 @@ fun fullAccountDto(
 
 fun createAccountDto(
     emailAddress: String = "katie@test.test",
-    username: String = "katie",
+    username: String = "ksmith",
     firstName: String = "Katie",
     lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet()
