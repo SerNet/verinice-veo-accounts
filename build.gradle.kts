@@ -10,8 +10,8 @@ plugins {
     id("org.springframework.boot") version "2.7.4"
     id("io.spring.dependency-management") version "1.0.14.RELEASE"
 
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.spring") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
+    kotlin("plugin.spring") version "1.7.20"
 
     id("com.diffplug.spotless") version "6.10.0"
     id("org.cadixdev.licenser") version "0.6.1"
