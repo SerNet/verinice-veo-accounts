@@ -113,6 +113,7 @@ class AccountService(
         user.groups = groups.groupNames.map(::getUserGroupPath) +
             getUserGroupPath("veo-user") +
             authAccount.veoClient.groupName
+        user.isEnabled = enabled.value
     }
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
@@ -125,6 +126,7 @@ class AccountService(
             }
         firstName = dto.firstName.value
         lastName = dto.lastName.value
+        isEnabled = dto.enabled.value
     }
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"

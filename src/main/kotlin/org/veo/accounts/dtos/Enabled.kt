@@ -15,20 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.dtos.request
+package org.veo.accounts.dtos
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.dtos.AssignableGroupSet
-import org.veo.accounts.dtos.EmailAddress
-import org.veo.accounts.dtos.Enabled
-import org.veo.accounts.dtos.FirstName
-import org.veo.accounts.dtos.LastName
 
-@Schema(description = "Subset of veo user account data for update operations. Immutable properties are absent.")
-class UpdateAccountDto(
-    val emailAddress: EmailAddress,
-    val firstName: FirstName,
-    val lastName: LastName,
-    val groups: AssignableGroupSet,
-    val enabled: Enabled
-)
+@Schema(description = "Whether an account is active. A disabled account cannot authenticate with a service.")
+data class Enabled(@get:JsonValue val value: Boolean)

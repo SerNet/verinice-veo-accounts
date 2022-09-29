@@ -41,10 +41,11 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hans",
+                "emailAddress" to "$prefix-hans@test.test",
                 "firstName" to "Hans",
                 "lastName" to "Dance",
-                "emailAddress" to "$prefix-hans@test.test",
-                "groups" to listOf("veo-write-access")
+                "groups" to listOf("veo-write-access"),
+                "enabled" to true
             )
         ).rawBody
         accountId shouldNotBe null
@@ -52,10 +53,11 @@ class AccountManagementRestTest : AbstractRestTest() {
         // and retrieved
         get("/$accountId", managerId).bodyAsMap.apply {
             get("username") shouldBe "$prefix-hans"
+            get("emailAddress") shouldBe "$prefix-hans@test.test"
             get("firstName") shouldBe "Hans"
             get("lastName") shouldBe "Dance"
-            get("emailAddress") shouldBe "$prefix-hans@test.test"
             get("groups") shouldBe listOf("veo-write-access")
+            get("enabled") shouldBe true
         }
 
         // and found in the list
@@ -66,6 +68,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 get("firstName") shouldBe "Hans"
                 get("lastName") shouldBe "Dance"
                 get("emailAddress") shouldBe "$prefix-hans@test.test"
+                get("enabled") shouldBe true
             }
 
         // and updated
@@ -76,7 +79,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-hansi@test.test",
                 "firstName" to "Hansi",
                 "lastName" to "Dance",
-                "groups" to listOf("veo-write-access")
+                "groups" to listOf("veo-write-access"),
+                "enabled" to false
             )
         )
         get("/$accountId", managerId).bodyAsMap.apply {
@@ -85,6 +89,7 @@ class AccountManagementRestTest : AbstractRestTest() {
             get("lastName") shouldBe "Dance"
             get("emailAddress") shouldBe "$prefix-hansi@test.test"
             get("groups") shouldBe listOf("veo-write-access")
+            get("enabled") shouldBe false
         }
 
         // and deleted
@@ -103,10 +108,12 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-paula",
+                "emailAddress" to "$prefix-pla@test.test",
                 "firstName" to "Paula",
                 "lastName" to "Fowler",
                 "emailAddress" to "$prefix-pla@test.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
         post(
@@ -114,10 +121,12 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-hubert",
+                "emailAddress" to "$prefix-hub@test.test",
                 "firstName" to "Hubert",
                 "lastName" to "Hugh-Bird",
                 "emailAddress" to "$prefix-hub@test.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
 
@@ -144,7 +153,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-manager@test.test",
                 "firstName" to "Man",
                 "lastName" to "Ager",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             404
         )
@@ -167,7 +177,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Tara",
                 "lastName" to "Rattan",
                 "emailAddress" to "$prefix-user@power.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         ).rawBody!!
 
@@ -177,10 +188,12 @@ class AccountManagementRestTest : AbstractRestTest() {
             managerId,
             mapOf(
                 "username" to "$prefix-power-loser",
+                "emailAddress" to "$prefix-user@power.test",
                 "firstName" to "Tara",
                 "lastName" to "Rattan",
                 "emailAddress" to "$prefix-user@power.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
 
@@ -202,7 +215,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-randy@test.test",
                 "firstName" to "Randy",
                 "lastName" to "Random",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             404
         )

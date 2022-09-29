@@ -20,6 +20,7 @@ package org.veo.accounts
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
@@ -34,7 +35,8 @@ fun fullAccountDto(
     emailAddress: String = "katie@test.test",
     firstName: String = "Katie",
     lastName: String = "Smith",
-    groups: Set<AssignableGroup> = emptySet()
+    groups: Set<AssignableGroup> = emptySet(),
+    enabled: Boolean = true
 ) =
     FullAccountDto(
         id,
@@ -42,7 +44,8 @@ fun fullAccountDto(
         EmailAddress(emailAddress),
         FirstName(firstName),
         LastName(lastName),
-        AssignableGroupSet(groups)
+        AssignableGroupSet(groups),
+        Enabled(enabled)
     )
 
 fun createAccountDto(
@@ -50,20 +53,23 @@ fun createAccountDto(
     username: String = "ksmith",
     firstName: String = "Katie",
     lastName: String = "Smith",
-    groups: Set<AssignableGroup> = emptySet()
+    groups: Set<AssignableGroup> = emptySet(),
+    enabled: Boolean = true
 ) =
     CreateAccountDto(
         Username(username),
         EmailAddress(emailAddress),
         FirstName(firstName),
         LastName(lastName),
-        AssignableGroupSet(groups)
+        AssignableGroupSet(groups),
+        Enabled(enabled)
     )
 
 fun updateAccountDto(
     emailAddress: String = "katie@test.test",
     firstName: String = "Katie",
     lastName: String = "Smith",
-    groups: Set<AssignableGroup> = emptySet()
+    groups: Set<AssignableGroup> = emptySet(),
+    enabled: Boolean = true
 ) =
-    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), AssignableGroupSet(groups))
+    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), AssignableGroupSet(groups), Enabled(enabled))

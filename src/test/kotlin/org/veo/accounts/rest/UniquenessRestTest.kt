@@ -40,7 +40,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Snowy",
                 "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
 
@@ -53,7 +54,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Copy",
                 "lastName" to "Kitty",
                 "emailAddress" to "$prefix-copy@cat.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             409
         ).rawBody shouldBe "Username or email address already taken"
@@ -70,7 +72,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "firstName" to "Snowy",
                 "lastName" to "Flaky",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
 
@@ -83,7 +86,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Copy",
                 "lastName" to "Kitty",
                 "emailAddress" to "$prefix-special@snowflake.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             409
         ).rawBody shouldBe "Username or email address already taken"
@@ -100,7 +104,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Snowy",
                 "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         )
         val secondAccountId = post(
@@ -111,7 +116,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Glowy",
                 "lastName" to "Cakey",
                 "emailAddress" to "$prefix-special@glowcake.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         ).rawBody!!
 
@@ -123,7 +129,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "firstName" to "Glowy",
                 "lastName" to "Cakey",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             409
         ).rawBody shouldBe "Email address already taken"

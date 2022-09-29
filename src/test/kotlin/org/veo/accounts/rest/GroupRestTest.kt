@@ -40,7 +40,8 @@ class GroupRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         ).rawBody!!
         var accountBody = get("/$accountId", managerId).bodyAsMap
@@ -76,7 +77,8 @@ class GroupRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
-                "groups" to listOf("veo-write-access")
+                "groups" to listOf("veo-write-access"),
+                "enabled" to true
             )
         ).rawBody!!
 
@@ -97,7 +99,8 @@ class GroupRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
-                "groups" to listOf("veo-admin")
+                "groups" to listOf("veo-admin"),
+                "enabled" to true
             ),
             400
         )
@@ -114,7 +117,8 @@ class GroupRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         ).rawBody!!
 
@@ -126,7 +130,8 @@ class GroupRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
-                "groups" to listOf("veo-admin")
+                "groups" to listOf("veo-admin"),
+                "enabled" to true
             ),
             400
         )

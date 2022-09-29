@@ -22,6 +22,7 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
+import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
@@ -33,7 +34,8 @@ class FullAccountDto(
     val emailAddress: EmailAddress?,
     val firstName: FirstName?,
     val lastName: LastName?,
-    val groups: AssignableGroupSet
+    val groups: AssignableGroupSet,
+    val enabled: Enabled
 ) {
     constructor(user: UserRepresentation) : this(
         AccountId(user.id),
@@ -41,6 +43,7 @@ class FullAccountDto(
         user.email?.let { EmailAddress(it) },
         user.firstName?.let { FirstName(it) },
         user.lastName?.let { LastName(it) },
-        AssignableGroupSet.byGroupNames(user.groups)
+        AssignableGroupSet.byGroupNames(user.groups),
+        Enabled(user.isEnabled)
     )
 }

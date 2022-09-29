@@ -43,7 +43,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
                 "firstName" to "Louis",
                 "lastName" to "King",
                 "emailAddress" to "$prefix-louis@client1.test",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             )
         ).rawBody
 
@@ -64,7 +65,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
                 "emailAddress" to "$prefix-evil@string.test",
                 "firstName" to "Louis",
                 "lastName" to "King",
-                "groups" to emptyList<String>()
+                "groups" to emptyList<String>(),
+                "enabled" to true
             ),
             404
         )
