@@ -42,7 +42,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
-    implementation("io.mockk:mockk:1.13.1")
+    implementation("io.mockk:mockk:1.13.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4")
     implementation("net.swiftzer.semver:semver:1.2.0")
 
