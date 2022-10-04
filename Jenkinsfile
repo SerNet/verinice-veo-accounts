@@ -171,7 +171,7 @@ pipeline {
                 anyOf { branch 'main'; branch 'develop' }
             }
             steps {
-                build job: 'verinice-veo-deployment/main'
+                build job: 'verinice-veo-deployment/master'
             }
         }
     }
