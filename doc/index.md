@@ -33,4 +33,4 @@ The following rules are imposed on account management by veo-accounts:
 * accounts cannot be granted account management roles (`account:*)
 * once an account has been created, the username cannot be changed
 * accounts can only be created or updated with an email address
-* no self-destruction: the authenticated user cannot delete their own account
+* no self-management: the authenticated user cannot view, update or delete their own account

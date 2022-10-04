@@ -27,7 +27,6 @@ import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
-import org.veo.accounts.exceptions.ForbiddenOperationException
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import javax.ws.rs.ClientErrorException
 import javax.ws.rs.NotFoundException
@@ -43,9 +42,13 @@ class AccountService(
         groups()
             .group(getGroupId(authAccount.veoClient.groupName))
             .members()
+            // Self-management is not supported
+            .filter { it.id != authAccount.id.toString() }
     }
 
     fun getAccount(id: AccountId, authAccount: AuthenticatedAccount): UserRepresentation = facade.perform {
+        // Self-management is not supported
+        if (id == authAccount.id) throw ResourceNotFoundException()
         users().get(id.toString())
             .let { userResource ->
                 try {
@@ -97,7 +100,6 @@ class AccountService(
         }
 
     fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = facade.perform {
-        if (id == authAccount.id) throw ForbiddenOperationException("Account cannot self-destruct")
         getAccount(id, authAccount)
             .also { users().delete(id.toString()) }
             .run { }

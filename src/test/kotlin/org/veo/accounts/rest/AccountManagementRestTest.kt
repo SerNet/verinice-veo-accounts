@@ -17,7 +17,7 @@
  */
 package org.veo.accounts.rest
 
-import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -94,8 +94,8 @@ class AccountManagementRestTest : AbstractRestTest() {
 
     @Test
     fun `create multiple accounts`() {
-        // expect that only the manager is listed
-        get("/", managerId).bodyAsListOfMaps shouldHaveSize 1
+        // expect that the manager is not listed
+        get("/", managerId).bodyAsListOfMaps shouldHaveSize 0
 
         // when creating two accounts
         post(
@@ -123,20 +123,20 @@ class AccountManagementRestTest : AbstractRestTest() {
 
         // then they appear in the list
         get("/", managerId).bodyAsListOfMaps.apply {
-            size shouldBe 3
-            map { it["username"] } shouldContainAll listOf("$prefix-paula", "$prefix-hubert")
+            size shouldBe 2
+            map { it["username"] } shouldContainExactlyInAnyOrder listOf("$prefix-paula", "$prefix-hubert")
         }
     }
 
     @Test
-    fun `account manager can manage themselves`() {
-        // expect that authenticated account is listed
-        get("/", managerId).bodyAsListOfMaps[0]["id"] shouldBe managerId
+    fun `account manager cannot manage themselves`() {
+        // expect that authenticated account is not listed
+        get("/", managerId).bodyAsListOfMaps shouldHaveSize 0
 
-        // and it can be retrieved individually
-        get("/$managerId", managerId)
+        // and it cannot be retrieved individually
+        get("/$managerId", managerId, 404)
 
-        // and it can be updated
+        // and it cannot be updated
         put(
             "/$managerId",
             managerId,
@@ -145,19 +145,15 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Man",
                 "lastName" to "Ager",
                 "groups" to emptyList<String>()
-            )
+            ),
+            404
         )
-        get("/$managerId", managerId).bodyAsMap.apply {
-            get("emailAddress") shouldBe "$prefix-manager@test.test"
-            get("firstName") shouldBe "Man"
-            get("lastName") shouldBe "Ager"
-        }
 
         // and it cannot be deleted
-        delete("/$managerId", managerId, 403).rawBody shouldBe "Account cannot self-destruct"
+        delete("/$managerId", managerId, 404)
 
         // and it still works after deletion attempt
-        get("/$managerId", managerId)
+        get("/", managerId)
     }
 
     @Test

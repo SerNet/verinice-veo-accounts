@@ -53,8 +53,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
         // and client 2 manager cannot access it
         get("/$accountId", client2ManagerId, 404)
 
-        // and client 2 manager can only see themselves in the list
-        get("/", client2ManagerId).bodyAsListOfMaps shouldHaveSize 1
+        // and client 2 manager cannot see it in the list
+        get("/", client2ManagerId).bodyAsListOfMaps shouldHaveSize 0
 
         // and client 2 cannot update it
         put(
