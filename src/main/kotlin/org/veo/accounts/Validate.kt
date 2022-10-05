@@ -17,7 +17,7 @@
  */
 package org.veo.accounts
 
-import javax.validation.ConstraintViolationException
+import javax.validation.ConstraintViolation
 import javax.validation.Validation
 
 private val validator = Validation.buildDefaultValidatorFactory().validator
@@ -27,6 +27,12 @@ fun Any.validate() = validator
     .validate(this)
     .let {
         if (it.isNotEmpty()) {
-            throw ConstraintViolationException(it)
+            throw ValidationException(it)
         }
     }
+
+class ValidationException(violations: Collection<ConstraintViolation<Any>>) : Exception(
+    violations.joinToString("; ") {
+        "Invalid ${it.rootBeanClass.simpleName}: ${it.message}"
+    }
+)

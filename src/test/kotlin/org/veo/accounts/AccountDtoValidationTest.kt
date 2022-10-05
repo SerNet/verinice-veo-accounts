@@ -20,7 +20,6 @@ package org.veo.accounts
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import org.junit.jupiter.api.Test
-import javax.validation.ConstraintViolationException
 
 class AccountDtoValidationTest {
     @Test
@@ -31,32 +30,32 @@ class AccountDtoValidationTest {
 
     @Test
     fun `empty strings are not ok`() {
-        shouldThrow<ConstraintViolationException> { createAccountDto(firstName = "") }
-        shouldThrow<ConstraintViolationException> { createAccountDto(lastName = "") }
-        shouldThrow<ConstraintViolationException> { createAccountDto(username = "") }
+        shouldThrow<ValidationException> { createAccountDto(firstName = "") }
+        shouldThrow<ValidationException> { createAccountDto(lastName = "") }
+        shouldThrow<ValidationException> { createAccountDto(username = "") }
 
-        shouldThrow<ConstraintViolationException> { updateAccountDto(firstName = "") }
-        shouldThrow<ConstraintViolationException> { updateAccountDto(lastName = "") }
+        shouldThrow<ValidationException> { updateAccountDto(firstName = "") }
+        shouldThrow<ValidationException> { updateAccountDto(lastName = "") }
     }
 
     @Test
     fun `overly long strings are not ok`() {
         val longText = "u".repeat(300)
 
-        shouldThrow<ConstraintViolationException> { createAccountDto(firstName = longText) }
-        shouldThrow<ConstraintViolationException> { createAccountDto(lastName = longText) }
-        shouldThrow<ConstraintViolationException> { createAccountDto(username = longText) }
+        shouldThrow<ValidationException> { createAccountDto(firstName = longText) }
+        shouldThrow<ValidationException> { createAccountDto(lastName = longText) }
+        shouldThrow<ValidationException> { createAccountDto(username = longText) }
 
-        shouldThrow<ConstraintViolationException> { updateAccountDto(firstName = longText) }
-        shouldThrow<ConstraintViolationException> { updateAccountDto(lastName = longText) }
+        shouldThrow<ValidationException> { updateAccountDto(firstName = longText) }
+        shouldThrow<ValidationException> { updateAccountDto(lastName = longText) }
     }
 
     @Test
     fun `invalid email address is not ok`() {
-        shouldThrow<ConstraintViolationException> { createAccountDto(emailAddress = "verinice test") }
-        shouldThrow<ConstraintViolationException> { createAccountDto(emailAddress = "verinice.test") }
+        shouldThrow<ValidationException> { createAccountDto(emailAddress = "verinice test") }
+        shouldThrow<ValidationException> { createAccountDto(emailAddress = "verinice.test") }
 
-        shouldThrow<ConstraintViolationException> { updateAccountDto(emailAddress = "verinice test") }
-        shouldThrow<ConstraintViolationException> { updateAccountDto(emailAddress = "verinice.test") }
+        shouldThrow<ValidationException> { updateAccountDto(emailAddress = "verinice test") }
+        shouldThrow<ValidationException> { updateAccountDto(emailAddress = "verinice.test") }
     }
 }

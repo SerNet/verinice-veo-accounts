@@ -17,6 +17,8 @@
  */
 package org.veo.accounts
 
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.ResponseEntity
@@ -28,13 +30,28 @@ import org.veo.accounts.exceptions.AbstractMappedException
 
 @ControllerAdvice
 class ExceptionHandler {
-    @ExceptionHandler(HttpMessageNotReadableException::class, MethodArgumentNotValidException::class)
-    fun handle(exception: Exception): ResponseEntity<String> = handle(exception, BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handle(exception: HttpMessageNotReadableException): ResponseEntity<String> =
+        handle(getParsingErrorMessage(exception), BAD_REQUEST)
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handle(exception: MethodArgumentNotValidException): ResponseEntity<String> =
+        handle(exception.message, BAD_REQUEST)
 
     @ExceptionHandler(AbstractMappedException::class)
-    fun handle(ex: AbstractMappedException) = handle(ex, ex.status)
+    fun handle(ex: AbstractMappedException) = handle(ex.message, ex.status)
 
-    private fun handle(exception: Exception, status: HttpStatus): ResponseEntity<String> {
-        return ResponseEntity<String>(exception.message, status)
+    private fun handle(message: String?, status: HttpStatus): ResponseEntity<String> {
+        return ResponseEntity<String>(message, status)
     }
+
+    private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? = ex.cause
+        .let { cause ->
+            when (cause) {
+                is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
+                is ValueInstantiationException -> cause.cause?.message
+                else -> cause?.message
+            }
+        }
+        ?: ex.message
 }
