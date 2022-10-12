@@ -21,6 +21,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID.randomUUID
@@ -63,13 +64,17 @@ class AccountManagementRestTest : AbstractRestTest() {
         // and found in the list
         get("/", managerId).bodyAsListOfMaps
             .first { it["id"] == accountId }
-            .apply {
-                get("username") shouldBe "$prefix-hans"
-                get("emailAddress") shouldBe "$prefix-hans@test.test"
-                get("firstName") shouldBe "Hans"
-                get("lastName") shouldBe "Dance"
-                get("groups") shouldBe listOf("veo-write-access")
-                get("enabled") shouldBe true
+            .also { hans ->
+                hans["username"] shouldBe "$prefix-hans"
+                hans["emailAddress"] shouldBe "$prefix-hans@test.test"
+                hans["firstName"] shouldBe "Hans"
+                hans["lastName"] shouldBe "Dance"
+                hans["groups"] shouldBe listOf("veo-write-access")
+                hans["enabled"] shouldBe true
+                hans["_self"] as String shouldMatch "https?://.*/$accountId"
+               /* (hans["_self"] as String).let {                                           TODO VEO-1723
+                    get(it, managerId, 200)
+                }*/
             }
 
         // and updated
