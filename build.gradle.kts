@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.keycloak:keycloak-admin-client:19.0.2")
+    implementation("org.keycloak:keycloak-admin-client:19.0.3")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
