@@ -65,9 +65,9 @@ class AccountManagementRestTest : AbstractRestTest() {
             .first { it["id"] == accountId }
             .apply {
                 get("username") shouldBe "$prefix-hans"
+                get("emailAddress") shouldBe "$prefix-hans@test.test"
                 get("firstName") shouldBe "Hans"
                 get("lastName") shouldBe "Dance"
-                get("emailAddress") shouldBe "$prefix-hans@test.test"
                 get("groups") shouldBe listOf("veo-write-access")
                 get("enabled") shouldBe true
             }
