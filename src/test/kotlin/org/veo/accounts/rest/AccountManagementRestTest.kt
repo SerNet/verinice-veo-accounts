@@ -68,6 +68,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 get("firstName") shouldBe "Hans"
                 get("lastName") shouldBe "Dance"
                 get("emailAddress") shouldBe "$prefix-hans@test.test"
+                get("groups") shouldBe listOf("veo-write-access")
                 get("enabled") shouldBe true
             }
 

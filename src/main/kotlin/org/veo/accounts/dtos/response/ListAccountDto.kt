@@ -20,6 +20,7 @@ package org.veo.accounts.dtos.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
@@ -33,6 +34,7 @@ class ListAccountDto(
     val emailAddress: EmailAddress?,
     val firstName: FirstName?,
     val lastName: LastName?,
+    val groups: AssignableGroupSet,
     val enabled: Enabled
 ) {
     constructor(user: UserRepresentation) : this(
@@ -41,6 +43,7 @@ class ListAccountDto(
         user.email?.let { EmailAddress(it) },
         user.firstName?.let { FirstName(it) },
         user.lastName?.let { LastName(it) },
+        AssignableGroupSet.byGroupNames(user.groups),
         Enabled(user.isEnabled)
     )
 }

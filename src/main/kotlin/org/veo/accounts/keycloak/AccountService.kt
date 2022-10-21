@@ -49,6 +49,7 @@ class AccountService(
             .members()
             // Self-management is not supported
             .filter { it.id != authAccount.id.toString() }
+            .onEach { loadGroups(it) }
     }
 
     fun getAccount(id: AccountId, authAccount: AuthenticatedAccount): UserRepresentation = facade.perform {
@@ -57,13 +58,12 @@ class AccountService(
         users().get(id.toString())
             .let { userResource ->
                 try {
-                    userResource.toRepresentation().apply {
-                        groups = userResource.groups().map { it.name } // groups must be fetched separately
-                    }
+                    userResource.toRepresentation()
                 } catch (_: NotFoundException) {
                     throw ResourceNotFoundException()
                 }
             }
+            .also { loadGroups(it) }
             .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
     }
 
@@ -152,4 +152,10 @@ class AccountService(
         .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
         .also { log.debug { "Determined email actions for user $accountId: $it" } }
         .let { if (mailingEnabled) users().get(accountId).executeActionsEmail(it) }
+
+    private fun RealmResource.loadGroups(user: UserRepresentation) {
+        user.apply {
+            groups = users().get(id.toString()).groups().map { it.name }
+        }
+    }
 }
