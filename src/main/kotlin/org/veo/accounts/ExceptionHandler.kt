@@ -17,6 +17,7 @@
  */
 package org.veo.accounts
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.springframework.http.HttpStatus
@@ -48,6 +49,7 @@ class ExceptionHandler {
     private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? = ex.cause
         .let { cause ->
             when (cause) {
+                is InvalidFormatException -> cause.originalMessage
                 is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
                 is ValueInstantiationException -> cause.cause?.message
                 else -> cause?.message

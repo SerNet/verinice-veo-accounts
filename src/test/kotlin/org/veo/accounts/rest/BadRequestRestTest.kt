@@ -46,6 +46,23 @@ class BadRequestRestTest : AbstractRestTest() {
     }
 
     @Test
+    fun `cannot create account with invalid group`() {
+        post(
+            "/",
+            managerId,
+            mapOf(
+                "username" to "hansi",
+                "emailAddress" to "$prefix-hansi@test.test",
+                "firstName" to "Hansi",
+                "lastName" to "Dance",
+                "groups" to listOf("veo-night-access"),
+                "enabled" to false
+            ),
+            400
+        ).rawBody shouldBe "Cannot deserialize value of type `org.veo.accounts.AssignableGroup` from String \"veo-night-access\": not one of the values accepted for Enum class: [veo-write-access]"
+    }
+
+    @Test
     fun `cannot create account with empty username`() {
         post(
             "/",
