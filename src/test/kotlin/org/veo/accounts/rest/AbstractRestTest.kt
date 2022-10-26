@@ -69,19 +69,19 @@ abstract class AbstractRestTest {
     protected fun createManager(groupId: String, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
         testAccountService.createManager(groupId, roles, prefix)
 
-    protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int = 200, headers: Map<String, List<String>> = emptyMap()): Response =
+    protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
         exchange(HttpMethod.OPTIONS, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
-    protected fun get(url: String, authAccountId: String? = null, expectedStatus: Int = 200, headers: Map<String, List<String>> = emptyMap()): Response =
+    protected fun get(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
         exchange(HttpMethod.GET, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
-    protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int = 201): Response =
+    protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int? = 201): Response =
         exchange(HttpMethod.POST, url, authAccountId, body, expectedStatus = expectedStatus)
 
-    protected fun put(url: String, authAccountId: String? = null, body: Any?, expectedStatus: Int = 204): Response =
+    protected fun put(url: String, authAccountId: String? = null, body: Any?, expectedStatus: Int? = 204): Response =
         exchange(HttpMethod.PUT, url, authAccountId, body, expectedStatus = expectedStatus)
 
-    protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int = 204): Response =
+    protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204): Response =
         exchange(HttpMethod.DELETE, url, authAccountId, expectedStatus = expectedStatus)
 
     private fun exchange(
@@ -90,10 +90,10 @@ abstract class AbstractRestTest {
         authAccountId: String?,
         body: Any? = null,
         headers: Map<String, List<String>> = emptyMap(),
-        expectedStatus: Int
+        expectedStatus: Int?
     ): Response =
         testRestTemplate.exchange(baseUrl + uri, method, buildHttpEntity(body, headers, authAccountId), String::class.java)
-            .apply { statusCode.value() shouldBe expectedStatus }
+            .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
             .let { Response(it) }
 
     private fun buildHttpEntity(
