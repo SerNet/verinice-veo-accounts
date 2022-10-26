@@ -28,8 +28,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
 
     @BeforeEach
     fun setup() {
-        client1ManagerId = createAccount(createVeoClientGroup())
-        client2ManagerId = createAccount(createVeoClientGroup())
+        client1ManagerId = createManager(createVeoClientGroup())
+        client2ManagerId = createManager(createVeoClientGroup())
     }
 
     @Test

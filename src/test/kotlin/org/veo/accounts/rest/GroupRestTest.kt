@@ -26,7 +26,7 @@ class GroupRestTest : AbstractRestTest() {
 
     @BeforeEach
     fun setup() {
-        managerId = createAccount(createVeoClientGroup())
+        managerId = createManager(createVeoClientGroup())
     }
 
     @Test

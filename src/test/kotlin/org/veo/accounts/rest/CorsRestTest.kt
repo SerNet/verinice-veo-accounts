@@ -27,7 +27,7 @@ class CorsRestTest : AbstractRestTest() {
 
     @BeforeEach
     fun setup() {
-        accountId = createAccount(createVeoClientGroup())
+        accountId = createManager(createVeoClientGroup())
     }
 
     @Test

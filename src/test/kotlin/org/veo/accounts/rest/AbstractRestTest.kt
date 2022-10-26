@@ -66,8 +66,8 @@ abstract class AbstractRestTest {
 
     protected fun createVeoClientGroup(): String = testAccountService.createVeoClientGroup()
 
-    protected fun createAccount(groupId: String, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
-        testAccountService.createAccount(groupId, roles, prefix)
+    protected fun createManager(groupId: String, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
+        testAccountService.createManager(groupId, roles, prefix)
 
     protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int = 200, headers: Map<String, List<String>> = emptyMap()): Response =
         exchange(HttpMethod.OPTIONS, url, authAccountId, headers = headers, expectedStatus = expectedStatus)

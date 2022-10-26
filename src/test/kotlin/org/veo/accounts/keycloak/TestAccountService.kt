@@ -42,7 +42,7 @@ class TestAccountService(
     private val createdAccountIds = mutableListOf<String>()
     private val createdGroupIds = mutableListOf<String>()
 
-    fun createAccount(groupId: String, roles: List<Role>, usernamePrefix: String): String = facade.perform {
+    fun createManager(groupId: String, roles: List<Role>, usernamePrefix: String): String = facade.perform {
         UserRepresentation()
             .apply {
                 username = "$usernamePrefix-account-${randomUUID()}"

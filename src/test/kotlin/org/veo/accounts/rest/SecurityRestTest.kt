@@ -36,7 +36,7 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `CRUD managers have full access`() {
-        val managerId = createAccount(createVeoClientGroup())
+        val managerId = createManager(createVeoClientGroup())
 
         get("/", managerId, 200)
         get("/${randomUUID()}", managerId, 404)
@@ -47,7 +47,7 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `readers have limited access`() {
-        val readerId = createAccount(createVeoClientGroup(), roles = listOf(READ))
+        val readerId = createManager(createVeoClientGroup(), roles = listOf(READ))
 
         get("/", readerId, 200)
         get("/${randomUUID()}", readerId, 404)
@@ -59,7 +59,7 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `creators have limited access`() {
-        val creatorId = createAccount(createVeoClientGroup(), roles = listOf(CREATE))
+        val creatorId = createManager(createVeoClientGroup(), roles = listOf(CREATE))
 
         post("/", creatorId, null, 400)
 
@@ -71,7 +71,7 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `updaters have limited access`() {
-        val updaterId = createAccount(createVeoClientGroup(), roles = listOf(UPDATE))
+        val updaterId = createManager(createVeoClientGroup(), roles = listOf(UPDATE))
 
         put("/${randomUUID()}", updaterId, null, 400)
 
@@ -83,7 +83,7 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `deleters have limited access`() {
-        val deleterId = createAccount(createVeoClientGroup(), roles = listOf(DELETE))
+        val deleterId = createManager(createVeoClientGroup(), roles = listOf(DELETE))
 
         delete("/${randomUUID()}", deleterId, 404)
 
