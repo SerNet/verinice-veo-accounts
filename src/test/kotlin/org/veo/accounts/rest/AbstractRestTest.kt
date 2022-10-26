@@ -38,6 +38,7 @@ import org.veo.accounts.VeoAccountsApplication
 import org.veo.accounts.WebSecurity
 import org.veo.accounts.keycloak.TestAccountService
 import java.util.UUID.randomUUID
+import kotlin.Int.Companion.MAX_VALUE
 
 @ActiveProfiles(value = ["resttest"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
@@ -64,10 +65,15 @@ abstract class AbstractRestTest {
         testAccountService.cleanup()
     }
 
-    protected fun createVeoClientGroup(): String = testAccountService.createVeoClientGroup()
+    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE): String =
+        testAccountService.createVeoClientGroup(maxUsers)
 
     protected fun createManager(groupId: String, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
         testAccountService.createManager(groupId, roles, prefix)
+
+    protected fun updateMaxUsers(veoClientGroupId: String, maxUsers: Int) {
+        testAccountService.updateMaxUsers(veoClientGroupId, maxUsers)
+    }
 
     protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
         exchange(HttpMethod.OPTIONS, url, authAccountId, headers = headers, expectedStatus = expectedStatus)

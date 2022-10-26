@@ -15,22 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.rest
+package org.veo.accounts.exceptions
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.springframework.http.ResponseEntity
-import org.veo.accounts.asListOfMaps
-import org.veo.accounts.asMap
+import org.springframework.http.HttpStatus.FORBIDDEN
 
-private val objectMapper = jacksonObjectMapper()
-
-class Response(
-    private val entity: ResponseEntity<String>
-) {
-    val bodyAsMap get() = parseBody().asMap()
-    val bodyAsListOfMaps get() = parseBody().asListOfMaps()
-    val rawBody = entity.body
-    val statusCode = entity.statusCode.value()
-    fun getHeader(name: String): String? = entity.headers[name]?.firstOrNull()
-    private fun parseBody(): Any = objectMapper.readValue(rawBody, Object::class.java)
-}
+class ExceedingMaxUsersException(maxUsers: Int) :
+    AbstractMappedException(
+        "Your veo license only allows up to $maxUsers enabled account(s)",
+        FORBIDDEN
+    )

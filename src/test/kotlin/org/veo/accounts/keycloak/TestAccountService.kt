@@ -58,11 +58,28 @@ class TestAccountService(
             .also(createdAccountIds::add)
     }
 
-    fun createVeoClientGroup(): String = facade.perform {
+    fun createVeoClientGroup(maxUsers: Int): String = facade.perform {
         groups()
-            .add(GroupRepresentation().apply { name = "veo_client:${randomUUID()}" })
+            .add(
+                GroupRepresentation().apply {
+                    name = "veo_client:${randomUUID()}"
+                    attributes = mapOf("maxUsers" to listOf(maxUsers.toString()))
+                }
+            )
             .let(facade::parseResourceId)
             .also(createdGroupIds::add)
+    }
+
+    fun updateMaxUsers(veoClientGroupId: String, maxUsers: Int) = facade.perform {
+        groups()
+            .group(veoClientGroupId)
+            .run {
+                update(
+                    toRepresentation().also {
+                        it.attributes["maxUsers"] = listOf(maxUsers.toString())
+                    }
+                )
+            }
     }
 
     fun cleanup() = facade.perform {

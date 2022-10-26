@@ -28,6 +28,7 @@ import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
+import org.veo.accounts.exceptions.ExceedingMaxUsersException
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import javax.ws.rs.ClientErrorException
 import javax.ws.rs.NotFoundException
@@ -44,9 +45,7 @@ class AccountService(
     private val mailingEnabled: Boolean
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> = facade.perform {
-        groups()
-            .group(getGroupId(authAccount.veoClient.groupName))
-            .members()
+        findAccounts(authAccount)
             // Self-management is not supported
             .filter { it.id != authAccount.id.toString() }
             .onEach { loadGroups(it) }
@@ -67,19 +66,30 @@ class AccountService(
             .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
     }
 
-    fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): String = facade.perform {
-        dto
-            .toUser(authAccount)
-            .let { users().create(it) }
-            .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
-            .apply { check(status == 201) { "Unexpected user creation response $status" } }
-            .let(facade::parseResourceId)
-            .also { sendEmail(it) }
-    }
+    fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): String =
+        performSynchronized(authAccount) {
+            dto
+                .apply {
+                    if (enabled.value) {
+                        checkMaxUsersNotExhausted(authAccount)
+                    }
+                }
+                .toUser(authAccount)
+                .let { users().create(it) }
+                .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
+                .apply { check(status == 201) { "Unexpected user creation response $status" } }
+                .let(facade::parseResourceId)
+                .also { sendEmail(it) }
+        }
 
     fun updateAccount(id: AccountId, dto: UpdateAccountDto, authAccount: AuthenticatedAccount) =
-        facade.perform {
+        performSynchronized(authAccount) {
             getAccount(id, authAccount)
+                .apply {
+                    if (!isEnabled && dto.enabled.value) {
+                        checkMaxUsersNotExhausted(authAccount)
+                    }
+                }
                 .apply { update(dto) }
                 .also {
                     try {
@@ -106,11 +116,42 @@ class AccountService(
                 .run { if (!isEmailVerified) sendEmail(id.toString()) }
         }
 
-    fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = facade.perform {
+    fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = performSynchronized(authAccount) {
         getAccount(id, authAccount)
             .also { users().delete(id.toString()) }
             .run { }
     }
+
+    private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T = facade.perform {
+        synchronized(authAccount.veoClient.groupName.intern()) {
+            block()
+        }
+    }
+
+    private fun RealmResource.findAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
+        groups()
+            .group(getGroupId(authAccount.veoClient.groupName))
+            .members()
+
+    private fun RealmResource.checkMaxUsersNotExhausted(authAccount: AuthenticatedAccount) =
+        getMaxUsers(authAccount).let {
+            if (countEnabledUsers(authAccount) >= it) {
+                throw ExceedingMaxUsersException(it)
+            }
+        }
+
+    private fun RealmResource.getMaxUsers(authAccount: AuthenticatedAccount): Int = groups()
+        .group(getGroupId(authAccount.veoClient.groupName))
+        .toRepresentation()
+        .attributes["maxUsers"]
+        ?.firstOrNull()
+        ?.toInt()
+        ?: throw IllegalStateException("maxUsers is not defined in group ${authAccount.veoClient.groupName}")
+
+    private fun RealmResource.countEnabledUsers(authAccount: AuthenticatedAccount): Int =
+        findAccounts(authAccount)
+            .filter { it.isEnabled }
+            .size
 
     private fun CreateAccountDto.toUser(authAccount: AuthenticatedAccount) = UserRepresentation().also { user ->
         user.username = username.value

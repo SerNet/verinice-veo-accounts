@@ -24,6 +24,7 @@ import org.keycloak.authorization.client.Configuration
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 @Profile("resttest")
@@ -46,7 +47,7 @@ internal class TestAuthenticator(
     @Value("\${veo.accounts.keycloak.proxyPort:#{3128}}")
     private val proxyPort: Int
 ) {
-    private val userTokenCache = mutableMapOf<String, String>()
+    private val userTokenCache = ConcurrentHashMap<String, String>()
 
     fun getToken(username: String, password: String): String = userTokenCache.computeIfAbsent(username) {
         HttpClientBuilder.create()
