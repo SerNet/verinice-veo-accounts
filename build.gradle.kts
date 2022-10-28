@@ -114,7 +114,7 @@ tasks.register("restTest", Test::class.java) {
 
 spotless {
     format("misc") {
-        target("**/*.md", "**/*.gitignore")
+        target("**/*.md", "**/*.gitignore", "**/*.properties")
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
