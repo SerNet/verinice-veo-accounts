@@ -15,7 +15,6 @@ For more information, see the [docs](doc/index.md)
     export JAVA_HOME=/path/to/jdk-17
     ./gradlew build [-x test]
 
-
 For verification, we recommend `./gradlew build` as a `pre-commit` git hook.
 
 ## Runtime dependencies

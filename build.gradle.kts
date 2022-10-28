@@ -118,6 +118,7 @@ spotless {
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
+        replaceRegex("Excessive line breaks", "\n{3,}", "\n\n")
     }
     kotlin {
         ktlint()
