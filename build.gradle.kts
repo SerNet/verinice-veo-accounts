@@ -39,7 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.security:spring-security-test")
-    implementation("io.github.microutils:kotlin-logging-jvm:3.0.2")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
     implementation("io.mockk:mockk:1.13.2")
