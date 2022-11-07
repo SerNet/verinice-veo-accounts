@@ -17,7 +17,8 @@
  */
 package org.veo.accounts
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.springframework.http.HttpStatus
@@ -49,9 +50,15 @@ class ExceptionHandler {
     private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? = ex.cause
         .let { cause ->
             when (cause) {
-                is InvalidFormatException -> cause.originalMessage
                 is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
                 is ValueInstantiationException -> cause.cause?.message
+                is MismatchedInputException ->
+                    cause
+                        .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
+                is JsonParseException ->
+                    cause
+                        .location
+                        .run { "Invalid request body: JSON syntax error at line $lineNr, column $columnNr" }
                 else -> cause?.message
             }
         }
