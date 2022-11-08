@@ -66,7 +66,7 @@ pipeline {
                      withDockerNetwork{ n ->
                          docker.image(imageForGradleStages).inside("${dockerArgsForGradleStages} --network ${n}") {
                             // Don't fail the build here, let the junit step decide what to do if there are test failures.
-                             sh script: './gradlew --no-daemon test'
+                             sh script: './gradlew --no-daemon -i test'
                              // Touch all test results (to keep junit step from complaining about old results).
                              sh script: 'find build/test-results | xargs touch'
                              junit allowEmptyResults: true, testResults: '**/build/test-results/test/*.xml'
@@ -144,7 +144,7 @@ pipeline {
                                 }
                                 sh """export VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=\$KEYCLOAK_SERVICE_CLIENT_SECRET && \
                                    export VEO_ACCOUNTS_KEYCLOAK_PROXYHOST=\$KEYCLOAK_SERVICE_PROXY_HOST && \
-                                   ./gradlew -Dhttp.nonProxyHosts=\"localhost|veo-accounts-${n}\" -PciBuildNumber=\$BUILD_NUMBER -PciJobName=\$JOB_NAME restTest"""
+                                   ./gradlew -Dhttp.nonProxyHosts=\"localhost|veo-accounts-${n}\" -PciBuildNumber=\$BUILD_NUMBER -PciJobName=\$JOB_NAME -i restTest"""
                                 junit allowEmptyResults: true, testResults: 'build/test-results/restTest/*.xml'
                                 publishHTML([
                                     allowMissing: false,
