@@ -43,7 +43,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
     implementation("io.mockk:mockk:1.13.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     implementation("net.swiftzer.semver:semver:1.2.0")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
