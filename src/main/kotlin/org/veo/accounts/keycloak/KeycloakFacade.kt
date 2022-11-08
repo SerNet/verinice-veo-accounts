@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.veo.accounts.exceptions.AbstractMappedException
 import javax.ws.rs.client.Client
+import javax.ws.rs.client.ClientBuilder
 import javax.ws.rs.core.Response
 
 private val log = logger {}
@@ -87,7 +88,7 @@ class KeycloakFacade(
         ?.substringAfterLast('/')
         ?: throw IllegalStateException("Failed parsing ID")
 
-    private fun buildClient(): Client = ResteasyClientBuilder()
+    private fun buildClient(): Client = (ClientBuilder.newBuilder() as ResteasyClientBuilder)
         .apply { proxyHost?.let { defaultProxy(it, proxyPort, "http") } }
         .build()
 
