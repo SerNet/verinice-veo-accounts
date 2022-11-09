@@ -30,9 +30,9 @@ These roles are currently only granted to a veo client's main account that is cr
 ### Restrictions
 The following rules are imposed on account management by veo-accounts:
 * accounts cannot be assigned to any veo client group other than the authenticated user's veo client group
-* accounts cannot be granted account management roles (`account:*)
+* accounts cannot be granted account management roles (`account:*`)
 * once an account has been created, the username cannot be changed
-* accounts can only be created or updated with an email address
+* accounts can only be created or updated with an email address, first name & last name
 * no self-management: the authenticated user cannot view, update or delete their own account
 
 ### Mailing
