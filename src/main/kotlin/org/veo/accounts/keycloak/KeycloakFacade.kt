@@ -48,7 +48,7 @@ class KeycloakFacade(
     private val realmName: String,
 
     @Value("\${veo.accounts.keycloak.clients.service.name}")
-    private val clientId: String,
+    private val clientName: String,
 
     @Value("\${veo.accounts.keycloak.clients.service.secret}")
     private val secret: String,
@@ -63,7 +63,7 @@ class KeycloakFacade(
         .serverUrl(serverUrl)
         .realm(realmName)
         .grantType(CLIENT_CREDENTIALS)
-        .clientId(clientId)
+        .clientId(clientName)
         .clientSecret(secret)
         .resteasyClient(buildClient())
         .build()
