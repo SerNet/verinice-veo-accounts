@@ -48,7 +48,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "groups" to listOf("veo-write-access"),
                 "enabled" to true
             )
-        ).rawBody
+        ).bodyAsMap["id"]
         accountId shouldNotBe null
 
         // and retrieved
@@ -186,7 +186,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "groups" to emptyList<String>(),
                 "enabled" to true
             )
-        ).rawBody!!
+        ).bodyAsMap["id"]
 
         // when trying to change the username
         put(

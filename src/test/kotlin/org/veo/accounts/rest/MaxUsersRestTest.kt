@@ -37,8 +37,8 @@ class MaxUsersRestTest : AbstractRestTest() {
     @Test
     fun `cannot exceed maxUsers`() {
         // Given an account with a maximum of 3 accounts, a manager and two more accounts
-        val account2Id = postAccount("two", true).rawBody
-        val account3Id = postAccount("three", true).rawBody
+        val account2Id = postAccount("two", true).bodyAsMap["id"]
+        val account3Id = postAccount("three", true).bodyAsMap["id"]
 
         // expect that an additional enabled account cannot be created
         postAccount("four", true, 403)
@@ -87,9 +87,9 @@ class MaxUsersRestTest : AbstractRestTest() {
     @Test
     fun `shrinking maxUsers is handled`(): Unit = runBlocking(IO) {
         // Given a manager, two more enabled accounts and one disabled account
-        val account2Id = postAccount("two", true).rawBody
-        val account3Id = postAccount("three", true).rawBody
-        val account4Id = postAccount("four", false).rawBody
+        val account2Id = postAccount("two", true).bodyAsMap["id"]
+        val account3Id = postAccount("three", true).bodyAsMap["id"]
+        val account4Id = postAccount("four", false).bodyAsMap["id"]
 
         // when reducing the maximum amount of accounts to 2
         updateMaxUsers(groupId, 2)
@@ -155,7 +155,7 @@ class MaxUsersRestTest : AbstractRestTest() {
     fun `maxUsers cannot be exceeded using simultaneous PUTs`() = runBlocking(IO) {
         // Given many disabled accounts
         val accounts = (1..20)
-            .map { postAccount("user$it", false).rawBody }
+            .map { postAccount("user$it", false).bodyAsMap["id"] }
             .map { get("/$it", managerId).bodyAsMap }
 
         // when trying to enable all accounts at once and waiting for all operations to finish

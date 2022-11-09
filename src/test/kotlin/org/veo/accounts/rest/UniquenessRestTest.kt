@@ -119,7 +119,7 @@ class UniquenessRestTest : AbstractRestTest() {
                 "groups" to emptyList<String>(),
                 "enabled" to true
             )
-        ).rawBody!!
+        ).bodyAsMap["id"]
 
         // expect that updating the second account with the first account's email address will fail
         put(

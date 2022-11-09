@@ -66,7 +66,7 @@ class AccountService(
             .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
     }
 
-    fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): String =
+    fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): AccountId =
         performSynchronized(authAccount) {
             dto
                 .apply {
@@ -80,6 +80,7 @@ class AccountService(
                 .apply { check(status == 201) { "Unexpected user creation response $status" } }
                 .let(facade::parseResourceId)
                 .also { sendEmail(it) }
+                .let { AccountId(it) }
         }
 
     fun updateAccount(id: AccountId, dto: UpdateAccountDto, authAccount: AuthenticatedAccount) =

@@ -43,7 +43,7 @@ class GroupRestTest : AbstractRestTest() {
                 "groups" to emptyList<String>(),
                 "enabled" to true
             )
-        ).rawBody!!
+        ).bodyAsMap["id"]
         var accountBody = get("/$accountId", managerId).bodyAsMap
 
         // then it was saved only with the client group
@@ -80,7 +80,7 @@ class GroupRestTest : AbstractRestTest() {
                 "groups" to listOf("veo-write-access"),
                 "enabled" to true
             )
-        ).rawBody!!
+        ).bodyAsMap["id"]
 
         // then it is assigned to group
         get("/$accountId", managerId).bodyAsMap.apply {
@@ -120,7 +120,7 @@ class GroupRestTest : AbstractRestTest() {
                 "groups" to emptyList<String>(),
                 "enabled" to true
             )
-        ).rawBody!!
+        ).bodyAsMap["id"]
 
         // expect that adding it to admin group should fail
         put(

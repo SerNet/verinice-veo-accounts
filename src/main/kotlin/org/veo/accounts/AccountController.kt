@@ -35,6 +35,7 @@ import org.veo.accounts.auth.parseAccount
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
+import org.veo.accounts.dtos.response.AccountCreatedDto
 import org.veo.accounts.dtos.response.FullAccountDto
 import org.veo.accounts.dtos.response.ListAccountDto
 import org.veo.accounts.keycloak.AccountService
@@ -69,8 +70,9 @@ class AccountController(
         @Valid
         @RequestBody
         dto: CreateAccountDto
-    ): String = dto
+    ): AccountCreatedDto = dto
         .let { accountService.createAccount(it, auth.parseAccount()) }
+        .let { id -> AccountCreatedDto(id) }
 
     @Operation(description = "Update an account.")
     @PutMapping("{id}")
