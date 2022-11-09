@@ -47,6 +47,10 @@ class KeycloakFacade(
     @Value("\${veo.accounts.keycloak.realm}")
     private val realmName: String,
 
+    /**
+     * Name of the keycloak service client for this application. This is equivalent to the OAuth "client ID", but it is
+     * not to be confused with the "client ID" in keycloak which is a UUID.
+     */
     @Value("\${veo.accounts.keycloak.clients.service.name}")
     private val clientName: String,
 
