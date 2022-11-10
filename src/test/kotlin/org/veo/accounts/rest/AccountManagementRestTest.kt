@@ -71,10 +71,10 @@ class AccountManagementRestTest : AbstractRestTest() {
                 hans["lastName"] shouldBe "Dance"
                 hans["groups"] shouldBe listOf("veo-write-access")
                 hans["enabled"] shouldBe true
-                hans["_self"] as String shouldMatch "https?://.*/$accountId"
-               /* (hans["_self"] as String).let {                                           TODO VEO-1723
+                (hans["_self"] as String).let {
+                    it shouldMatch "https?://.*/$accountId"
                     get(it, managerId, 200)
-                }*/
+                }
             }
 
         // and updated

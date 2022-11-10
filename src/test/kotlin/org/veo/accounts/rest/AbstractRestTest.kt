@@ -98,9 +98,15 @@ abstract class AbstractRestTest {
         headers: Map<String, List<String>> = emptyMap(),
         expectedStatus: Int?
     ): Response =
-        testRestTemplate.exchange(baseUrl + uri, method, buildHttpEntity(body, headers, authAccountId), String::class.java)
+        testRestTemplate.exchange(buildUrl(uri), method, buildHttpEntity(body, headers, authAccountId), String::class.java)
             .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
             .let { Response(it) }
+
+    private fun buildUrl(uri: String): String = if (uri.startsWith("http")) {
+        uri
+    } else {
+        baseUrl + uri
+    }
 
     private fun buildHttpEntity(
         body: Any?,
