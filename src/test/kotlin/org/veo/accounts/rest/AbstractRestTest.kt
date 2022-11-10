@@ -102,11 +102,7 @@ abstract class AbstractRestTest {
             .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
             .let { Response(it) }
 
-    private fun buildUrl(uri: String): String = if (uri.startsWith("http")) {
-        uri
-    } else {
-        baseUrl + uri
-    }
+    private fun buildUrl(uri: String): String = if (uri.startsWith("http")) uri else baseUrl + uri
 
     private fun buildHttpEntity(
         body: Any?,
