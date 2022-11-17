@@ -65,14 +65,14 @@ abstract class AbstractRestTest {
         testAccountService.cleanup()
     }
 
-    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE): String =
+    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE): VeoClient =
         testAccountService.createVeoClientGroup(maxUsers)
 
-    protected fun createManager(groupId: String, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
-        testAccountService.createManager(groupId, roles, prefix)
+    protected fun createManager(group: VeoClient, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
+        testAccountService.createManager(group, roles, prefix)
 
-    protected fun updateMaxUsers(veoClientGroupId: String, maxUsers: Int) {
-        testAccountService.updateMaxUsers(veoClientGroupId, maxUsers)
+    protected fun updateMaxUsers(group: VeoClient, maxUsers: Int) {
+        testAccountService.updateMaxUsers(group, maxUsers)
     }
 
     protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =

@@ -23,15 +23,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.veo.accounts.auth.VeoClient
 
 class MaxUsersRestTest : AbstractRestTest() {
-    lateinit var groupId: String
+    lateinit var client: VeoClient
     lateinit var managerId: String
 
     @BeforeEach
     fun setup() {
-        groupId = createVeoClientGroup(3)
-        managerId = createManager(groupId)
+        client = createVeoClientGroup(3)
+        managerId = createManager(client)
     }
 
     @Test
@@ -76,7 +77,7 @@ class MaxUsersRestTest : AbstractRestTest() {
     @Test
     fun `account managers count as users`() {
         // when maxUsers is exhausted with the existing manager, another manager and a third user
-        createManager(groupId)
+        createManager(client)
         postAccount("three", true)
 
         // then no more enabled accounts can be created
@@ -92,7 +93,7 @@ class MaxUsersRestTest : AbstractRestTest() {
         val account4Id = postAccount("four", false).bodyAsMap["id"]
 
         // when reducing the maximum amount of accounts to 2
-        updateMaxUsers(groupId, 2)
+        updateMaxUsers(client, 2)
 
         // then an existing account can still be modified
         get("/$account2Id", managerId).bodyAsMap.let {

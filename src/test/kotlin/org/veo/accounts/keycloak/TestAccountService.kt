@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.veo.accounts.Role
+import org.veo.accounts.auth.VeoClient
+import java.util.UUID
 import java.util.UUID.randomUUID
 import javax.ws.rs.NotFoundException
 
@@ -40,15 +42,15 @@ class TestAccountService(
 
     val testPassword = randomUUID().toString()
     private val createdAccountIds = mutableListOf<String>()
-    private val createdGroupIds = mutableListOf<String>()
+    private val createdGroupIds = mutableMapOf<VeoClient, UUID>()
 
-    fun createManager(groupId: String, roles: List<Role>, usernamePrefix: String): String = facade.perform {
+    fun createManager(group: VeoClient, roles: List<Role>, usernamePrefix: String): String = facade.perform {
         UserRepresentation()
             .apply {
                 username = "$usernamePrefix-account-${randomUUID()}"
                 isEnabled = true
                 isEmailVerified = true
-                groups = listOf(groups().group(groupId).toRepresentation().path)
+                groups = listOf(group.path)
             }
             .let { users().create(it) }
             .getHeaderString("Location")
@@ -58,21 +60,14 @@ class TestAccountService(
             .also(createdAccountIds::add)
     }
 
-    fun createVeoClientGroup(maxUsers: Int): String = facade.perform {
-        groups()
-            .add(
-                GroupRepresentation().apply {
-                    name = "veo_client:${randomUUID()}"
-                    attributes = mapOf("maxUsers" to listOf(maxUsers.toString()))
-                }
-            )
-            .let(facade::parseResourceId)
-            .also(createdGroupIds::add)
+    fun createVeoClientGroup(maxUsers: Int): VeoClient = facade.perform {
+        VeoClient(randomUUID())
+            .also { createdGroupIds[it] = createVeoClientGroup(it, maxUsers) }
     }
 
-    fun updateMaxUsers(veoClientGroupId: String, maxUsers: Int) = facade.perform {
+    fun updateMaxUsers(client: VeoClient, maxUsers: Int) = facade.perform {
         groups()
-            .group(veoClientGroupId)
+            .group(createdGroupIds[client].toString())
             .run {
                 update(
                     toRepresentation().also {
@@ -87,7 +82,8 @@ class TestAccountService(
             .onEach { tryDeleteAccount(it) }
             .clear()
         createdGroupIds
-            .onEach { tryDeleteGroup(it) }
+            .values
+            .onEach { tryDeleteGroup(it.toString()) }
             .clear()
     }
 
@@ -96,6 +92,15 @@ class TestAccountService(
             .toRepresentation()
             .username
     }
+
+    private fun RealmResource.createVeoClientGroup(client: VeoClient, maxUsers: Int): UUID = GroupRepresentation()
+        .apply {
+            name = client.groupName
+            attributes = mapOf("maxUsers" to listOf(maxUsers.toString()))
+        }
+        .let { groups().add(it) }
+        .let(facade::parseResourceId)
+        .let(UUID::fromString)
 
     private fun RealmResource.assignTestPassword(accountId: String) = users()
         .get(accountId)
