@@ -113,8 +113,12 @@ pipeline {
         }
         stage('HTTP REST Test') {
             environment {
+                def tag = "${env.BUILD_TAG}".replaceAll("[^A-Za-z0-9]", "_")
                 KEYCLOAK_SERVICE_CLIENT_SECRET = credentials("keycloak_service_client_secret")
                 KEYCLOAK_SERVICE_PROXY_HOST = "cache.int.sernet.de"
+                RABBITMQ_CREDS = credentials('veo_rabbit_credentials')
+                VEO_ACCOUNTS_RABBITMQ_SUBSCRIPTION_ROUTING_KEY_PREFIX = "VEO_TEST_${tag}."
+                VEO_ACCOUNTS_RABBITMQ_QUEUE = "VEO_ACCOUNTS_REST_TEST_${tag}"
             }
             agent any
             steps {
@@ -144,6 +148,8 @@ pipeline {
                                 }
                                 sh """export VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=\$KEYCLOAK_SERVICE_CLIENT_SECRET && \
                                    export VEO_ACCOUNTS_KEYCLOAK_PROXYHOST=\$KEYCLOAK_SERVICE_PROXY_HOST && \
+                                   export SPRING_RABBITMQ_USERNAME=$RABBITMQ_CREDS_USR && \
+                                   export SPRING_RABBITMQ_PASSWORD=$RABBITMQ_CREDS_PSW && \
                                    ./gradlew -Dhttp.nonProxyHosts=\"localhost|veo-accounts-${n}\" -PciBuildNumber=\$BUILD_NUMBER -PciJobName=\$JOB_NAME -i restTest"""
                                 junit allowEmptyResults: true, testResults: 'build/test-results/restTest/*.xml'
                                 publishHTML([

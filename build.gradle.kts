@@ -45,6 +45,7 @@ dependencies {
     implementation("io.mockk:mockk:1.13.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
     implementation("net.swiftzer.semver:semver:1.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
 
@@ -53,6 +54,7 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-property-jvm:$kotestVersion")
+    testImplementation("org.testcontainers:rabbitmq:1.17.5")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     testImplementation("org.keycloak:keycloak-authz-client:20.0.1")

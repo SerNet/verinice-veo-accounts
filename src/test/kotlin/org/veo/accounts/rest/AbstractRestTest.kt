@@ -20,6 +20,7 @@ package org.veo.accounts.rest
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,6 +30,8 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.ActiveProfiles
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.Wait.forListeningPort
 import org.veo.accounts.Role
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
@@ -36,6 +39,7 @@ import org.veo.accounts.Role.READ
 import org.veo.accounts.Role.UPDATE
 import org.veo.accounts.VeoAccountsApplication
 import org.veo.accounts.WebSecurity
+import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.keycloak.TestAccountService
 import java.util.UUID.randomUUID
 import kotlin.Int.Companion.MAX_VALUE
@@ -52,8 +56,33 @@ abstract class AbstractRestTest {
     @Autowired
     private lateinit var testAuthenticator: TestAuthenticator
 
+    @Autowired
+    private lateinit var testMessageDispatcher: TestMessageDispatcher
+
     @Value("\${veo.resttest.baseUrl:#{null}}")
     private var configuredBaseUrl: String? = null
+
+    companion object {
+        private lateinit var rabbit: GenericContainer<*>
+
+        @BeforeAll
+        @JvmStatic
+        fun setupAll() {
+            if (System.getenv("SPRING_RABBITMQ_HOST") == null) {
+                rabbit = GenericContainer("rabbitmq:3-management")
+                    .withExposedPorts(5672, 15672)
+                    .waitingFor(forListeningPort())
+                    .apply { start() }
+
+                System.getProperties().putAll(
+                    mapOf(
+                        "spring.rabbitmq.host" to rabbit.host,
+                        "spring.rabbitmq.port" to rabbit.getMappedPort(5672)
+                    )
+                )
+            }
+        }
+    }
 
     /** Prefix usernames & email addresses with this to keep simultaneous rest-test runs on the same keycloak instance isolated. */
     protected val prefix = "veo-accounts-rest-test-run-${randomUUID().toString().substring(0,7)}"
@@ -92,6 +121,12 @@ abstract class AbstractRestTest {
 
     protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204): Response =
         exchange(HttpMethod.DELETE, url, authAccountId, expectedStatus = expectedStatus)
+
+    protected fun sendMessage(routingKey: String, content: Map<String, *>) {
+        testMessageDispatcher.sendMessage(routingKey, content)
+    }
+
+    protected fun accountExists(accountId: String): Boolean = testAccountService.accountExists(accountId)
 
     private fun exchange(
         method: HttpMethod,

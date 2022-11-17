@@ -77,6 +77,15 @@ class TestAccountService(
             }
     }
 
+    fun accountExists(accountId: String): Boolean = facade.perform {
+        try {
+            users().get(accountId).toRepresentation()
+            true
+        } catch (_: NotFoundException) {
+            false
+        }
+    }
+
     fun cleanup() = facade.perform {
         createdAccountIds
             .onEach { tryDeleteAccount(it) }

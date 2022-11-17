@@ -23,6 +23,7 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.auth.AuthenticatedAccount
+import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.request.CreateAccountDto
@@ -121,6 +122,11 @@ class AccountService(
         getAccount(id, authAccount)
             .also { users().delete(id.toString()) }
             .run { }
+    }
+
+    fun deleteClient(client: VeoClient) = facade.perform {
+        log.info("Deleting veo client group ${client.groupName}")
+        tryDeleteGroup(getGroupId(client.groupName))
     }
 
     private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T = facade.perform {

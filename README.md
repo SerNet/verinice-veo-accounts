@@ -20,6 +20,7 @@ For verification, we recommend `./gradlew build` as a `pre-commit` git hook.
 ## Runtime dependencies
 * Java 17
 * Keycloak server
+* RabbitMQ
 
 ## Config & Launch
 
