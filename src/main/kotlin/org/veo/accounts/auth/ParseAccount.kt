@@ -21,19 +21,14 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.veo.accounts.dtos.AccountId
-import java.util.UUID
-
-private const val uuidPattern = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
-private val clientGroupRegex = Regex("^/(veo_client:($uuidPattern))$")
 
 fun Authentication.parseAccount(): AuthenticatedAccount = AuthenticatedAccount(AccountId(name), getVeoClient())
 
 private fun Authentication.getVeoClient(): VeoClient = token()
     .getClaimAsStringList("groups")!!
-    .mapNotNull { clientGroupRegex.matchEntire(it) }
+    .mapNotNull { VeoClient.tryParse(it) }
     .also { require(it.size == 1) { "Expected 1 client for the account. Got ${it.size}." } }
     .first()
-    .let { VeoClient(it.groups[1]!!.value, UUID.fromString(it.groups[2]!!.value)) }
 
 private fun Authentication.token(): Jwt =
     (this as JwtAuthenticationToken).token

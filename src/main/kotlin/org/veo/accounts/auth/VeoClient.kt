@@ -19,8 +19,20 @@ package org.veo.accounts.auth
 
 import java.util.UUID
 
+private const val uuidPattern = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
+private const val clientGroupPrefix = "veo_client:"
+private val clientGroupPathRegex = Regex("^/$clientGroupPrefix($uuidPattern)$")
+
 /**
  * Not to be confused with the keycloak client. Each keycloak user account can be assigned to one veo client with a
  * group mapping.
  */
-data class VeoClient internal constructor(val groupName: String, val clientId: UUID)
+data class VeoClient internal constructor(val clientId: UUID) {
+    val groupName = "$clientGroupPrefix$clientId"
+    val path = "/$groupName"
+    companion object {
+        fun tryParse(groupPath: String): VeoClient? = groupPath
+            .let { clientGroupPathRegex.matchEntire(it) }
+            ?.let { VeoClient(UUID.fromString(it.groups[1]!!.value)) }
+    }
+}
