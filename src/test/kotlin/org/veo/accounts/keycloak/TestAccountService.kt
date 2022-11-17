@@ -114,21 +114,4 @@ class TestAccountService(
         .roles()
         .clientLevel(clientId)
         .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }
-
-    private fun RealmResource.tryDeleteGroup(it: String) {
-        try {
-            groups().group(it).apply {
-                members().forEach { tryDeleteAccount(it.id) }
-                remove()
-            }
-        } catch (_: NotFoundException) {
-        }
-    }
-
-    private fun RealmResource.tryDeleteAccount(it: String) {
-        try {
-            users().delete(it)
-        } catch (_: NotFoundException) {
-        }
-    }
 }
