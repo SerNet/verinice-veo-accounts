@@ -42,6 +42,20 @@ JDK with Proxy
      -Dhttps.proxyHost=[PROXY_HOST] -Dhttps.proxyPort=[PORT] \
      -jar build/libs/veo-accounts-[VERSION].jar
 
+### Test
+
+To run unit tests:
+
+    ./gradlew test
+
+To run restTests (integration tests using real HTTP and a real Keycloak instance):
+
+    ./gradlew restTest
+
+By default, restTests use [testcontainers](https://github.com/testcontainers/testcontainers-java) to run a RabbitMQ test
+instance. This requires docker to be installed. To use an external RabbitMQ instead, run restTests with the
+`SPRING_RABBITMQ_HOST` env variable set.
+
 ## API docs
 Launch and visit <http://localhost:8099/swagger-ui.html>
 
