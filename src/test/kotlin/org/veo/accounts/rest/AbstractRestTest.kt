@@ -82,10 +82,13 @@ abstract class AbstractRestTest {
         exchange(HttpMethod.GET, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
     protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int? = 201): Response =
+        postRaw(url, authAccountId, serialize(body), expectedStatus)
+
+    protected fun postRaw(url: String, authAccountId: String? = null, body: String?, expectedStatus: Int? = 201): Response =
         exchange(HttpMethod.POST, url, authAccountId, body, expectedStatus = expectedStatus)
 
     protected fun put(url: String, authAccountId: String? = null, body: Any?, expectedStatus: Int? = 204): Response =
-        exchange(HttpMethod.PUT, url, authAccountId, body, expectedStatus = expectedStatus)
+        exchange(HttpMethod.PUT, url, authAccountId, serialize(body), expectedStatus = expectedStatus)
 
     protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204): Response =
         exchange(HttpMethod.DELETE, url, authAccountId, expectedStatus = expectedStatus)
@@ -94,7 +97,7 @@ abstract class AbstractRestTest {
         method: HttpMethod,
         uri: String,
         authAccountId: String?,
-        body: Any? = null,
+        body: String? = null,
         headers: Map<String, List<String>> = emptyMap(),
         expectedStatus: Int?
     ): Response =
@@ -105,13 +108,15 @@ abstract class AbstractRestTest {
     private fun buildUrl(uri: String): String = if (uri.startsWith("http")) uri else baseUrl + uri
 
     private fun buildHttpEntity(
-        body: Any?,
+        body: String?,
         headerMap: Map<String, List<String>>,
         authAccountId: String?
     ) = HttpEntity(
-        body?.let { jacksonObjectMapper().writeValueAsString(it) },
+        body ?: "",
         buildHeaders(headerMap, authAccountId)
     )
+
+    private fun serialize(body: Any?): String? = body?.let { jacksonObjectMapper().writeValueAsString(it) }
 
     private fun buildHeaders(headerMap: Map<String, List<String>>, authAccountId: String?) = HttpHeaders()
         .apply { set("Content-Type", "application/json") }
