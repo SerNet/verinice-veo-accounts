@@ -18,6 +18,7 @@
 package org.veo.accounts
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
@@ -55,6 +56,8 @@ class ExceptionHandler {
                 is MismatchedInputException ->
                     cause
                         .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
+                is JsonMappingException ->
+                    cause.originalMessage
                 is JsonParseException ->
                     cause
                         .location

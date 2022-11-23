@@ -40,6 +40,25 @@ class BadRequestRestTest : AbstractRestTest() {
     }
 
     @Test
+    fun `JSON syntax error leads to 400`() {
+        postRaw(
+            "/",
+            managerId,
+            """
+              {
+                "username": "$prefix-jason",
+                "emailAddress": "$prefix-jason@test.test",
+                "firstName": "Jason",
+                "lastName": "Svenson,
+                "groups": [],
+                "enabled": false
+              }
+            """,
+            400
+        ).rawBody shouldBe "Illegal unquoted character ((CTRL-CHAR, code 10)): has to be escaped using backslash to be included in string value"
+    }
+
+    @Test
     fun `cannot create account without username`() {
         post(
             "/",
