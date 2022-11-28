@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Calendar
 
 plugins {
-    id("org.springframework.boot") version "2.7.6"
+    id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.0"
 
     kotlin("jvm") version "1.7.22"
@@ -41,7 +41,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-test")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0")
     implementation("io.mockk:mockk:1.13.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
     implementation("net.swiftzer.semver:semver:1.2.0")
@@ -110,6 +110,8 @@ tasks.register("restTest", Test::class.java) {
             ).contains(it)
         }
     )
+    // Enable Origin header for CORS tests
+    systemProperty("sun.net.http.allowRestrictedHeaders", "true")
 }
 
 spotless {
@@ -159,9 +161,11 @@ springBoot {
     buildInfo {
         properties {
             if (getRootProject().hasProperty("ciBuildNumber")) {
-                additional = mapOf(
-                    "ci.buildnumber" to rootProject.properties["ciBuildNumber"],
-                    "ci.jobname" to rootProject.properties["ciJobName"]
+                additional.set(
+                    mapOf(
+                        "ci.buildnumber" to rootProject.properties["ciBuildNumber"],
+                        "ci.jobname" to rootProject.properties["ciJobName"]
+                    )
                 )
             }
         }

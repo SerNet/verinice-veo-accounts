@@ -20,6 +20,7 @@ package org.veo.accounts
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.HttpMethod.DELETE
@@ -27,7 +28,6 @@ import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
@@ -42,7 +42,7 @@ private val log = KotlinLogging.logger { }
 /**
  * This class bundles custom API security configurations.
  */
-@EnableWebSecurity
+@Configuration
 class WebSecurity(
     @Value("\${veo.cors.origins}")
     private val origins: Array<String>,
@@ -64,16 +64,16 @@ class WebSecurity(
             // Make sure that no critical API can be accessed by an anonymous user!
             // .anonymous()
             //     .disable()
-            .authorizeRequests()
-            .antMatchers("/actuator/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/v2/**")
+            .authorizeHttpRequests()
+            .requestMatchers("/actuator/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/v2/**")
             .permitAll()
-            .antMatchers(GET)
+            .requestMatchers(GET)
             .hasRole(Role.READ.roleName)
-            .antMatchers(POST)
+            .requestMatchers(POST)
             .hasRole(Role.CREATE.roleName)
-            .antMatchers(PUT)
+            .requestMatchers(PUT)
             .hasRole(Role.UPDATE.roleName)
-            .antMatchers(DELETE)
+            .requestMatchers(DELETE)
             .hasRole(Role.DELETE.roleName)
             .and()
             .sessionManagement()

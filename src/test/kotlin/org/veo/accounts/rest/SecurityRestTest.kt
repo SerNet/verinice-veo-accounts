@@ -97,7 +97,7 @@ class SecurityRestTest : AbstractRestTest() {
     fun `documentation is accessible`() {
         get("/actuator/health/readiness", expectedStatus = 200)
         get("/actuator/health/liveness", expectedStatus = 200)
-        get("/swagger-ui.html", expectedStatus = 302)
+        get("/swagger-ui.html", expectedStatus = 200)
         get("/swagger-ui/index.html", expectedStatus = 200)
         get("/v3/api-docs", expectedStatus = 200)
     }

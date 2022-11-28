@@ -17,8 +17,8 @@
  */
 package org.veo.accounts
 
-import javax.validation.ConstraintViolation
-import javax.validation.Validation
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Validation
 
 private val validator = Validation.buildDefaultValidatorFactory().validator
 

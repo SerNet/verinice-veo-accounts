@@ -19,8 +19,8 @@ package org.veo.accounts.dtos
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Email
 import org.veo.accounts.validate
-import javax.validation.constraints.Email
 
 @Schema(description = "Email address", type = "string", minLength = 1, example = "katie@test.test")
 data class EmailAddress(

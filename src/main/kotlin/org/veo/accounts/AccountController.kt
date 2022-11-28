@@ -19,6 +19,7 @@ package org.veo.accounts
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.Authentication
@@ -39,7 +40,6 @@ import org.veo.accounts.dtos.response.AccountCreatedDto
 import org.veo.accounts.dtos.response.FullAccountDto
 import org.veo.accounts.dtos.response.ListAccountDto
 import org.veo.accounts.keycloak.AccountService
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/")

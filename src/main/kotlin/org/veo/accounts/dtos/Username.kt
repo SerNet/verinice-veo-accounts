@@ -19,9 +19,9 @@ package org.veo.accounts.dtos
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Size
 import org.springframework.validation.annotation.Validated
 import org.veo.accounts.validate
-import javax.validation.constraints.Size
 
 private const val minLength = 1
 private const val maxLength = 256
