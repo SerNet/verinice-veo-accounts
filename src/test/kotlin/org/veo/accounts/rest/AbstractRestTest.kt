@@ -52,7 +52,7 @@ abstract class AbstractRestTest {
     @Autowired
     private lateinit var testAuthenticator: TestAuthenticator
 
-    @Value("\${veo.resttest.baseUrl}")
+    @Value("\${veo.resttest.baseUrl:#{null}}")
     private var configuredBaseUrl: String? = null
 
     /** Prefix usernames & email addresses with this to keep simultaneous rest-test runs on the same keycloak instance isolated. */
