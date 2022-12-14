@@ -57,7 +57,7 @@ dependencies {
     testImplementation("org.testcontainers:rabbitmq:1.17.6")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    testImplementation("org.keycloak:keycloak-authz-client:20.0.1")
+    testImplementation("org.keycloak:keycloak-authz-client:20.0.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
