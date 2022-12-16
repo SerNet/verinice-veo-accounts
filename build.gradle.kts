@@ -2,6 +2,9 @@ import com.diffplug.spotless.FormatterStep
 import com.fasterxml.jackson.core.util.DefaultIndenter.SYSTEM_LINEFEED_INSTANCE
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.TextReportRenderer
+import com.github.jk1.license.task.ReportTask
 import org.cadixdev.gradle.licenser.header.HeaderFormatRegistry
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Calendar
@@ -17,6 +20,7 @@ plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     jacoco
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
+    id("com.github.jk1.dependency-license-report") version "2.1"
 }
 
 group = "org.veo"
@@ -64,6 +68,31 @@ dependencies {
 }
 
 extra["kotlin-coroutines.version"] = "1.6.0"
+
+val licenseFile3rdParty = "LICENSE-3RD-PARTY.txt"
+licenseReport {
+    renderers = arrayOf(
+        TextReportRenderer(licenseFile3rdParty),
+    )
+    projects = arrayOf(project)
+    filters = arrayOf(
+        LicenseBundleNormalizer(),
+    )
+}
+
+val reportTask = tasks.getByName("generateLicenseReport") as ReportTask
+// work around for license report not being updated when the project's version number changes
+// https://github.com/jk1/Gradle-License-Report/issues/223
+reportTask.outputs.apply {
+    upToDateWhen { false }
+    cacheIf { false }
+}
+task("copy3rdPartyLicenseFile") {
+    reportTask.finalizedBy(this)
+    doLast {
+        file(licenseFile3rdParty).writeText(file("${reportTask.config.outputDir}/$licenseFile3rdParty").readText())
+    }
+}
 
 tasks.withType<Test> {
     useJUnitPlatform()

@@ -12,6 +12,25 @@
         "^org.jetbrains.kotlin"
       ],
       "groupName" : "Kotlin"
+    },
+    {
+      "matchPackagePatterns" : [
+        "^com.diffplug.spotless",
+        "^com.github.jk1.dependency-license-report$",
+        "^io.kotest:",
+        "^org.testcontainers:",
+        "^gradle$"
+      ],
+      "postUpgradeTasks" : { }
     }
-  ]
+  ],
+  "postUpgradeTasks" : {
+    "commands" : [
+      "./gradlew generateLicenseReport"
+    ],
+    "fileFilters" : [
+      "LICENSE-3RD-PARTY.txt"
+    ],
+    "executionMode" : "update"
+  }
 }

@@ -56,7 +56,12 @@ pipeline {
                 }
             }
             steps {
-                sh './gradlew --no-daemon classes'
+                sh './gradlew --no-daemon classes generateLicenseReport'
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'build/reports/dependency-license/*.*', allowEmptyArchive: true
+                }
             }
         }
         stage('Test') {
@@ -86,6 +91,29 @@ pipeline {
             steps {
                 sh './gradlew --no-daemon -PciBuildNumber=$BUILD_NUMBER -PciJobName=$JOB_NAME clean build -x test'
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+            }
+        }
+        stage('Validate 3rd party license report') {
+            agent {
+                docker {
+                    image imageForGradleStages
+                    alwaysPull true
+                    args dockerArgsForGradleStages
+                }
+            }
+            steps {
+                unarchive mapping: ['build/reports/dependency-license/LICENSE-3RD-PARTY.txt': 'build/reports/dependency-license/LICENSE-3RD-PARTY.txt']
+                script {
+                    def repositoryFileContent = readFile('LICENSE-3RD-PARTY.txt')
+                    def generatedFileContent = readFile('build/reports/dependency-license/LICENSE-3RD-PARTY.txt')
+                    def repositoryFileContentWithoutDate = repositoryFileContent
+                        .replaceAll(/\RThis report was generated at .+\R/, '')
+                    def generatedFileContentWithoutDate = generatedFileContent
+                        .replaceAll(/\RThis report was generated at .+\R/, '')
+                    if (repositoryFileContentWithoutDate != generatedFileContentWithoutDate){
+                        error 'LICENSE-3RD-PARTY.txt is not up to date, please re-run ./gradlew generateLicenseReport'
+                    }
+                }
             }
         }
         stage('Dockerimage') {

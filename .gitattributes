@@ -1,0 +1,2 @@
+# Leave CRs alone when committing 3rd party license
+LICENSE-3RD-PARTY.txt -text
