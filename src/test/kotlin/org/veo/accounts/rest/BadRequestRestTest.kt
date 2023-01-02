@@ -35,7 +35,7 @@ class BadRequestRestTest : AbstractRestTest() {
             "/",
             managerId,
             emptyList<Any>(),
-            400
+            400,
         ).rawBody shouldBe "Cannot deserialize value of type `CreateAccountDto` from Array value (token `JsonToken.START_ARRAY`)"
     }
 
@@ -54,7 +54,7 @@ class BadRequestRestTest : AbstractRestTest() {
                 "enabled": false
               }
             """,
-            400
+            400,
         ).rawBody shouldBe "Illegal unquoted character ((CTRL-CHAR, code 10)): has to be escaped using backslash to be included in string value"
     }
 
@@ -68,9 +68,9 @@ class BadRequestRestTest : AbstractRestTest() {
                 "firstName" to "Hansi",
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to false
+                "enabled" to false,
             ),
-            400
+            400,
         ).rawBody shouldBe "username must not be null"
     }
 
@@ -85,9 +85,9 @@ class BadRequestRestTest : AbstractRestTest() {
                 "firstName" to "Hansi",
                 "lastName" to "Dance",
                 "groups" to listOf("veo-night-access"),
-                "enabled" to false
+                "enabled" to false,
             ),
-            400
+            400,
         ).rawBody shouldBe "Cannot deserialize value of type `AssignableGroup` from String \"veo-night-access\": not one of the values accepted for Enum class: [veo-write-access]"
     }
 
@@ -102,9 +102,9 @@ class BadRequestRestTest : AbstractRestTest() {
                 "firstName" to "Hansi",
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to false
+                "enabled" to false,
             ),
-            400
+            400,
         ).rawBody shouldBe "Invalid Username: size must be between 1 and 256"
     }
 }

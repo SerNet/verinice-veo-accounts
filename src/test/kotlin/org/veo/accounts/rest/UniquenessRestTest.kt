@@ -41,8 +41,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
 
         // expect that creating another account with the same username will fail
@@ -55,9 +55,9 @@ class UniquenessRestTest : AbstractRestTest() {
                 "lastName" to "Kitty",
                 "emailAddress" to "$prefix-copy@cat.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            409
+            409,
         ).rawBody shouldBe "Username or email address already taken"
     }
 
@@ -73,8 +73,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Snowy",
                 "lastName" to "Flaky",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
 
         // expect that creating another account with the same email address will fail
@@ -87,9 +87,9 @@ class UniquenessRestTest : AbstractRestTest() {
                 "lastName" to "Kitty",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            409
+            409,
         ).rawBody shouldBe "Username or email address already taken"
     }
 
@@ -105,8 +105,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "lastName" to "Flaky",
                 "emailAddress" to "$prefix-special@snowflake.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
         val secondAccountId = post(
             "/",
@@ -117,8 +117,8 @@ class UniquenessRestTest : AbstractRestTest() {
                 "lastName" to "Cakey",
                 "emailAddress" to "$prefix-special@glowcake.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
 
         // expect that updating the second account with the first account's email address will fail
@@ -130,9 +130,9 @@ class UniquenessRestTest : AbstractRestTest() {
                 "firstName" to "Glowy",
                 "lastName" to "Cakey",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            409
+            409,
         ).rawBody shouldBe "Email address already taken"
     }
 }

@@ -45,7 +45,7 @@ internal class TestAuthenticator(
     private val proxyHost: String?,
 
     @Value("\${veo.accounts.keycloak.proxyPort:#{3128}}")
-    private val proxyPort: Int
+    private val proxyPort: Int,
 ) {
     private val userTokenCache = ConcurrentHashMap<String, String>()
 

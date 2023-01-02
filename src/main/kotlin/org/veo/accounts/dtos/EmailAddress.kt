@@ -26,7 +26,7 @@ import org.veo.accounts.validate
 data class EmailAddress(
     @field:Email
     @get:JsonValue
-    val value: String
+    val value: String,
 ) {
     init {
         validate()

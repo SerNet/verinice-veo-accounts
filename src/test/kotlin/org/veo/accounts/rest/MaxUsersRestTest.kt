@@ -190,8 +190,8 @@ class MaxUsersRestTest : AbstractRestTest() {
             "firstName" to "Max",
             "lastName" to "Users",
             "groups" to listOf("veo-write-access"),
-            "enabled" to enabled
+            "enabled" to enabled,
         ),
-        expectedStatus
+        expectedStatus,
     )
 }

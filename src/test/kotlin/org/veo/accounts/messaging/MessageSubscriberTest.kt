@@ -44,8 +44,8 @@ class MessageSubscriberTest {
             message(
                 "eventType" to "client_change",
                 "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
-                "type" to "DELETION"
-            )
+                "type" to "DELETION",
+            ),
         )
 
         // then the client is deleted
@@ -60,8 +60,8 @@ class MessageSubscriberTest {
                 message(
                     "eventType" to "client_change",
                     "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
-                    "type" to "CREATION"
-                )
+                    "type" to "CREATION",
+                ),
             )
         }
     }

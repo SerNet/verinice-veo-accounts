@@ -61,7 +61,7 @@ class KeycloakFacade(
     private val proxyHost: String?,
 
     @Value("\${veo.accounts.keycloak.proxyPort:#{3128}}")
-    private val proxyPort: Int
+    private val proxyPort: Int,
 ) {
     private val realm = builder()
         .serverUrl(serverUrl)

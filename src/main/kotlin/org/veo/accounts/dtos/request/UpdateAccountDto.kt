@@ -30,5 +30,5 @@ class UpdateAccountDto(
     val firstName: FirstName,
     val lastName: LastName,
     val groups: AssignableGroupSet,
-    val enabled: Enabled
+    val enabled: Enabled,
 )

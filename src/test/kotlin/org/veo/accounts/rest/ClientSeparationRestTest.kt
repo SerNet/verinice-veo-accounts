@@ -44,8 +44,8 @@ class ClientSeparationRestTest : AbstractRestTest() {
                 "lastName" to "King",
                 "emailAddress" to "$prefix-louis@client1.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
 
         // then client 1 manager can access it
@@ -66,9 +66,9 @@ class ClientSeparationRestTest : AbstractRestTest() {
                 "firstName" to "Louis",
                 "lastName" to "King",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            404
+            404,
         )
         get("/$accountId", client1ManagerId).bodyAsMap["emailAddress"] shouldBe "$prefix-louis@client1.test"
 

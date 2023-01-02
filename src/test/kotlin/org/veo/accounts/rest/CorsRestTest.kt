@@ -39,7 +39,7 @@ class CorsRestTest : AbstractRestTest() {
         val result = get(
             "/",
             accountId,
-            headers = mapOf("Origin" to listOf(origin))
+            headers = mapOf("Origin" to listOf(origin)),
         )
 
         // the request was successful
@@ -54,7 +54,7 @@ class CorsRestTest : AbstractRestTest() {
             "/",
             accountId,
             403,
-            mapOf("Origin" to listOf("https://invalid.notverinice.example"))
+            mapOf("Origin" to listOf("https://invalid.notverinice.example")),
         )
 
         // then an error is returned
@@ -78,9 +78,9 @@ class CorsRestTest : AbstractRestTest() {
                     "Content-Type",
                     "Authorization",
                     "X-Ample",
-                    "X-Custom-Header"
-                )
-            )
+                    "X-Custom-Header",
+                ),
+            ),
         )
 
         // then CORS headers are returned

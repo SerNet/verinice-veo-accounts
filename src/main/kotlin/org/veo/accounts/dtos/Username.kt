@@ -31,13 +31,13 @@ private const val maxLength = 256
     type = "string",
     minLength = minLength,
     maxLength = maxLength,
-    example = "ksmith"
+    example = "ksmith",
 )
 @Validated
 data class Username(
     @field:Size(min = minLength, max = maxLength)
     @get:JsonValue
-    val value: String
+    val value: String,
 ) {
     init {
         validate()

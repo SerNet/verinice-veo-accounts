@@ -45,7 +45,7 @@ import org.veo.accounts.keycloak.AccountService
 @RequestMapping("/")
 @SecurityRequirement(name = SECURITY_SCHEME_OAUTH)
 class AccountController(
-    private val accountService: AccountService
+    private val accountService: AccountService,
 ) {
 
     @Operation(description = "Get all accounts.")
@@ -69,7 +69,7 @@ class AccountController(
         auth: Authentication,
         @Valid
         @RequestBody
-        dto: CreateAccountDto
+        dto: CreateAccountDto,
     ): AccountCreatedDto = dto
         .let { accountService.createAccount(it, auth.parseAccount()) }
         .let { id -> AccountCreatedDto(id) }
@@ -82,7 +82,7 @@ class AccountController(
         @PathVariable("id") id: AccountId,
         @Valid
         @RequestBody
-        dto: UpdateAccountDto
+        dto: UpdateAccountDto,
     ) = accountService.updateAccount(id, dto, auth.parseAccount())
 
     @Operation(description = "Delete an account.")

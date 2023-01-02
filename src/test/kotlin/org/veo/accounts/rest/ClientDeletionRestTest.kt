@@ -50,8 +50,8 @@ class ClientDeletionRestTest : AbstractRestTest() {
                 "firstName" to "Dan",
                 "lastName" to "Man",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"] as String
         val clientAccount2Id = post(
             "/",
@@ -62,8 +62,8 @@ class ClientDeletionRestTest : AbstractRestTest() {
                 "firstName" to "Syd",
                 "lastName" to "Did",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"] as String
 
         // and an account in the other client
@@ -76,8 +76,8 @@ class ClientDeletionRestTest : AbstractRestTest() {
                 "firstName" to "Kim",
                 "lastName" to "Dim",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"] as String
 
         // expect the clients to be populated
@@ -93,8 +93,8 @@ class ClientDeletionRestTest : AbstractRestTest() {
             mapOf(
                 "eventType" to "client_change",
                 "clientId" to client.clientId,
-                "type" to "DELETION"
-            )
+                "type" to "DELETION",
+            ),
         )
 
         // then the accounts are gone

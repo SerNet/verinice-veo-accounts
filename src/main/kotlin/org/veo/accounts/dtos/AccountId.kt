@@ -26,7 +26,7 @@ import java.util.UUID
 @Schema(description = "Generated ID for an account. Not to be confused with username.", type = "text", example = "2505d684-5f19-4615-9c9b-a24eeea96ea0")
 data class AccountId(
     @get:JsonValue
-    val value: UUID
+    val value: UUID,
 ) {
     constructor(str: String) : this(UUID.fromString(str))
 

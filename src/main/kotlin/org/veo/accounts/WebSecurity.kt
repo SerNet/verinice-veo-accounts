@@ -51,7 +51,7 @@ class WebSecurity(
     private val allowedHeaders: Array<String>,
 
     @Value("\${veo.accounts.keycloak.clients.service.name}")
-    private val keycloakServiceClientName: String
+    private val keycloakServiceClientName: String,
 ) {
     @Bean
     @Throws(Exception::class)
@@ -93,7 +93,7 @@ class WebSecurity(
                             ?.map { SimpleGrantedAuthority("ROLE_$it") }
                             ?: emptyList()
                     }
-                }
+                },
             )
         return http.build()
     }

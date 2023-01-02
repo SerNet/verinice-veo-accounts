@@ -25,7 +25,7 @@ import org.veo.accounts.asMap
 private val objectMapper = jacksonObjectMapper()
 
 class Response(
-    private val entity: ResponseEntity<String>
+    private val entity: ResponseEntity<String>,
 ) {
     val bodyAsMap get() = parseBody().asMap()
     val bodyAsListOfMaps get() = parseBody().asListOfMaps()

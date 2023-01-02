@@ -35,7 +35,7 @@ import javax.ws.rs.NotFoundException
 @Profile("resttest")
 class TestAccountService(
     @Value("\${veo.resttest.clientId}")
-    private val clientId: String
+    private val clientId: String,
 ) {
     @Autowired
     private lateinit var facade: KeycloakFacade
@@ -72,7 +72,7 @@ class TestAccountService(
                 update(
                     toRepresentation().also {
                         it.attributes["maxUsers"] = listOf(maxUsers.toString())
-                    }
+                    },
                 )
             }
     }
@@ -118,12 +118,12 @@ class TestAccountService(
                 isTemporary = false
                 type = "password"
                 value = testPassword
-            }
+            },
         )
 
     private fun RealmResource.assignRoles(
         accountId: String,
-        roles: List<Role>
+        roles: List<Role>,
     ) = users().get(accountId)
         .roles()
         .clientLevel(clientId)

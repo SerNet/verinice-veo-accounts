@@ -77,8 +77,8 @@ abstract class AbstractRestTest {
                 System.getProperties().putAll(
                     mapOf(
                         "spring.rabbitmq.host" to rabbit.host,
-                        "spring.rabbitmq.port" to rabbit.getMappedPort(5672)
-                    )
+                        "spring.rabbitmq.port" to rabbit.getMappedPort(5672),
+                    ),
                 )
             }
         }
@@ -134,7 +134,7 @@ abstract class AbstractRestTest {
         authAccountId: String?,
         body: String? = null,
         headers: Map<String, List<String>> = emptyMap(),
-        expectedStatus: Int?
+        expectedStatus: Int?,
     ): Response =
         testRestTemplate.exchange(buildUrl(uri), method, buildHttpEntity(body, headers, authAccountId), String::class.java)
             .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
@@ -145,10 +145,10 @@ abstract class AbstractRestTest {
     private fun buildHttpEntity(
         body: String?,
         headerMap: Map<String, List<String>>,
-        authAccountId: String?
+        authAccountId: String?,
     ) = HttpEntity(
         body ?: "",
-        buildHeaders(headerMap, authAccountId)
+        buildHeaders(headerMap, authAccountId),
     )
 
     private fun serialize(body: Any?): String? = body?.let { jacksonObjectMapper().writeValueAsString(it) }
@@ -160,6 +160,6 @@ abstract class AbstractRestTest {
 
     private fun getToken(authAccountId: String): String = testAuthenticator.getToken(
         testAccountService.getUsername(authAccountId),
-        testAccountService.testPassword
+        testAccountService.testPassword,
     )
 }

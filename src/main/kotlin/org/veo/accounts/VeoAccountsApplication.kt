@@ -43,9 +43,9 @@ const val SECURITY_SCHEME_OAUTH = "OAuth2"
     description = "openidconnect Login",
     flows = OAuthFlows(
         implicit = OAuthFlow(
-            authorizationUrl = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth"
-        )
-    )
+            authorizationUrl = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth",
+        ),
+    ),
 )
 @OpenAPIDefinition(
     info = Info(
@@ -53,13 +53,13 @@ const val SECURITY_SCHEME_OAUTH = "OAuth2"
         description = "OpenAPI documentation for verinice.veo-accounts.",
         license = License(
             name = "GNU Affero General Public License",
-            url = "https://www.gnu.org/licenses/agpl-3.0.html.en"
+            url = "https://www.gnu.org/licenses/agpl-3.0.html.en",
         ),
         contact = Contact(
             url = "http://verinice.com",
-            email = "verinice@sernet.de"
-        )
-    )
+            email = "verinice@sernet.de",
+        ),
+    ),
 )
 class VeoAccountsApplication {
     @Bean

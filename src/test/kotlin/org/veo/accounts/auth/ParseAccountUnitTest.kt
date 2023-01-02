@@ -35,7 +35,7 @@ class ParseAccountUnitTest {
                 every { getClaimAsStringList("groups") } returns listOf(
                     "veo-user",
                     "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
-                    "some-random-other-group"
+                    "some-random-other-group",
                 )
             }
         }
@@ -58,7 +58,7 @@ class ParseAccountUnitTest {
                     "veo-user",
                     "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
                     "/veo_client:d7c687bc-46a5-4bfa-a29e-b63ca6a3ec54",
-                    "some-random-other-group"
+                    "some-random-other-group",
                 )
             }
         }
@@ -73,7 +73,7 @@ class ParseAccountUnitTest {
             every { token } returns mockk {
                 every { getClaimAsStringList("groups") } returns listOf(
                     "veo-user",
-                    "some-random-other-group"
+                    "some-random-other-group",
                 )
             }
         }

@@ -13,7 +13,7 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
 
-    id("com.diffplug.spotless") version "6.12.0"
+    id("com.diffplug.spotless") version "6.12.1"
     id("org.cadixdev.licenser") version "0.6.1"
     jacoco
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
@@ -108,9 +108,9 @@ tasks.register("restTest", Test::class.java) {
                 "http.nonProxyHosts",
                 "https.proxyHost",
                 "https.proxyPort",
-                "http.nonProxyHosts"
+                "http.nonProxyHosts",
             ).contains(it)
-        }
+        },
     )
     // Enable Origin header for CORS tests
     systemProperty("sun.net.http.allowRestrictedHeaders", "true")
@@ -152,7 +152,7 @@ license {
     style(
         closureOf<HeaderFormatRegistry> {
             put("kt", "JAVADOC")
-        }
+        },
     )
     ext["year"] = Calendar.getInstance().get(Calendar.YEAR)
     ext["author"] = ProcessBuilder("git", "config", "user.name").start()
@@ -166,8 +166,8 @@ springBoot {
                 additional.set(
                     mapOf(
                         "ci.buildnumber" to rootProject.properties["ciBuildNumber"],
-                        "ci.jobname" to rootProject.properties["ciJobName"]
-                    )
+                        "ci.jobname" to rootProject.properties["ciJobName"],
+                    ),
                 )
             }
         }

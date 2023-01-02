@@ -34,5 +34,5 @@ fun Any.validate() = validator
 class ValidationException(violations: Collection<ConstraintViolation<Any>>) : Exception(
     violations.joinToString("; ") {
         "Invalid ${it.rootBeanClass.simpleName}: ${it.message}"
-    }
+    },
 )

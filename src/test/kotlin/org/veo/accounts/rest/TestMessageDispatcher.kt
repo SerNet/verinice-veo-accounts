@@ -33,13 +33,13 @@ class TestMessageDispatcher(
     private val exchange: String,
     @Value("\${veo.accounts.rabbitmq.subscription_routing_key_prefix}")
     private val subscriptionRoutingKeyPrefix: String,
-    private val rabbitTemplate: RabbitTemplate
+    private val rabbitTemplate: RabbitTemplate,
 ) {
     fun sendMessage(routingKey: String, content: Map<String, *>) {
         send(
             "$subscriptionRoutingKeyPrefix$routingKey",
             (random() * Long.MAX_VALUE).toLong(),
-            om.writeValueAsString(content)
+            om.writeValueAsString(content),
         )
     }
 
@@ -48,7 +48,7 @@ class TestMessageDispatcher(
             exchange,
             routingKey,
             om.writeValueAsString(mapOf("content" to content)),
-            CorrelationData(id.toStr())
+            CorrelationData(id.toStr()),
         )
     }
 }

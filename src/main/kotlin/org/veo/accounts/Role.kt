@@ -21,5 +21,5 @@ enum class Role(val roleName: String) {
     CREATE("account:create"),
     READ("account:read"),
     UPDATE("account:update"),
-    DELETE("account:delete")
+    DELETE("account:delete"),
 }

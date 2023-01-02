@@ -41,8 +41,8 @@ class GroupRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
         var accountBody = get("/$accountId", managerId).bodyAsMap
 
@@ -78,8 +78,8 @@ class GroupRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
 
         // then it is assigned to group
@@ -100,9 +100,9 @@ class GroupRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-admin"),
-                "enabled" to true
+                "enabled" to true,
             ),
-            400
+            400,
         )
     }
 
@@ -118,8 +118,8 @@ class GroupRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
 
         // expect that adding it to admin group should fail
@@ -131,9 +131,9 @@ class GroupRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "emailAddress" to "$prefix-hans@test.test",
                 "groups" to listOf("veo-admin"),
-                "enabled" to true
+                "enabled" to true,
             ),
-            400
+            400,
         )
     }
 }

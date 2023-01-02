@@ -46,8 +46,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Hans",
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
         accountId shouldNotBe null
 
@@ -86,8 +86,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Hansi",
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
-                "enabled" to false
-            )
+                "enabled" to false,
+            ),
         )
         get("/$accountId", managerId).bodyAsMap.apply {
             get("username") shouldBe "$prefix-hans"
@@ -119,8 +119,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Fowler",
                 "emailAddress" to "$prefix-pla@test.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
         post(
             "/",
@@ -132,8 +132,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Hugh-Bird",
                 "emailAddress" to "$prefix-hub@test.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
 
         // then they appear in the list
@@ -160,9 +160,9 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Man",
                 "lastName" to "Ager",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            404
+            404,
         )
 
         // and it cannot be deleted
@@ -184,8 +184,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Rattan",
                 "emailAddress" to "$prefix-user@power.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         ).bodyAsMap["id"]
 
         // when trying to change the username
@@ -199,8 +199,8 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Rattan",
                 "emailAddress" to "$prefix-user@power.test",
                 "groups" to emptyList<String>(),
-                "enabled" to true
-            )
+                "enabled" to true,
+            ),
         )
 
         // then nothing changed
@@ -222,9 +222,9 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "firstName" to "Randy",
                 "lastName" to "Random",
                 "groups" to emptyList<String>(),
-                "enabled" to true
+                "enabled" to true,
             ),
-            404
+            404,
         )
         delete("/$randId", managerId, 404)
     }

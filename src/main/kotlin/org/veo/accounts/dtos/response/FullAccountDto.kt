@@ -35,7 +35,7 @@ class FullAccountDto(
     val firstName: FirstName?,
     val lastName: LastName?,
     val groups: AssignableGroupSet,
-    val enabled: Enabled
+    val enabled: Enabled,
 ) {
     constructor(user: UserRepresentation) : this(
         AccountId(user.id),
@@ -44,6 +44,6 @@ class FullAccountDto(
         user.firstName?.let { FirstName(it) },
         user.lastName?.let { LastName(it) },
         AssignableGroupSet.byGroupNames(user.groups),
-        Enabled(user.isEnabled)
+        Enabled(user.isEnabled),
     )
 }

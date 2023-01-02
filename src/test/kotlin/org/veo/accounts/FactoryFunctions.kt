@@ -36,7 +36,7 @@ fun fullAccountDto(
     firstName: String = "Katie",
     lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet(),
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) =
     FullAccountDto(
         id,
@@ -45,7 +45,7 @@ fun fullAccountDto(
         FirstName(firstName),
         LastName(lastName),
         AssignableGroupSet(groups),
-        Enabled(enabled)
+        Enabled(enabled),
     )
 
 fun createAccountDto(
@@ -54,7 +54,7 @@ fun createAccountDto(
     firstName: String = "Katie",
     lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet(),
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) =
     CreateAccountDto(
         Username(username),
@@ -62,7 +62,7 @@ fun createAccountDto(
         FirstName(firstName),
         LastName(lastName),
         AssignableGroupSet(groups),
-        Enabled(enabled)
+        Enabled(enabled),
     )
 
 fun updateAccountDto(
@@ -70,6 +70,6 @@ fun updateAccountDto(
     firstName: String = "Katie",
     lastName: String = "Smith",
     groups: Set<AssignableGroup> = emptySet(),
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) =
     UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), AssignableGroupSet(groups), Enabled(enabled))

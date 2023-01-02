@@ -37,7 +37,7 @@ private val om = jacksonObjectMapper()
 @Component
 @ConditionalOnProperty(value = ["veo.accounts.rabbitmq.subscribe"], havingValue = "true")
 class MessageSubscriber(
-    private val accountService: AccountService
+    private val accountService: AccountService,
 ) {
     @RabbitListener(
         bindings = [
@@ -47,14 +47,14 @@ class MessageSubscriber(
                     exclusive = "false",
                     durable = "true",
                     autoDelete = "\${veo.accounts.rabbitmq.queue.auto_delete}",
-                    arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")]
+                    arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
                 ),
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchange}", type = "topic"),
                 key = [
-                    "\${veo.accounts.rabbitmq.subscription_routing_key_prefix}client_change"
-                ]
-            )
-        ]
+                    "\${veo.accounts.rabbitmq.subscription_routing_key_prefix}client_change",
+                ],
+            ),
+        ],
     )
     fun handleMessage(message: String) = try {
         om

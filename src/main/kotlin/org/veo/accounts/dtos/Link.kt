@@ -29,11 +29,11 @@ private const val maxLength = 2000
     type = "string",
     minLength = minLength,
     maxLength = maxLength,
-    example = "https://<api.example.org>/veo/accounts/6d071be3-ca56-4c2a-8fba-1a80596e3403"
+    example = "https://<api.example.org>/veo/accounts/6d071be3-ca56-4c2a-8fba-1a80596e3403",
 )
 data class Link(
     @get:JsonValue
-    val value: URI
+    val value: URI,
 ) {
     init {
         require(value.toString().length in minLength until maxLength)

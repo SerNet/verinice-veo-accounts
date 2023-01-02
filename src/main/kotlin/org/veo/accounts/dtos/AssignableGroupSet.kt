@@ -26,10 +26,10 @@ import org.veo.accounts.AssignableGroup
     arraySchema = Schema(
         description = "Groups that an account can be manually assigned to using veo-accounts. Assignable groups " +
             "grant additional privileges. Automatically assigned groups (e.g. veo client membership group) are " +
-            "not included in this collection."
+            "not included in this collection.",
     ),
     uniqueItems = true,
-    schema = Schema(implementation = AssignableGroup::class)
+    schema = Schema(implementation = AssignableGroup::class),
 )
 data class AssignableGroupSet(@get:JsonValue val values: Set<AssignableGroup>) {
     val groupNames: List<String>

@@ -43,7 +43,7 @@ class AccountService(
     private val userSuperGroupName: String,
     private val facade: KeycloakFacade,
     @Value("\${veo.accounts.keycloak.mailing.enabled}")
-    private val mailingEnabled: Boolean
+    private val mailingEnabled: Boolean,
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> = facade.perform {
         findAccounts(authAccount)
