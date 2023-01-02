@@ -15,7 +15,19 @@
     },
     {
       "matchPackagePatterns" : [
-        "^com.diffplug.spotless",
+        "^com.diffplug.spotless"
+      ],
+      "postUpgradeTasks" : {
+        "commands" : [
+          "./gradlew spotlessApply"
+        ],
+        "fileFilters" : [
+          "**/*"
+        ]
+      }
+    },
+    {
+      "matchPackagePatterns" : [
         "^com.github.jk1.dependency-license-report$",
         "^io.kotest:",
         "^org.testcontainers:",
