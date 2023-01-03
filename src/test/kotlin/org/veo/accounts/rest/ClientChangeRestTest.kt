@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.veo.accounts.auth.VeoClient
 
-class ClientDeletionRestTest : AbstractRestTest() {
+class ClientChangeRestTest : AbstractRestTest() {
     lateinit var client: VeoClient
     lateinit var managerId: String
 
