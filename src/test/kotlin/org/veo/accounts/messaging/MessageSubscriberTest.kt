@@ -36,6 +36,40 @@ class MessageSubscriberTest {
     private val sut = MessageSubscriber(accountService)
 
     @Test
+    fun `handles client activation`() {
+        every { accountService.activateClient(any()) } just Runs
+
+        // when a client deletion message is received
+        sut.handleMessage(
+            message(
+                "eventType" to "client_change",
+                "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
+                "type" to "ACTIVATION",
+            ),
+        )
+
+        // then the client is activated
+        verify { accountService.activateClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+    }
+
+    @Test
+    fun `handles client deactivation`() {
+        every { accountService.deactivateClient(any()) } just Runs
+
+        // when a client deletion message is received
+        sut.handleMessage(
+            message(
+                "eventType" to "client_change",
+                "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
+                "type" to "DEACTIVATION",
+            ),
+        )
+
+        // then the client is deactivated
+        verify { accountService.deactivateClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+    }
+
+    @Test
     fun `handles client deletion`() {
         every { accountService.deleteClient(any()) } just Runs
 

@@ -82,12 +82,14 @@ class MessageSubscriber(
     }
 
     private fun handleClientChange(content: JsonNode) {
-        if (content.get("type").asText() == "DELETION") {
-            content.get("clientId")
-                .asText()
-                .let { UUID.fromString(it) }
-                .let { VeoClient(it) }
-                .let { accountService.deleteClient(it) }
+        val client = content.get("clientId")
+            .asText()
+            .let { UUID.fromString(it) }
+            .let { VeoClient(it) }
+        when (content.get("type").asText()) {
+            "ACTIVATION" -> accountService.activateClient(client)
+            "DEACTIVATION" -> accountService.deactivateClient(client)
+            "DELETION" -> accountService.deleteClient(client)
         }
     }
 }

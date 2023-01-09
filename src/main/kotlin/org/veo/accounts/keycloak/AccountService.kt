@@ -36,6 +36,8 @@ import javax.ws.rs.NotFoundException
 
 private val log = logger {}
 
+private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
+
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
 @Component
 class AccountService(
@@ -124,13 +126,44 @@ class AccountService(
             .run { }
     }
 
+    fun deactivateClient(veoClient: VeoClient) = performSynchronized(veoClient) {
+        groups().group(getGroupId(veoClient.groupName))
+            .apply {
+                toRepresentation()
+                    .singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true")
+                    .let(::update)
+            }
+            .members()
+            .map { users().get(it.id) }
+            .filter { userResource -> userResource.groups().any { it.name == "veo-user" } }
+            .forEach {
+                it.leaveGroup(getGroupId("veo-user"))
+            }
+    }
+
+    fun activateClient(veoClient: VeoClient) = performSynchronized(veoClient) {
+        groups().group(getGroupId(veoClient.groupName))
+            .apply {
+                toRepresentation()
+                    .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
+                    .let(::update)
+            }
+            .members()
+            .forEach {
+                users().get(it.id).joinGroup(getGroupId("veo-user"))
+            }
+    }
+
     fun deleteClient(client: VeoClient) = facade.perform {
         log.info("Deleting veo client group ${client.groupName}")
         tryDeleteGroup(getGroupId(client.groupName))
     }
 
-    private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T = facade.perform {
-        synchronized(authAccount.veoClient.groupName.intern()) {
+    private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T =
+        performSynchronized(authAccount.veoClient, block)
+
+    private fun <T> performSynchronized(client: VeoClient, block: RealmResource.() -> T): T = facade.perform {
+        synchronized(client.groupName.intern()) {
             block()
         }
     }
@@ -160,16 +193,21 @@ class AccountService(
             .filter { it.isEnabled }
             .size
 
-    private fun dtoToUser(dto: CreateAccountDto, authAccount: AuthenticatedAccount) = UserRepresentation().apply {
+    private fun RealmResource.dtoToUser(dto: CreateAccountDto, authAccount: AuthenticatedAccount) = UserRepresentation().apply {
         username = dto.username.value
         email = dto.emailAddress.value
         firstName = dto.firstName.value
         lastName = dto.lastName.value
         groups = dto.groups.groupNames.map(::getUserGroupPath) +
-            getUserGroupPath("veo-user") +
-            authAccount.veoClient.groupName
+            authAccount.veoClient.groupName +
+            if (groupActivated(authAccount.veoClient)) listOf(getUserGroupPath("veo-user")) else emptyList()
         isEnabled = dto.enabled.value
     }
+
+    private fun RealmResource.groupActivated(veoClient: VeoClient): Boolean =
+        groups().group(getGroupId(veoClient.groupName))
+            .toRepresentation()
+            .attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
         dto.emailAddress.value

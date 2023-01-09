@@ -86,6 +86,10 @@ class TestAccountService(
         }
     }
 
+    fun accountInGroup(accountId: String, groupName: String): Boolean = facade.perform {
+        users().get(accountId).groups().any { it.name == groupName }
+    }
+
     fun cleanup() = facade.perform {
         createdAccountIds
             .onEach { tryDeleteAccount(it) }
