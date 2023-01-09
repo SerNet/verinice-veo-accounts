@@ -75,7 +75,7 @@ class AccountService(
                         checkMaxUsersNotExhausted(authAccount)
                     }
                 }
-                .toUser(authAccount)
+                .let { dtoToUser(it, authAccount) }
                 .let { users().create(it) }
                 .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
                 .apply { check(status == 201) { "Unexpected user creation response $status" } }
@@ -160,15 +160,15 @@ class AccountService(
             .filter { it.isEnabled }
             .size
 
-    private fun CreateAccountDto.toUser(authAccount: AuthenticatedAccount) = UserRepresentation().also { user ->
-        user.username = username.value
-        user.email = emailAddress.value
-        user.firstName = firstName.value
-        user.lastName = lastName.value
-        user.groups = groups.groupNames.map(::getUserGroupPath) +
+    private fun dtoToUser(dto: CreateAccountDto, authAccount: AuthenticatedAccount) = UserRepresentation().apply {
+        username = dto.username.value
+        email = dto.emailAddress.value
+        firstName = dto.firstName.value
+        lastName = dto.lastName.value
+        groups = dto.groups.groupNames.map(::getUserGroupPath) +
             getUserGroupPath("veo-user") +
             authAccount.veoClient.groupName
-        user.isEnabled = enabled.value
+        isEnabled = dto.enabled.value
     }
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
