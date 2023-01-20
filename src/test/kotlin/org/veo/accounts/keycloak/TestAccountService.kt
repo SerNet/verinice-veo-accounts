@@ -66,15 +66,9 @@ class TestAccountService(
     }
 
     fun updateMaxUsers(client: VeoClient, maxUsers: Int) = facade.perform {
-        groups()
-            .group(createdGroupIds[client].toString())
-            .run {
-                update(
-                    toRepresentation().also {
-                        it.attributes["maxUsers"] = listOf(maxUsers.toString())
-                    },
-                )
-            }
+        findGroup(client.groupName)!!
+            .singleAttribute("maxUsers", maxUsers.toString())
+            .let { groups().group(it.id).update(it) }
     }
 
     fun accountExists(accountId: String): Boolean = facade.perform {
