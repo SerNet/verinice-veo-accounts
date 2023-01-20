@@ -140,6 +140,8 @@ abstract class AbstractRestTest {
 
     protected fun accountExists(accountId: String): Boolean = testAccountService.accountExists(accountId)
 
+    protected fun findGroup(groupName: String): GroupRepresentation? = testAccountService.findGroup(groupName)
+
     protected fun accountInGroup(accountId: String, groupName: String): Boolean = testAccountService.accountInGroup(accountId, groupName)
 
     private fun exchange(

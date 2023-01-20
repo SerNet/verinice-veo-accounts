@@ -243,7 +243,8 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "type" to "DELETION",
             ),
         ) {
-            // then the  accounts are gone
+            // then the  client and accounts are gone
+            findGroup(client.groupName) shouldBe null
             accountExists(managerId) shouldBe false
             accountExists(clientAccount1Id) shouldBe false
             accountExists(clientAccount2Id) shouldBe false

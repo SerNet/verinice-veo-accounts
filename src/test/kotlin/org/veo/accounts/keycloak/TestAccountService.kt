@@ -86,6 +86,10 @@ class TestAccountService(
         }
     }
 
+    fun findGroup(groupName: String): GroupRepresentation? = facade.perform {
+        groups().groups(groupName, true, 0, 1, false).firstOrNull()
+    }
+
     fun accountInGroup(accountId: String, groupName: String): Boolean = facade.perform {
         users().get(accountId).groups().any { it.name == groupName }
     }
