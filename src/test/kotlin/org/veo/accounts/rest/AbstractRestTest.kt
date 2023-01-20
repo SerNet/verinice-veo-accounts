@@ -20,8 +20,10 @@ package org.veo.accounts.rest
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.until.until
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
+import org.keycloak.representations.idm.GroupRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -50,6 +52,8 @@ import kotlin.Int.Companion.MAX_VALUE
 @ActiveProfiles(value = ["resttest"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
 abstract class AbstractRestTest {
+    private val createdVeoClients = mutableListOf<VeoClient>()
+
     @Autowired
     private lateinit var testRestTemplate: TestRestTemplate
 
@@ -96,10 +100,35 @@ abstract class AbstractRestTest {
     @AfterEach
     fun teardown() {
         testAccountService.cleanup()
+        createdVeoClients
+            .filter { findGroup(it.groupName) != null }
+            .forEach {
+                sendMessage(
+                    "client_change",
+                    mapOf(
+                        "clientId" to it.clientId,
+                        "eventType" to "client_change",
+                        "type" to "DELETION",
+                    ),
+                ) { findGroup(it.groupName) shouldBe null }
+            }
     }
 
-    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE): VeoClient =
-        testAccountService.createVeoClientGroup(maxUsers)
+    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE, maxUnits: Int = MAX_VALUE): VeoClient =
+        VeoClient(randomUUID())
+            .apply {
+                sendMessage(
+                    "client_change",
+                    mapOf(
+                        "clientId" to clientId,
+                        "eventType" to "client_change",
+                        "maxUnits" to maxUnits,
+                        "maxUsers" to maxUsers,
+                        "type" to "CREATION",
+                    ),
+                ) { findGroup(groupName) shouldNotBe null }
+            }
+            .also { createdVeoClients.add(it) }
 
     protected fun createManager(group: VeoClient, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
         testAccountService.createManager(group, roles, prefix)

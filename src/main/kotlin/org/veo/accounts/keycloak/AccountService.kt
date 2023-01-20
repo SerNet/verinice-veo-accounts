@@ -19,6 +19,7 @@ package org.veo.accounts.keycloak
 
 import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RealmResource
+import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -139,6 +140,18 @@ class AccountService(
             .forEach {
                 it.leaveGroup(getGroupId("veo-user"))
             }
+    }
+
+    fun createClient(client: VeoClient, maxUnits: Int, maxUsers: Int) = performSynchronized(client) {
+        log.info("Creating veo client group ${client.groupName}")
+        GroupRepresentation()
+            .apply {
+                name = client.groupName
+                singleAttribute("maxUnits", maxUnits.toString())
+                singleAttribute("maxUsers", maxUsers.toString())
+            }
+            .let { groups().add(it) }
+            .run {}
     }
 
     fun activateClient(veoClient: VeoClient) = performSynchronized(veoClient) {

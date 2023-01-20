@@ -88,6 +88,11 @@ class MessageSubscriber(
             .let { VeoClient(it) }
         when (content.get("type").asText()) {
             "ACTIVATION" -> accountService.activateClient(client)
+            "CREATION" -> accountService.createClient(
+                client,
+                content.get("maxUnits").asInt(),
+                content.get("maxUsers").asInt(),
+            )
             "DEACTIVATION" -> accountService.deactivateClient(client)
             "DELETION" -> accountService.deleteClient(client)
         }

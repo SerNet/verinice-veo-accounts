@@ -31,11 +31,19 @@ class ClientChangeRestTest : AbstractRestTest() {
 
     @BeforeEach
     fun setup() {
-        client = createVeoClientGroup()
+        client = createVeoClientGroup(10, 13)
         managerId = createManager(client)
 
         otherClient = createVeoClientGroup()
         otherManagerId = createManager(otherClient)
+    }
+
+    @Test
+    fun `creates client`() {
+        findGroup(client.groupName)!!.apply {
+            attributes["maxUnits"] shouldBe listOf("13")
+            attributes["maxUsers"] shouldBe listOf("10")
+        }
     }
 
     @Test

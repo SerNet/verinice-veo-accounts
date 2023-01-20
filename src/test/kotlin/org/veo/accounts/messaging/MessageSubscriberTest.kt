@@ -18,7 +18,6 @@
 package org.veo.accounts.messaging
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -34,6 +33,25 @@ private val om = jacksonObjectMapper()
 class MessageSubscriberTest {
     private val accountService = mockk<AccountService>()
     private val sut = MessageSubscriber(accountService)
+
+    @Test
+    fun `handles client creation`() {
+        every { accountService.createClient(any(), any(), any()) } just Runs
+
+        // when a client deletion message is received
+        sut.handleMessage(
+            message(
+                "eventType" to "client_change",
+                "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
+                "maxUnits" to 6,
+                "maxUsers" to 7,
+                "type" to "CREATION",
+            ),
+        )
+
+        // then the client is created
+        verify { accountService.createClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")), 6, 7) }
+    }
 
     @Test
     fun `handles client activation`() {
@@ -84,20 +102,6 @@ class MessageSubscriberTest {
 
         // then the client is deleted
         verify { accountService.deleteClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
-    }
-
-    @Test
-    fun `ignores client creation`() {
-        // expect that no unprepared calls are performed on the mockk
-        shouldNotThrow<Exception> {
-            sut.handleMessage(
-                message(
-                    "eventType" to "client_change",
-                    "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
-                    "type" to "CREATION",
-                ),
-            )
-        }
     }
 
     private fun message(vararg properties: Pair<String, Any>): String =

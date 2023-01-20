@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.veo.accounts.Role
 import org.veo.accounts.auth.VeoClient
-import java.util.UUID
 import java.util.UUID.randomUUID
 import javax.ws.rs.NotFoundException
 
@@ -42,7 +41,6 @@ class TestAccountService(
 
     val testPassword = randomUUID().toString()
     private val createdAccountIds = mutableListOf<String>()
-    private val createdGroupIds = mutableMapOf<VeoClient, UUID>()
 
     fun createManager(group: VeoClient, roles: List<Role>, usernamePrefix: String): String = facade.perform {
         UserRepresentation()
@@ -58,11 +56,6 @@ class TestAccountService(
             .also { assignRoles(it, roles) }
             .also { assignTestPassword(it) }
             .also(createdAccountIds::add)
-    }
-
-    fun createVeoClientGroup(maxUsers: Int): VeoClient = facade.perform {
-        VeoClient(randomUUID())
-            .also { createdGroupIds[it] = createVeoClientGroup(it, maxUsers) }
     }
 
     fun updateMaxUsers(client: VeoClient, maxUsers: Int) = facade.perform {
@@ -92,10 +85,6 @@ class TestAccountService(
         createdAccountIds
             .onEach { tryDeleteAccount(it) }
             .clear()
-        createdGroupIds
-            .values
-            .onEach { tryDeleteGroup(it.toString()) }
-            .clear()
     }
 
     fun getUsername(accountId: String): String = facade.perform {
@@ -103,15 +92,6 @@ class TestAccountService(
             .toRepresentation()
             .username
     }
-
-    private fun RealmResource.createVeoClientGroup(client: VeoClient, maxUsers: Int): UUID = GroupRepresentation()
-        .apply {
-            name = client.groupName
-            attributes = mapOf("maxUsers" to listOf(maxUsers.toString()))
-        }
-        .let { groups().add(it) }
-        .let(facade::parseResourceId)
-        .let(UUID::fromString)
 
     private fun RealmResource.assignTestPassword(accountId: String) = users()
         .get(accountId)
