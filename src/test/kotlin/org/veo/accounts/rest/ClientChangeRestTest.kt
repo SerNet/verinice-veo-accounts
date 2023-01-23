@@ -93,11 +93,11 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "clientId" to client.clientId,
                 "type" to "DEACTIVATION",
             ),
-        )
-
-        // then the accounts are removed from veo-user group
-        accountInGroup(danAccountId, "veo-user") shouldBe false
-        accountInGroup(sydAccountId, "veo-user") shouldBe false
+        ) {
+            // then the accounts are removed from veo-user group
+            accountInGroup(danAccountId, "veo-user") shouldBe false
+            accountInGroup(sydAccountId, "veo-user") shouldBe false
+        }
 
         // and the other client's accounts are still in the veo-user group
         accountInGroup(otherClientAccountId, "veo-user") shouldBe true
@@ -128,12 +128,12 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "clientId" to client.clientId,
                 "type" to "ACTIVATION",
             ),
-        )
-
-        // then the accounts are back in the veo-user group
-        accountInGroup(danAccountId, "veo-user") shouldBe true
-        accountInGroup(sydAccountId, "veo-user") shouldBe true
-        accountInGroup(timAccountId, "veo-user") shouldBe true
+        ) {
+            // then the accounts are back in the veo-user group
+            accountInGroup(danAccountId, "veo-user") shouldBe true
+            accountInGroup(sydAccountId, "veo-user") shouldBe true
+            accountInGroup(timAccountId, "veo-user") shouldBe true
+        }
 
         // when creating a new user in the activated veo client group
         val catAccountId = post(
@@ -160,13 +160,13 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "clientId" to client.clientId,
                 "type" to "DEACTIVATION",
             ),
-        )
-
-        // then all accounts are removed from the veo-user group
-        accountInGroup(danAccountId, "veo-user") shouldBe false
-        accountInGroup(sydAccountId, "veo-user") shouldBe false
-        accountInGroup(timAccountId, "veo-user") shouldBe false
-        accountInGroup(catAccountId, "veo-user") shouldBe false
+        ) {
+            // then all accounts are removed from the veo-user group
+            accountInGroup(danAccountId, "veo-user") shouldBe false
+            accountInGroup(sydAccountId, "veo-user") shouldBe false
+            accountInGroup(timAccountId, "veo-user") shouldBe false
+            accountInGroup(catAccountId, "veo-user") shouldBe false
+        }
 
         // when activating the client again
         sendMessage(
@@ -176,13 +176,13 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "clientId" to client.clientId,
                 "type" to "ACTIVATION",
             ),
-        )
-
-        // then all accounts are back in the veo-user group
-        accountInGroup(danAccountId, "veo-user") shouldBe true
-        accountInGroup(sydAccountId, "veo-user") shouldBe true
-        accountInGroup(timAccountId, "veo-user") shouldBe true
-        accountInGroup(catAccountId, "veo-user") shouldBe true
+        ) {
+            // then all accounts are back in the veo-user group
+            accountInGroup(danAccountId, "veo-user") shouldBe true
+            accountInGroup(sydAccountId, "veo-user") shouldBe true
+            accountInGroup(timAccountId, "veo-user") shouldBe true
+            accountInGroup(catAccountId, "veo-user") shouldBe true
+        }
     }
 
     @Test
@@ -242,12 +242,12 @@ class ClientChangeRestTest : AbstractRestTest() {
                 "clientId" to client.clientId,
                 "type" to "DELETION",
             ),
-        )
-
-        // then the accounts are gone
-        accountExists(managerId) shouldBe false
-        accountExists(clientAccount1Id) shouldBe false
-        accountExists(clientAccount2Id) shouldBe false
+        ) {
+            // then the  accounts are gone
+            accountExists(managerId) shouldBe false
+            accountExists(clientAccount1Id) shouldBe false
+            accountExists(clientAccount2Id) shouldBe false
+        }
 
         // and the other client's accounts are still there
         accountExists(otherManagerId) shouldBe true

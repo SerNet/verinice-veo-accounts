@@ -18,12 +18,9 @@
 package org.veo.accounts.rest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.mockk.InternalPlatformDsl.toStr
-import org.springframework.amqp.rabbit.connection.CorrelationData
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.lang.Math.random
 
 val om = jacksonObjectMapper()
 
@@ -38,17 +35,15 @@ class TestMessageDispatcher(
     fun sendMessage(routingKey: String, content: Map<String, *>) {
         send(
             "$subscriptionRoutingKeyPrefix$routingKey",
-            (random() * Long.MAX_VALUE).toLong(),
             om.writeValueAsString(content),
         )
     }
 
-    private fun send(routingKey: String, id: Long, content: String) {
-        rabbitTemplate.convertSendAndReceive(
+    private fun send(routingKey: String, content: String) {
+        rabbitTemplate.convertAndSend(
             exchange,
             routingKey,
             om.writeValueAsString(mapOf("content" to content)),
-            CorrelationData(id.toStr()),
         )
     }
 }

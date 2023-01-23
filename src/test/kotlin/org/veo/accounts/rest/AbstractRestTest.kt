@@ -18,6 +18,7 @@
 package org.veo.accounts.rest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.kotest.assertions.until.until
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -32,6 +33,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait.forListeningPort
+import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.veo.accounts.Role
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
@@ -42,6 +44,7 @@ import org.veo.accounts.WebSecurity
 import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.keycloak.TestAccountService
 import java.util.UUID.randomUUID
+import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.Int.Companion.MAX_VALUE
 
 @ActiveProfiles(value = ["resttest"])
@@ -122,8 +125,16 @@ abstract class AbstractRestTest {
     protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204): Response =
         exchange(HttpMethod.DELETE, url, authAccountId, expectedStatus = expectedStatus)
 
-    protected fun sendMessage(routingKey: String, content: Map<String, *>) {
+    protected fun sendMessage(routingKey: String, content: Map<String, *>, completionAssertion: () -> Unit) {
         testMessageDispatcher.sendMessage(routingKey, content)
+        await().atMost(5, SECONDS).until {
+            try {
+                completionAssertion()
+                true
+            } catch (ex: Throwable) {
+                false
+            }
+        }
     }
 
     protected fun accountExists(accountId: String): Boolean = testAccountService.accountExists(accountId)
