@@ -66,23 +66,24 @@ abstract class AbstractRestTest {
     private var configuredBaseUrl: String? = null
 
     companion object {
-        private lateinit var rabbit: GenericContainer<*>
+        private var rabbit: GenericContainer<*>? = null
 
         @BeforeAll
         @JvmStatic
         fun setupAll() {
-            if (System.getenv("SPRING_RABBITMQ_HOST") == null) {
+            if (rabbit == null && System.getenv("SPRING_RABBITMQ_HOST") == null) {
                 rabbit = GenericContainer("rabbitmq:3-management")
                     .withExposedPorts(5672, 15672)
                     .waitingFor(forListeningPort())
                     .apply { start() }
-
-                System.getProperties().putAll(
-                    mapOf(
-                        "spring.rabbitmq.host" to rabbit.host,
-                        "spring.rabbitmq.port" to rabbit.getMappedPort(5672),
-                    ),
-                )
+                    .apply {
+                        System.getProperties().putAll(
+                            mapOf(
+                                "spring.rabbitmq.host" to host,
+                                "spring.rabbitmq.port" to getMappedPort(5672),
+                            ),
+                        )
+                    }
             }
         }
     }
