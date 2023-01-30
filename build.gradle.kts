@@ -46,7 +46,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-    implementation("io.mockk:mockk:1.13.3")
+    implementation("io.mockk:mockk:1.13.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
     implementation("net.swiftzer.semver:semver:1.2.0")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
