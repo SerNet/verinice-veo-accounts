@@ -100,5 +100,6 @@ class SecurityRestTest : AbstractRestTest() {
         get("/swagger-ui.html", expectedStatus = 200)
         get("/swagger-ui/index.html", expectedStatus = 200)
         get("/v3/api-docs", expectedStatus = 200)
+        get("/v3/api-docs/swagger-config", expectedStatus = 200)
     }
 }

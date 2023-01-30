@@ -28,6 +28,7 @@ import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
@@ -56,45 +57,41 @@ class WebSecurity(
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.cors()
-            .and()
-            .csrf()
-            .disable() // Anonymous access (a user with role "ROLE_ANONYMOUS" must be enabled for
-            // swagger-ui. We cannot disable it.
-            // Make sure that no critical API can be accessed by an anonymous user!
-            // .anonymous()
-            //     .disable()
-            .authorizeHttpRequests()
-            .requestMatchers("/actuator/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/v2/**")
-            .permitAll()
-            .requestMatchers(GET)
-            .hasRole(Role.READ.roleName)
-            .requestMatchers(POST)
-            .hasRole(Role.CREATE.roleName)
-            .requestMatchers(PUT)
-            .hasRole(Role.UPDATE.roleName)
-            .requestMatchers(DELETE)
-            .hasRole(Role.DELETE.roleName)
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(STATELESS)
-            .and()
-            .oauth2ResourceServer()
-            .jwt()
-            .jwtAuthenticationConverter(
-                JwtAuthenticationConverter().apply {
-                    setJwtGrantedAuthoritiesConverter { jwt ->
-                        jwt.getClaimAsMap("resource_access")
-                            ?.get(keycloakServiceClientName)
-                            ?.let { it as Map<*, *> }
-                            ?.get("roles")
-                            ?.let { it as Collection<*> }
-                            ?.map { it as String }
-                            ?.map { SimpleGrantedAuthority("ROLE_$it") }
-                            ?: emptyList()
+        http {
+            cors { }
+            csrf { disable() }
+            authorizeHttpRequests {
+                authorize("/actuator/**", permitAll)
+                authorize("/swagger-ui.html", permitAll)
+                authorize("/swagger-ui/**", permitAll)
+                authorize("/v2/api-docs/**", permitAll)
+                authorize("/v3/api-docs/**", permitAll)
+
+                authorize(GET, "/**", hasRole(Role.READ.roleName))
+                authorize(POST, "/**", hasRole(Role.CREATE.roleName))
+                authorize(PUT, "/**", hasRole(Role.UPDATE.roleName))
+                authorize(DELETE, "/**", hasRole(Role.DELETE.roleName))
+            }
+            sessionManagement {
+                sessionCreationPolicy = STATELESS
+            }
+            oauth2ResourceServer {
+                jwt {
+                    jwtAuthenticationConverter = JwtAuthenticationConverter().apply {
+                        setJwtGrantedAuthoritiesConverter { jwt ->
+                            jwt.getClaimAsMap("resource_access")
+                                ?.get(keycloakServiceClientName)
+                                ?.let { it as Map<*, *> }
+                                ?.get("roles")
+                                ?.let { it as Collection<*> }
+                                ?.map { it as String }
+                                ?.map { SimpleGrantedAuthority("ROLE_$it") }
+                                ?: emptyList()
+                        }
                     }
-                },
-            )
+                }
+            }
+        }
         return http.build()
     }
 
