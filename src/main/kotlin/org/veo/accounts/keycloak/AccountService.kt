@@ -167,7 +167,7 @@ class AccountService(
             }
     }
 
-    fun deleteClient(client: VeoClient) = facade.perform {
+    fun deleteClient(client: VeoClient) = performSynchronized(client) {
         log.info("Deleting veo client group ${client.groupName}")
         groups().group(getGroupId(client.groupName)).run {
             members().forEach {
