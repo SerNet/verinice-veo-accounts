@@ -27,6 +27,9 @@ Operations on veo-accounts are governed by the following Keycloak roles:
 
 These roles are currently only granted to a veo client's main account that is created along with the veo client itself.
 
+### Client lifecycle
+Veo-accounts is responsible for managing veo client groups in Keycloak and listens to client lifecycle events via AMQP. See [Events](./events.md).
+
 ### Restrictions
 The following rules are imposed on account management by veo-accounts:
 * accounts cannot be assigned to any veo client group other than the authenticated user's veo client group
