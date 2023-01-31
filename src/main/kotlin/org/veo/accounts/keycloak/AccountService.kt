@@ -169,7 +169,12 @@ class AccountService(
 
     fun deleteClient(client: VeoClient) = facade.perform {
         log.info("Deleting veo client group ${client.groupName}")
-        tryDeleteGroup(getGroupId(client.groupName))
+        groups().group(getGroupId(client.groupName)).run {
+            members().forEach {
+                users().delete(it.id)
+            }
+            remove()
+        }
     }
 
     private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T =

@@ -40,7 +40,6 @@ class TestAccountService(
     private lateinit var facade: KeycloakFacade
 
     val testPassword = randomUUID().toString()
-    private val createdAccountIds = mutableListOf<String>()
 
     fun createManager(group: VeoClient, roles: List<Role>, usernamePrefix: String): String = facade.perform {
         UserRepresentation()
@@ -55,7 +54,6 @@ class TestAccountService(
             .substringAfterLast('/')
             .also { assignRoles(it, roles) }
             .also { assignTestPassword(it) }
-            .also(createdAccountIds::add)
     }
 
     fun updateMaxUsers(client: VeoClient, maxUsers: Int) = facade.perform {
@@ -79,12 +77,6 @@ class TestAccountService(
 
     fun accountInGroup(accountId: String, groupName: String): Boolean = facade.perform {
         users().get(accountId).groups().any { it.name == groupName }
-    }
-
-    fun cleanup() = facade.perform {
-        createdAccountIds
-            .onEach { tryDeleteAccount(it) }
-            .clear()
     }
 
     fun getUsername(accountId: String): String = facade.perform {

@@ -99,7 +99,6 @@ abstract class AbstractRestTest {
 
     @AfterEach
     fun teardown() {
-        testAccountService.cleanup()
         createdVeoClients
             .filter { findGroup(it.groupName) != null }
             .forEach {
