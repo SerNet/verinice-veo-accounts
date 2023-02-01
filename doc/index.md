@@ -1,15 +1,20 @@
 # veo-accounts
 
 ## Documentation
-Organizations using VEO are supposed to have one main user that is created by the shop or by an administrator. This
-user may create additional users but only with certain restrictions. Keycloak accounts for end users are not
-authorized to read or write other accounts directly on Keycloak. They can only manage other accounts within their own
-veo client group by using the veo-accounts REST API.
 
-Veo-accounts provides endpoints for reading, creating, updating and deleting Keycloak accounts that belong to the same
-veo client group as the authenticated user. Accounts are assigned to veo clients using a Keycloak group mapping with the
-group name schema "veo_client:{uuid}". Veo clients are not to be confused with
-[Keycloak clients](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms).
+Veo-accounts is a REST API that can be used by account managers to retrieve, create, modify, and delete veo user accounts within their own veo client. In the veo application ecosystem, it acts as a facade to the Keycloak admin API and is responsible for managing users and groups in Keycloak.
+
+For exhaustive API documentation, launch veo-accounts and visit `/swagger-ui.html`.
+
+### Clients
+Each veo client is represented as a Keycloak group with the group name schema "veo_client:{uuid}". Veo clients are not to be confused with [Keycloak clients](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms). Veo-accounts creates, updates, and deletes veo client groups in Keycloak when the corresponding [external events](./events.md) are received.
+
+### Client initialization
+
+To enable account management in a [newly created](./events.md#creation) veo client, an initial user must be created (otherwise there would be no users in the group who could authenticate with the veo-accounts API). For this purpose, the API features a dedicated endpoint `POST /initial`, which requires a secret API key (as opposed to the JWT that is required for other endpoints). The initial user is created with [account management privileges](#authorization) and will receive an email with a password reset link.
+
+### Account management
+After defining a password, the initial user can authenticate with veo-accounts using a JWT and create additional accounts in their own veo client group. `GET`, `POST`, `PUT` & `DELETE` endpoints are available for managing accounts. For usage details, see the API documentation and [Restrictions](#restrictions).
 
 ### Authentication
 Users authenticate with veo-accounts using a JWT for the public Keycloak authentication client (e.g. "veo-prod" or
@@ -25,7 +30,7 @@ Operations on veo-accounts are governed by the following Keycloak roles:
 * `account:delete`
 * `account:update`
 
-These roles are currently only granted to a veo client's main account that is created along with the veo client itself.
+These roles are currently only granted to a veo client's initial account that is created in a brand-new veo client.
 
 ### Client lifecycle
 Veo-accounts is responsible for managing veo client groups in Keycloak and listens to client lifecycle events via AMQP. See [Events](./events.md).
