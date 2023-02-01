@@ -216,11 +216,17 @@ class AccountService(
         email = dto.emailAddress.value
         firstName = dto.firstName.value
         lastName = dto.lastName.value
-        groups = dto.groups.groupNames.map(::getUserGroupPath) +
-            authAccount.veoClient.groupName +
-            if (groupActivated(authAccount.veoClient)) listOf(getUserGroupPath("veo-user")) else emptyList()
+        groups = getGroupsForNewAccount(authAccount.veoClient, dto.groups)
         isEnabled = dto.enabled.value
     }
+
+    private fun RealmResource.getGroupsForNewAccount(
+        veoClient: VeoClient,
+        assignableGroups: AssignableGroupSet,
+    ) = mutableListOf<String>()
+        .apply { addAll(assignableGroups.groupNames.map(::getUserGroupPath)) }
+        .apply { add(veoClient.groupName) }
+        .apply { if (groupActivated(veoClient)) add(getUserGroupPath("veo-user")) }
 
     private fun RealmResource.groupActivated(veoClient: VeoClient): Boolean =
         groups().group(getGroupId(veoClient.groupName))
