@@ -43,7 +43,7 @@ import org.veo.accounts.Role.READ
 import org.veo.accounts.Role.UPDATE
 import org.veo.accounts.VeoAccountsApplication
 import org.veo.accounts.WebSecurity
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.TestAccountService
 import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit.SECONDS
@@ -52,7 +52,7 @@ import kotlin.Int.Companion.MAX_VALUE
 @ActiveProfiles(value = ["resttest"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
 abstract class AbstractRestTest {
-    private val createdVeoClients = mutableListOf<VeoClient>()
+    private val createdVeoClients = mutableListOf<VeoClientId>()
 
     @Autowired
     private lateinit var testRestTemplate: TestRestTemplate
@@ -113,8 +113,8 @@ abstract class AbstractRestTest {
             }
     }
 
-    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE, maxUnits: Int = MAX_VALUE): VeoClient =
-        VeoClient(randomUUID())
+    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE, maxUnits: Int = MAX_VALUE): VeoClientId =
+        VeoClientId(randomUUID())
             .apply {
                 sendMessage(
                     "client_change",
@@ -129,10 +129,10 @@ abstract class AbstractRestTest {
             }
             .also { createdVeoClients.add(it) }
 
-    protected fun createManager(group: VeoClient, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
+    protected fun createManager(group: VeoClientId, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
         testAccountService.createManager(group, roles, prefix)
 
-    protected fun updateMaxUsers(group: VeoClient, maxUsers: Int) {
+    protected fun updateMaxUsers(group: VeoClientId, maxUsers: Int) {
         testAccountService.updateMaxUsers(group, maxUsers)
     }
 

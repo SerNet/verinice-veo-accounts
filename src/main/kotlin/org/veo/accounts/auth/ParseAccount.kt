@@ -21,12 +21,13 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.VeoClientId
 
 fun Authentication.parseAccount(): AuthenticatedAccount = AuthenticatedAccount(AccountId(name), getVeoClient())
 
-private fun Authentication.getVeoClient(): VeoClient = token()
+private fun Authentication.getVeoClient(): VeoClientId = token()
     .getClaimAsStringList("groups")!!
-    .mapNotNull { VeoClient.tryParse(it) }
+    .mapNotNull { VeoClientId.tryParse(it) }
     .also { require(it.size == 1) { "Expected 1 client for the account. Got ${it.size}." } }
     .first()
 

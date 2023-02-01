@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.auth
+package org.veo.accounts.dtos
 
+import com.fasterxml.jackson.annotation.JsonValue
+import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 
 private const val uuidPattern = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
@@ -27,12 +29,18 @@ private val clientGroupPathRegex = Regex("^/$clientGroupPrefix($uuidPattern)$")
  * Not to be confused with the keycloak client. Each keycloak user account can be assigned to one veo client with a
  * group mapping.
  */
-data class VeoClient internal constructor(val clientId: UUID) {
+@Schema(
+    description = "UUID of a veo client. Each account is assigned to a client. Account managers can only manage accounts within their own client.",
+)
+data class VeoClientId(
+    @get:JsonValue
+    val clientId: UUID,
+) {
     val groupName = "$clientGroupPrefix$clientId"
     val path = "/$groupName"
     companion object {
-        fun tryParse(groupPath: String): VeoClient? = groupPath
+        fun tryParse(groupPath: String): VeoClientId? = groupPath
             .let { clientGroupPathRegex.matchEntire(it) }
-            ?.let { VeoClient(UUID.fromString(it.groups[1]!!.value)) }
+            ?.let { VeoClientId(UUID.fromString(it.groups[1]!!.value)) }
     }
 }

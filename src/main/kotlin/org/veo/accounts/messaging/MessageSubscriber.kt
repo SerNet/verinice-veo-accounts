@@ -27,7 +27,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.AccountService
 import java.util.UUID
 
@@ -85,7 +85,7 @@ class MessageSubscriber(
         val client = content.get("clientId")
             .asText()
             .let { UUID.fromString(it) }
-            .let { VeoClient(it) }
+            .let { VeoClientId(it) }
         when (content.get("type").asText()) {
             "ACTIVATION" -> accountService.activateClient(client)
             "CREATION" -> accountService.createClient(

@@ -18,6 +18,7 @@
 package org.veo.accounts.auth
 
 import org.veo.accounts.dtos.AccountId
+import org.veo.accounts.dtos.VeoClientId
 
 /** The keycloak user account that is currently authenticated with this application. */
-data class AuthenticatedAccount internal constructor(val id: AccountId, val veoClient: VeoClient)
+data class AuthenticatedAccount internal constructor(val id: AccountId, val veoClient: VeoClientId)

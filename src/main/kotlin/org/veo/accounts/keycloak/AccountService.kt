@@ -24,9 +24,9 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.auth.AuthenticatedAccount
-import org.veo.accounts.auth.VeoClient
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
@@ -130,7 +130,7 @@ class AccountService(
             .run { }
     }
 
-    fun deactivateClient(veoClient: VeoClient) = performSynchronized(veoClient) {
+    fun deactivateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
         groups().group(getGroupId(veoClient.groupName))
             .apply {
                 toRepresentation()
@@ -145,7 +145,7 @@ class AccountService(
             }
     }
 
-    fun createClient(client: VeoClient, maxUnits: Int, maxUsers: Int) = performSynchronized(client) {
+    fun createClient(client: VeoClientId, maxUnits: Int, maxUsers: Int) = performSynchronized(client) {
         log.info("Creating veo client group ${client.groupName}")
         GroupRepresentation()
             .apply {
@@ -157,7 +157,7 @@ class AccountService(
             .run {}
     }
 
-    fun activateClient(veoClient: VeoClient) = performSynchronized(veoClient) {
+    fun activateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
         groups().group(getGroupId(veoClient.groupName))
             .apply {
                 toRepresentation()
@@ -170,7 +170,7 @@ class AccountService(
             }
     }
 
-    fun deleteClient(client: VeoClient) = performSynchronized(client) {
+    fun deleteClient(client: VeoClientId) = performSynchronized(client) {
         log.info("Deleting veo client group ${client.groupName}")
         groups().group(getGroupId(client.groupName)).run {
             members().forEach {
@@ -183,7 +183,7 @@ class AccountService(
     private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T =
         performSynchronized(authAccount.veoClient, block)
 
-    private fun <T> performSynchronized(client: VeoClient, block: RealmResource.() -> T): T = facade.perform {
+    private fun <T> performSynchronized(client: VeoClientId, block: RealmResource.() -> T): T = facade.perform {
         synchronized(client.groupName.intern()) {
             block()
         }
@@ -224,14 +224,14 @@ class AccountService(
     }
 
     private fun RealmResource.getGroupsForNewAccount(
-        veoClient: VeoClient,
+        veoClient: VeoClientId,
         assignableGroups: AssignableGroupSet,
     ) = mutableListOf<String>()
         .apply { addAll(assignableGroups.groupNames.map(::getUserGroupPath)) }
         .apply { add(veoClient.groupName) }
         .apply { if (groupActivated(veoClient)) add(getUserGroupPath("veo-user")) }
 
-    private fun RealmResource.groupActivated(veoClient: VeoClient): Boolean =
+    private fun RealmResource.groupActivated(veoClient: VeoClientId): Boolean =
         groups().group(getGroupId(veoClient.groupName))
             .toRepresentation()
             .attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")

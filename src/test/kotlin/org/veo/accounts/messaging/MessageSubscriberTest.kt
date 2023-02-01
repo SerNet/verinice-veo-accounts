@@ -24,7 +24,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.AccountService
 import java.util.UUID
 
@@ -50,7 +50,7 @@ class MessageSubscriberTest {
         )
 
         // then the client is created
-        verify { accountService.createClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")), 6, 7) }
+        verify { accountService.createClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")), 6, 7) }
     }
 
     @Test
@@ -67,7 +67,7 @@ class MessageSubscriberTest {
         )
 
         // then the client is activated
-        verify { accountService.activateClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { accountService.activateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     @Test
@@ -84,7 +84,7 @@ class MessageSubscriberTest {
         )
 
         // then the client is deactivated
-        verify { accountService.deactivateClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { accountService.deactivateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     @Test
@@ -101,7 +101,7 @@ class MessageSubscriberTest {
         )
 
         // then the client is deleted
-        verify { accountService.deleteClient(VeoClient(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { accountService.deleteClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     private fun message(vararg properties: Pair<String, Any>): String =

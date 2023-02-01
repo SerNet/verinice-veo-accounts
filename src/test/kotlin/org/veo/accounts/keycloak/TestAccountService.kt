@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.veo.accounts.Role
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 import java.util.UUID.randomUUID
 import javax.ws.rs.NotFoundException
 
@@ -41,7 +41,7 @@ class TestAccountService(
 
     val testPassword = randomUUID().toString()
 
-    fun createManager(group: VeoClient, roles: List<Role>, usernamePrefix: String): String = facade.perform {
+    fun createManager(group: VeoClientId, roles: List<Role>, usernamePrefix: String): String = facade.perform {
         UserRepresentation()
             .apply {
                 username = "$usernamePrefix-account-${randomUUID()}"
@@ -56,7 +56,7 @@ class TestAccountService(
             .also { assignTestPassword(it) }
     }
 
-    fun updateMaxUsers(client: VeoClient, maxUsers: Int) = facade.perform {
+    fun updateMaxUsers(client: VeoClientId, maxUsers: Int) = facade.perform {
         findGroup(client.groupName)!!
             .singleAttribute("maxUsers", maxUsers.toString())
             .let { groups().group(it.id).update(it) }

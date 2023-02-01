@@ -23,10 +23,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 
 class MaxUsersRestTest : AbstractRestTest() {
-    lateinit var client: VeoClient
+    lateinit var client: VeoClientId
     lateinit var managerId: String
 
     @BeforeEach

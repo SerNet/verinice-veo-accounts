@@ -20,13 +20,13 @@ package org.veo.accounts.rest
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.veo.accounts.auth.VeoClient
+import org.veo.accounts.dtos.VeoClientId
 
 class ClientChangeRestTest : AbstractRestTest() {
-    lateinit var client: VeoClient
+    lateinit var client: VeoClientId
     lateinit var managerId: String
 
-    lateinit var otherClient: VeoClient
+    lateinit var otherClient: VeoClientId
     lateinit var otherManagerId: String
 
     @BeforeEach
