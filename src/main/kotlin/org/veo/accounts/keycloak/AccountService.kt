@@ -79,13 +79,16 @@ class AccountService(
                     }
                 }
                 .let { dtoToUser(it, authAccount) }
-                .let { users().create(it) }
-                .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
-                .apply { check(status == 201) { "Unexpected user creation response $status" } }
-                .let(facade::parseResourceId)
-                .also { sendEmail(it) }
-                .let { AccountId(it) }
+                .let { createAccount(it) }
         }
+
+    private fun RealmResource.createAccount(userRepresentation: UserRepresentation): AccountId = userRepresentation
+        .let { users().create(it) }
+        .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
+        .apply { check(status == 201) { "Unexpected user creation response $status" } }
+        .let(facade::parseResourceId)
+        .also { sendEmail(it) }
+        .let { AccountId(it) }
 
     fun updateAccount(id: AccountId, dto: UpdateAccountDto, authAccount: AuthenticatedAccount) =
         performSynchronized(authAccount) {
