@@ -94,6 +94,24 @@ class SecurityRestTest : AbstractRestTest() {
     }
 
     @Test
+    fun `API key works for initial account creation`() {
+        post("/initial", headers = mapOf("Authorization" to listOf(clientInitApiKey)), expectedStatus = 400)
+        post("/initial", headers = mapOf("Authorization" to listOf("wrongKey")), expectedStatus = 401)
+        post("/initial", expectedStatus = 401)
+    }
+
+    @Test
+    fun `API key does not work for account management`() {
+        val headers = mapOf("Authorization" to listOf(clientInitApiKey))
+
+        get("/", headers = headers, expectedStatus = 401)
+        get("/${randomUUID()}", headers = headers, expectedStatus = 401)
+        post("/", headers = headers, expectedStatus = 401)
+        put("/${randomUUID()}", null, null, headers = headers, expectedStatus = 401)
+        delete("/${randomUUID()}", headers = headers, expectedStatus = 401)
+    }
+
+    @Test
     fun `monitoring & documentation are accessible`() {
         get("/actuator/health/readiness", expectedStatus = 200)
         get("/actuator/health/liveness", expectedStatus = 200)

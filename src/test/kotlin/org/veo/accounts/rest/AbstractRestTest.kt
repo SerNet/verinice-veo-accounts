@@ -18,12 +18,12 @@
 package org.veo.accounts.rest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.kotest.assertions.until.until
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.keycloak.representations.idm.GroupRepresentation
+import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -68,6 +68,9 @@ abstract class AbstractRestTest {
 
     @Value("\${veo.resttest.baseUrl:#{null}}")
     private var configuredBaseUrl: String? = null
+
+    @Value("\${veo.accounts.auth.apiKeys.clientInit}")
+    protected lateinit var clientInitApiKey: String
 
     companion object {
         private var rabbit: GenericContainer<*>? = null
@@ -142,17 +145,29 @@ abstract class AbstractRestTest {
     protected fun get(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
         exchange(HttpMethod.GET, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
-    protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int? = 201): Response =
-        postRaw(url, authAccountId, serialize(body), expectedStatus)
+    protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int? = 201, headers: Map<String, List<String>> = emptyMap()): Response =
+        postRaw(url, authAccountId, serialize(body), expectedStatus, headers)
 
-    protected fun postRaw(url: String, authAccountId: String? = null, body: String?, expectedStatus: Int? = 201): Response =
-        exchange(HttpMethod.POST, url, authAccountId, body, expectedStatus = expectedStatus)
+    protected fun postRaw(
+        url: String,
+        authAccountId: String? = null,
+        body: String?,
+        expectedStatus: Int? = 201,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response =
+        exchange(HttpMethod.POST, url, authAccountId, body, headers, expectedStatus)
 
-    protected fun put(url: String, authAccountId: String? = null, body: Any?, expectedStatus: Int? = 204): Response =
-        exchange(HttpMethod.PUT, url, authAccountId, serialize(body), expectedStatus = expectedStatus)
+    protected fun put(
+        url: String,
+        authAccountId: String? = null,
+        body: Any?,
+        expectedStatus: Int? = 204,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response =
+        exchange(HttpMethod.PUT, url, authAccountId, serialize(body), headers, expectedStatus)
 
-    protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204): Response =
-        exchange(HttpMethod.DELETE, url, authAccountId, expectedStatus = expectedStatus)
+    protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204, headers: Map<String, List<String>> = emptyMap()): Response =
+        exchange(HttpMethod.DELETE, url, authAccountId, null, headers, expectedStatus)
 
     protected fun sendMessage(routingKey: String, content: Map<String, *>, completionAssertion: () -> Unit) {
         testMessageDispatcher.sendMessage(routingKey, content)
@@ -166,7 +181,11 @@ abstract class AbstractRestTest {
         }
     }
 
-    protected fun accountExists(accountId: String): Boolean = testAccountService.accountExists(accountId)
+    protected fun accountExists(accountId: String): Boolean = testAccountService.findAccount(accountId) != null
+
+    protected fun findAccount(accountId: String): UserRepresentation? = testAccountService.findAccount(accountId)
+
+    protected fun findAccountGroupNames(accountId: String): List<String> = testAccountService.getAccountGroups(accountId)
 
     protected fun findGroup(groupName: String): GroupRepresentation? = testAccountService.findGroup(groupName)
 

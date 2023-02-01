@@ -141,6 +141,7 @@ pipeline {
         stage('HTTP REST Test') {
             environment {
                 def tag = "${env.BUILD_TAG}".replaceAll("[^A-Za-z0-9]", "_")
+                CLIENT_INIT_API_KEY = "jenkinsRestTestApiKey"
                 KEYCLOAK_SERVICE_CLIENT_SECRET = credentials("keycloak_service_client_secret")
                 KEYCLOAK_SERVICE_PROXY_HOST = "cache.int.sernet.de"
                 RABBITMQ_CREDS = credentials('veo_rabbit_credentials')
@@ -155,6 +156,7 @@ pipeline {
                 --network ${n}\
                 --name veo-accounts-${n}\
                 -m 1g\
+                -e VEO_ACCOUNTS_AUTH_APIKEYS_CLIENTINIT=${env.CLIENT_INIT_API_KEY}\
                 -e VEO_ACCOUNTS_KEYCLOAK_PROXYHOST=${env.KEYCLOAK_SERVICE_PROXY_HOST}\
                 -e VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=${env.KEYCLOAK_SERVICE_CLIENT_SECRET}\
                 -e VEO_ACCOUNTS_KEYCLOAK_MAILING_ENABLED=false\
@@ -173,7 +175,9 @@ pipeline {
                                         }
                                     }
                                 }
-                                sh """export VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=\$KEYCLOAK_SERVICE_CLIENT_SECRET && \
+                                sh """
+                                   export VEO_ACCOUNTS_AUTH_APIKEYS_CLIENTINIT=\\$CLIENT_INIT_API_KEY && \\
+                                   export VEO_ACCOUNTS_KEYCLOAK_CLIENTS_SERVICE_SECRET=\\$KEYCLOAK_SERVICE_CLIENT_SECRET && \\
                                    export VEO_ACCOUNTS_KEYCLOAK_PROXYHOST=\$KEYCLOAK_SERVICE_PROXY_HOST && \
                                    export SPRING_RABBITMQ_USERNAME=$RABBITMQ_CREDS_USR && \
                                    export SPRING_RABBITMQ_PASSWORD=$RABBITMQ_CREDS_PSW && \

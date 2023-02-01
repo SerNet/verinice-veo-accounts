@@ -62,12 +62,11 @@ class TestAccountService(
             .let { groups().group(it.id).update(it) }
     }
 
-    fun accountExists(accountId: String): Boolean = facade.perform {
+    fun findAccount(accountId: String): UserRepresentation? = facade.perform {
         try {
             users().get(accountId).toRepresentation()
-            true
         } catch (_: NotFoundException) {
-            false
+            null
         }
     }
 
@@ -102,4 +101,8 @@ class TestAccountService(
         .roles()
         .clientLevel(clientId)
         .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }
+
+    fun getAccountGroups(accountId: String): List<String> = facade.perform {
+        users().get(accountId).groups().map { it.name }
+    }
 }

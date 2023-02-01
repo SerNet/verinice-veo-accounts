@@ -23,15 +23,18 @@ import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.veo.accounts.AssignableGroup.VEO_WRITE_ACCESS
 import org.veo.accounts.auth.AuthenticatedAccount
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.dtos.request.CreateAccountDto
+import org.veo.accounts.dtos.request.CreateInitialAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ExceedingMaxUsersException
 import org.veo.accounts.exceptions.ResourceNotFoundException
+import org.veo.accounts.exceptions.UnprocessableDtoException
 import javax.ws.rs.ClientErrorException
 import javax.ws.rs.NotFoundException
 
@@ -68,6 +71,16 @@ class AccountService(
             }
             .also { loadGroups(it) }
             .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
+    }
+
+    fun createInitialAccount(dto: CreateInitialAccountDto): AccountId = performSynchronized(dto.clientId) {
+        if (findGroup(dto.clientId.groupName) == null) {
+            throw UnprocessableDtoException("Target veo client does not exist")
+        }
+        if (findAccounts(dto.clientId).isNotEmpty()) {
+            throw ConflictException("Target client already contains accounts, cannot create initial account")
+        }
+        createAccount(dtoToInitialUser(dto))
     }
 
     fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): AccountId =
@@ -190,8 +203,11 @@ class AccountService(
     }
 
     private fun RealmResource.findAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
+        findAccounts(authAccount.veoClient)
+
+    private fun RealmResource.findAccounts(veoClient: VeoClientId): List<UserRepresentation> =
         groups()
-            .group(getGroupId(authAccount.veoClient.groupName))
+            .group(getGroupId(veoClient.groupName))
             .members()
 
     private fun RealmResource.checkMaxUsersNotExhausted(authAccount: AuthenticatedAccount) =
@@ -223,13 +239,24 @@ class AccountService(
         isEnabled = dto.enabled.value
     }
 
+    private fun RealmResource.dtoToInitialUser(dto: CreateInitialAccountDto) = UserRepresentation().apply {
+        username = dto.username.value
+        email = dto.emailAddress.value
+        firstName = dto.firstName.value
+        lastName = dto.lastName.value
+        groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
+        isEnabled = true
+    }
+
     private fun RealmResource.getGroupsForNewAccount(
         veoClient: VeoClientId,
         assignableGroups: AssignableGroupSet,
+        isAccountManager: Boolean = false,
     ) = mutableListOf<String>()
         .apply { addAll(assignableGroups.groupNames.map(::getUserGroupPath)) }
         .apply { add(veoClient.groupName) }
         .apply { if (groupActivated(veoClient)) add(getUserGroupPath("veo-user")) }
+        .apply { if (isAccountManager) add(getUserGroupPath("veo-accountmanagers")) }
 
     private fun RealmResource.groupActivated(veoClient: VeoClientId): Boolean =
         groups().group(getGroupId(veoClient.groupName))
@@ -251,13 +278,15 @@ class AccountService(
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"
 
-    private fun RealmResource.getGroupId(groupName: String): String = groups()
-        .groups(groupName, 0, 1)
-        .first()
-        .let { listOf(it) + it.subGroups }
-        .firstOrNull { it.name == groupName }
+    private fun RealmResource.getGroupId(groupName: String): String = findGroup(groupName)
         ?.id
         ?: throw IllegalStateException("Group with name '$groupName' not found")
+
+    private fun RealmResource.findGroup(groupName: String): GroupRepresentation? = groups()
+        .groups(groupName, 0, 1)
+        .firstOrNull()
+        ?.let { listOf(it) + it.subGroups }
+        ?.firstOrNull { it.name == groupName }
 
     private fun RealmResource.sendEmail(accountId: String) = accountId
         .let { users().get(accountId).toRepresentation() }

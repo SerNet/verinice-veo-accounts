@@ -27,6 +27,7 @@ import org.springframework.http.HttpMethod.DELETE
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
+import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -53,6 +54,9 @@ class WebSecurity(
 
     @Value("\${veo.accounts.keycloak.clients.service.name}")
     private val keycloakServiceClientName: String,
+
+    @Value("\${veo.accounts.auth.apiKeys.clientInit}")
+    protected val clientInitApiKey: String,
 ) {
     @Bean
     @Throws(Exception::class)
@@ -66,6 +70,13 @@ class WebSecurity(
                 authorize("/swagger-ui/**", permitAll)
                 authorize("/v2/api-docs/**", permitAll)
                 authorize("/v3/api-docs/**", permitAll)
+
+                authorize(
+                    POST,
+                    "/initial",
+                ) { _, context ->
+                    AuthorizationDecision(context.request?.getHeader("Authorization") == clientInitApiKey)
+                }
 
                 authorize(GET, "/**", hasRole(Role.READ.roleName))
                 authorize(POST, "/**", hasRole(Role.CREATE.roleName))
