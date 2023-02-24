@@ -13996,7 +13996,7 @@ You may add additional accurate notices of copyright ownership.
 
 --------------------------------------------------------------------------------
 
-110. Group: org.keycloak  Name: keycloak-admin-client  Version: 20.0.5
+110. Group: org.keycloak  Name: keycloak-admin-client  Version: 21.0.0
 
 POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
 
@@ -14004,7 +14004,7 @@ POM License: PUBLIC DOMAIN - http://repository.jboss.org/licenses/cc0-1.0.txt
 
 --------------------------------------------------------------------------------
 
-111. Group: org.keycloak  Name: keycloak-common  Version: 20.0.5
+111. Group: org.keycloak  Name: keycloak-common  Version: 21.0.0
 
 Manifest Project URL: http://www.jboss.org
 
@@ -14016,7 +14016,7 @@ POM License: PUBLIC DOMAIN - http://repository.jboss.org/licenses/cc0-1.0.txt
 
 --------------------------------------------------------------------------------
 
-112. Group: org.keycloak  Name: keycloak-core  Version: 20.0.5
+112. Group: org.keycloak  Name: keycloak-core  Version: 21.0.0
 
 Manifest Project URL: http://www.jboss.org
 
@@ -21550,5 +21550,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Thu Feb 23 15:36:14 UTC 2023.
+This report was generated at Fri Feb 24 15:34:25 UTC 2023.
 
