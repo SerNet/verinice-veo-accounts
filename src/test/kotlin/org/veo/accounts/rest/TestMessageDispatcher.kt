@@ -26,9 +26,9 @@ val om = jacksonObjectMapper()
 
 @Component
 class TestMessageDispatcher(
-    @Value("\${veo.accounts.rabbitmq.exchange}")
+    @Value("\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}")
     private val exchange: String,
-    @Value("\${veo.accounts.rabbitmq.subscription_routing_key_prefix}")
+    @Value("\${veo.accounts.rabbitmq.routing_key_prefix}")
     private val subscriptionRoutingKeyPrefix: String,
     private val rabbitTemplate: RabbitTemplate,
 ) {

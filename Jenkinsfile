@@ -145,8 +145,8 @@ pipeline {
                 KEYCLOAK_SERVICE_CLIENT_SECRET = credentials("keycloak_service_client_secret")
                 KEYCLOAK_SERVICE_PROXY_HOST = "cache.int.sernet.de"
                 RABBITMQ_CREDS = credentials('veo_rabbit_credentials')
-                VEO_ACCOUNTS_RABBITMQ_SUBSCRIPTION_ROUTING_KEY_PREFIX = "VEO_TEST_${tag}."
-                VEO_ACCOUNTS_RABBITMQ_QUEUE = "VEO_ACCOUNTS_REST_TEST_${tag}"
+                VEO_ACCOUNTS_RABBITMQ_ROUTING_KEY_PREFIX = "VEO_TEST_${tag}."
+                VEO_ACCOUNTS_RABBITMQ_QUEUES_VEOSUBSCRIPTIONS = "VEO_ACCOUNTS_REST_TEST_VEOSUBSCRIPTIONS_${tag}"
             }
             agent any
             steps {
