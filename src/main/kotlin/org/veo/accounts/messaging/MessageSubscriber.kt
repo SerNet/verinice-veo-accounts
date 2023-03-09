@@ -63,9 +63,9 @@ class MessageSubscriber(
             .asText()
             .let(om::readTree)
             .let { handleMessage(it) }
-    } catch (ex: Exception) {
+    } catch (ex: Throwable) {
         log.error(ex) { "Handling failed for message: '$message'" }
-        throw ex
+        throw RuntimeException(ex)
     }
 
     private fun handleMessage(content: JsonNode) {
