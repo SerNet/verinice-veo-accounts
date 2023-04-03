@@ -18,21 +18,32 @@
 package org.veo.accounts.messaging
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.kotest.matchers.shouldBe
+import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.AccountService
 import java.util.UUID
+import kotlin.reflect.full.functions
 
 private val om = jacksonObjectMapper()
 
 class MessageSubscriberTest {
     private val accountService = mockk<AccountService>()
     private val sut = MessageSubscriber(accountService)
+
+    @Test
+    fun `listeners don't return anything`() {
+        MessageSubscriber::class.functions
+            .filter { it.annotations.filterIsInstance<RabbitListener>().isNotEmpty() }
+            .forEach { it.returnType.toStr() shouldBe "kotlin.Unit" }
+    }
 
     @Test
     fun `handles client creation`() {
