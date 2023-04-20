@@ -15,6 +15,12 @@
     },
     {
       "matchPackagePatterns" : [
+        "^org.keycloak:"
+      ],
+      "groupName" : "Keycloak Client"
+    },
+    {
+      "matchPackagePatterns" : [
         "^com.diffplug.spotless"
       ],
       "postUpgradeTasks" : {
