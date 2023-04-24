@@ -47,7 +47,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
     implementation("io.mockk:mockk:1.13.5")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("net.swiftzer.semver:semver:1.2.0")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
 
@@ -60,14 +60,12 @@ dependencies {
     testImplementation("io.kotest:kotest-property-jvm:$kotestVersion")
     testImplementation("org.testcontainers:rabbitmq:1.18.0")
 
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.keycloak:keycloak-authz-client:21.1.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 }
-
-extra["kotlin-coroutines.version"] = "1.6.0"
 
 val licenseFile3rdParty = "LICENSE-3RD-PARTY.txt"
 licenseReport {
