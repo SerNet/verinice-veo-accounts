@@ -5679,7 +5679,7 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 
-61. Group: net.swiftzer.semver  Name: semver  Version: 1.2.0
+61. Group: net.swiftzer.semver  Name: semver  Version: 1.3.0
 
 POM Project URL: https://github.com/swiftzer/semver
 
@@ -22214,5 +22214,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Wed May 10 07:41:06 UTC 2023.
+This report was generated at Fri May 19 12:33:22 UTC 2023.
 
