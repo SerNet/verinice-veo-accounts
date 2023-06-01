@@ -20,7 +20,7 @@ plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     jacoco
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
-    id("com.github.jk1.dependency-license-report") version "2.3"
+    id("com.github.jk1.dependency-license-report") version "2.4"
 }
 
 group = "org.veo"
