@@ -25,9 +25,11 @@ import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.Language
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Link
 import org.veo.accounts.dtos.Username
+import org.veo.accounts.keycloak.ATTRIBUTE_LOCALE
 import java.net.URI
 
 @Schema(description = "Veo user account that is a member of the authenticated user's veo client group")
@@ -37,6 +39,7 @@ class FullAccountDto(
     val emailAddress: EmailAddress?,
     val firstName: FirstName?,
     val lastName: LastName?,
+    val language: Language?,
     val groups: AssignableGroupSet,
     val enabled: Enabled,
 ) {
@@ -46,6 +49,7 @@ class FullAccountDto(
         user.email?.let { EmailAddress(it) },
         user.firstName?.let { FirstName(it) },
         user.lastName?.let { LastName(it) },
+        user.firstAttribute(ATTRIBUTE_LOCALE)?.let { Language(it) },
         AssignableGroupSet.byGroupNames(user.groups),
         Enabled(user.isEnabled),
     )

@@ -47,6 +47,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
                 "enabled" to true,
+                "language" to "de",
             ),
         ).bodyAsMap["id"]
         accountId shouldNotBe null
@@ -59,6 +60,7 @@ class AccountManagementRestTest : AbstractRestTest() {
             get("lastName") shouldBe "Dance"
             get("groups") shouldBe listOf("veo-write-access")
             get("enabled") shouldBe true
+            get("language") shouldBe "de"
         }
 
         // and found in the list
@@ -71,6 +73,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 hans["lastName"] shouldBe "Dance"
                 hans["groups"] shouldBe listOf("veo-write-access")
                 hans["enabled"] shouldBe true
+                hans["language"] shouldBe "de"
                 (hans["_self"] as String).let {
                     it shouldMatch "https?://.*/$accountId"
                     get(it, managerId, 200)
@@ -87,6 +90,7 @@ class AccountManagementRestTest : AbstractRestTest() {
                 "lastName" to "Dance",
                 "groups" to listOf("veo-write-access"),
                 "enabled" to false,
+                "language" to "fr",
             ),
         )
         get("/$accountId", managerId).bodyAsMap.apply {
@@ -96,6 +100,7 @@ class AccountManagementRestTest : AbstractRestTest() {
             get("emailAddress") shouldBe "$prefix-hansi@test.test"
             get("groups") shouldBe listOf("veo-write-access")
             get("enabled") shouldBe false
+            get("language") shouldBe "fr"
         }
 
         // and deleted

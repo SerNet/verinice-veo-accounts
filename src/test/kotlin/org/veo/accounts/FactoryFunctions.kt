@@ -22,6 +22,7 @@ import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.Language
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.request.CreateAccountDto
@@ -35,6 +36,7 @@ fun fullAccountDto(
     emailAddress: String = "katie@test.test",
     firstName: String = "Katie",
     lastName: String = "Smith",
+    language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
 ) =
@@ -44,6 +46,7 @@ fun fullAccountDto(
         EmailAddress(emailAddress),
         FirstName(firstName),
         LastName(lastName),
+        language?.let { Language(it) },
         AssignableGroupSet(groups),
         Enabled(enabled),
     )
@@ -53,6 +56,7 @@ fun createAccountDto(
     username: String = "ksmith",
     firstName: String = "Katie",
     lastName: String = "Smith",
+    language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
 ) =
@@ -61,6 +65,7 @@ fun createAccountDto(
         EmailAddress(emailAddress),
         FirstName(firstName),
         LastName(lastName),
+        language?.let { Language(it) },
         AssignableGroupSet(groups),
         Enabled(enabled),
     )
@@ -69,7 +74,8 @@ fun updateAccountDto(
     emailAddress: String = "katie@test.test",
     firstName: String = "Katie",
     lastName: String = "Smith",
+    language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
 ) =
-    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), AssignableGroupSet(groups), Enabled(enabled))
+    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), language?.let { Language(it) }, AssignableGroupSet(groups), Enabled(enabled))

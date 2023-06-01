@@ -43,6 +43,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 "firstName" to "Primus",
                 "lastName" to "Sinus",
                 "emailAddress" to "$prefix-ps@initial.test",
+                "language" to "la",
             ),
             headers = mapOf(
                 "Authorization" to listOf(clientInitApiKey),
@@ -55,6 +56,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
             email shouldBe "$prefix-ps@initial.test"
             firstName shouldBe "Primus"
             lastName shouldBe "Sinus"
+            firstAttribute("locale") shouldBe "la"
         }
 
         // and it has been assigned to the correct groups

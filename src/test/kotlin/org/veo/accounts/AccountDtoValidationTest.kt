@@ -58,4 +58,15 @@ class AccountDtoValidationTest {
         shouldThrow<ValidationException> { updateAccountDto(emailAddress = "verinice test") }
         shouldThrow<ValidationException> { updateAccountDto(emailAddress = "verinice.test") }
     }
+
+    @Test
+    fun `invalid language is not ok`() {
+        shouldThrow<ValidationException> { createAccountDto(language = "e") }
+        shouldThrow<ValidationException> { createAccountDto(language = "eng") }
+        shouldThrow<ValidationException> { createAccountDto(language = "xx") }
+
+        shouldThrow<ValidationException> { updateAccountDto(language = "e") }
+        shouldThrow<ValidationException> { updateAccountDto(language = "eng") }
+        shouldThrow<ValidationException> { updateAccountDto(language = "xx") }
+    }
 }

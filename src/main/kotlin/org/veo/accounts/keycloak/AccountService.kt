@@ -41,6 +41,7 @@ import javax.ws.rs.NotFoundException
 private val log = logger {}
 
 private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
+const val ATTRIBUTE_LOCALE = "locale"
 
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
 @Component
@@ -235,6 +236,7 @@ class AccountService(
         email = dto.emailAddress.value
         firstName = dto.firstName.value
         lastName = dto.lastName.value
+        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
         groups = getGroupsForNewAccount(authAccount.veoClient, dto.groups)
         isEnabled = dto.enabled.value
     }
@@ -244,6 +246,7 @@ class AccountService(
         email = dto.emailAddress.value
         firstName = dto.firstName.value
         lastName = dto.lastName.value
+        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
         groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
         isEnabled = true
     }
@@ -274,6 +277,7 @@ class AccountService(
         firstName = dto.firstName.value
         lastName = dto.lastName.value
         isEnabled = dto.enabled.value
+        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
     }
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"

@@ -22,6 +22,7 @@ import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
+import org.veo.accounts.dtos.Language
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
 
@@ -31,6 +32,7 @@ class CreateAccountDto(
     val emailAddress: EmailAddress,
     val firstName: FirstName,
     val lastName: LastName,
+    val language: Language?,
     val groups: AssignableGroupSet,
     val enabled: Enabled,
 )

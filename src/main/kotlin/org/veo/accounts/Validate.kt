@@ -31,8 +31,10 @@ fun Any.validate() = validator
         }
     }
 
-class ValidationException(violations: Collection<ConstraintViolation<Any>>) : Exception(
-    violations.joinToString("; ") {
-        "Invalid ${it.rootBeanClass.simpleName}: ${it.message}"
-    },
-)
+class ValidationException(message: String) : Exception(message) {
+    constructor(violations: Collection<ConstraintViolation<Any>>) : this(
+        violations.joinToString("; ") {
+            "Invalid ${it.rootBeanClass.simpleName}: ${it.message}"
+        },
+    )
+}

@@ -15,22 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.dtos.request
+package org.veo.accounts.dtos
 
+import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
-import org.veo.accounts.dtos.EmailAddress
-import org.veo.accounts.dtos.FirstName
-import org.veo.accounts.dtos.Language
-import org.veo.accounts.dtos.LastName
-import org.veo.accounts.dtos.Username
-import org.veo.accounts.dtos.VeoClientId
+import jakarta.validation.constraints.Size
+import org.veo.accounts.ValidationException
+import org.veo.accounts.validate
+import java.util.Locale
 
-@Schema(description = "Veo user account information for creating the initial account in a client. Account ID is absent because it is generated.")
-class CreateInitialAccountDto(
-    val clientId: VeoClientId,
-    val username: Username,
-    val emailAddress: EmailAddress,
-    val firstName: FirstName,
-    val lastName: LastName,
-    val language: Language?,
+private const val minLength = 2
+private const val maxLength = 2
+
+@Schema(
+    description = "User's preferred language (ISO 639-1 code)",
+    type = "string",
+    minLength = minLength,
+    maxLength = maxLength,
+    example = "de",
 )
+class Language(
+    @field:Size(min = minLength, max = maxLength)
+    @get:JsonValue
+    val value: String,
+) {
+    init {
+        validate()
+        if (!Locale.getISOLanguages().contains(value)) {
+            throw ValidationException("'$value' is not a valid ISO 639-1 language code")
+        }
+    }
+}
