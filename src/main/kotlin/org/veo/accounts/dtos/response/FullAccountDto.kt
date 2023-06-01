@@ -19,13 +19,16 @@ package org.veo.accounts.dtos.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
 import org.veo.accounts.dtos.FirstName
 import org.veo.accounts.dtos.LastName
+import org.veo.accounts.dtos.Link
 import org.veo.accounts.dtos.Username
+import java.net.URI
 
 @Schema(description = "Veo user account that is a member of the authenticated user's veo client group")
 class FullAccountDto(
@@ -46,4 +49,5 @@ class FullAccountDto(
         AssignableGroupSet.byGroupNames(user.groups),
         Enabled(user.isEnabled),
     )
+    val _self = Link(URI.create("${ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()}/$id"))
 }

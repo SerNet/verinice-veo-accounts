@@ -40,7 +40,6 @@ import org.veo.accounts.dtos.request.CreateInitialAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.AccountCreatedDto
 import org.veo.accounts.dtos.response.FullAccountDto
-import org.veo.accounts.dtos.response.ListAccountDto
 import org.veo.accounts.keycloak.AccountService
 
 @RestController
@@ -52,10 +51,10 @@ class AccountController(
 
     @Operation(description = "Get all accounts.")
     @GetMapping
-    fun getAccounts(auth: Authentication): List<ListAccountDto> =
+    fun getAccounts(auth: Authentication): List<FullAccountDto> =
         accountService
             .findAllAccounts(auth.parseAccount())
-            .map { ListAccountDto(it) }
+            .map { FullAccountDto(it) }
 
     @Operation(description = "Get a single account.")
     @GetMapping("{id}")
