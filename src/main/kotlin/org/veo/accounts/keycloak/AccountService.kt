@@ -81,7 +81,10 @@ class AccountService(
         if (findAccounts(dto.clientId).isNotEmpty()) {
             throw ConflictException("Target client already contains accounts, cannot create initial account")
         }
-        createAccount(dtoToInitialUser(dto))
+
+        dtoToInitialUser(dto)
+            .also { log.info { "Creating initial account ${it.username} for ${dto.clientId}" } }
+            .let { createAccount(it) }
     }
 
     fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): AccountId =
@@ -93,6 +96,7 @@ class AccountService(
                     }
                 }
                 .let { dtoToUser(it, authAccount) }
+                .also { log.info { "Creating new account ${it.username} in ${authAccount.veoClient}" } }
                 .let { createAccount(it) }
         }
 
@@ -112,6 +116,7 @@ class AccountService(
                         checkMaxUsersNotExhausted(authAccount)
                     }
                 }
+                .also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
                 .apply { update(dto) }
                 .also {
                     try {
@@ -140,6 +145,7 @@ class AccountService(
 
     fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = performSynchronized(authAccount) {
         getAccount(id, authAccount)
+            .also { log.info { "Deleting account ${it.username} in ${authAccount.veoClient}" } }
             .also { users().delete(id.toString()) }
             .run { }
     }
