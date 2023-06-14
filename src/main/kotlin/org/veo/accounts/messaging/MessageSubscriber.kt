@@ -93,6 +93,11 @@ class MessageSubscriber(
                 content.get("maxUnits").asInt(),
                 content.get("maxUsers").asInt(),
             )
+            "MODIFICATION" -> accountService.updateClient(
+                client,
+                content.get("maxUnits")?.asInt(),
+                content.get("maxUsers")?.asInt(),
+            )
             "DEACTIVATION" -> accountService.deactivateClient(client)
             "DELETION" -> accountService.deleteClient(client)
         }

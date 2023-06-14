@@ -47,6 +47,42 @@ class ClientChangeRestTest : AbstractRestTest() {
     }
 
     @Test
+    fun `updates client`() {
+        // when updating max units
+        sendMessage(
+            "client_change",
+            mapOf(
+                "eventType" to "client_change",
+                "clientId" to client.clientId,
+                "type" to "MODIFICATION",
+                "maxUnits" to 25,
+            ),
+        ) {
+            // then only max units is updated
+            findGroup(client.groupName)!!.apply {
+                attributes["maxUnits"] shouldBe listOf("25")
+                attributes["maxUsers"] shouldBe listOf("10")
+            }
+        }
+        // when updating max users
+        sendMessage(
+            "client_change",
+            mapOf(
+                "eventType" to "client_change",
+                "clientId" to client.clientId,
+                "type" to "MODIFICATION",
+                "maxUsers" to 16,
+            ),
+        ) {
+            // then only max users is updated
+            findGroup(client.groupName)!!.apply {
+                attributes["maxUnits"] shouldBe listOf("25")
+                attributes["maxUsers"] shouldBe listOf("16")
+            }
+        }
+    }
+
+    @Test
     fun `deactivates client`() {
         // given some accounts within the client
         val danAccountId = post(

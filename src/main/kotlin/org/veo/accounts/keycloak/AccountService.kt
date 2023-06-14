@@ -184,6 +184,15 @@ class AccountService(
             }
     }
 
+    fun updateClient(client: VeoClientId, maxUnits: Int?, maxUsers: Int?) = performSynchronized(client) {
+        getGroup(client.groupName)
+            .apply {
+                maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
+                maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
+            }
+            .let { groups().group(it.id).update(it) }
+    }
+
     fun deleteClient(client: VeoClientId) = performSynchronized(client) {
         log.info("Deleting veo client group ${client.groupName}")
         groups().group(getGroupId(client.groupName)).run {
