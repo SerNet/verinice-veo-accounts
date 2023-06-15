@@ -75,7 +75,7 @@ class AccountService(
     }
 
     fun createInitialAccount(dto: CreateInitialAccountDto): AccountId = performSynchronized(dto.clientId) {
-        if (findGroup(dto.clientId.groupName) == null) {
+        if (findGroup(dto.clientId.groupName, true) == null) {
             throw UnprocessableDtoException("Target veo client does not exist")
         }
         if (findAccounts(dto.clientId).isNotEmpty()) {
@@ -151,13 +151,10 @@ class AccountService(
     }
 
     fun deactivateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
-        groups().group(getGroupId(veoClient.groupName))
-            .apply {
-                toRepresentation()
-                    .singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true")
-                    .let(::update)
-            }
-            .members()
+        getGroup(veoClient.groupName)
+            .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
+            .also { groups().group(it.id).update(it) }
+            .let { groups().group(it.id).members() }
             .map { users().get(it.id) }
             .filter { userResource -> userResource.groups().any { it.name == "veo-user" } }
             .forEach {
@@ -178,13 +175,10 @@ class AccountService(
     }
 
     fun activateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
-        groups().group(getGroupId(veoClient.groupName))
-            .apply {
-                toRepresentation()
-                    .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
-                    .let(::update)
-            }
-            .members()
+        getGroup(veoClient.groupName)
+            .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
+            .also { groups().group(it.id).update(it) }
+            .let { groups().group(it.id).members() }
             .forEach {
                 users().get(it.id).joinGroup(getGroupId("veo-user"))
             }
@@ -224,13 +218,12 @@ class AccountService(
             }
         }
 
-    private fun RealmResource.getMaxUsers(authAccount: AuthenticatedAccount): Int = groups()
-        .group(getGroupId(authAccount.veoClient.groupName))
-        .toRepresentation()
-        .attributes["maxUsers"]
-        ?.firstOrNull()
-        ?.toInt()
-        ?: throw IllegalStateException("maxUsers is not defined in group ${authAccount.veoClient.groupName}")
+    private fun RealmResource.getMaxUsers(authAccount: AuthenticatedAccount): Int =
+        getGroup(authAccount.veoClient.groupName)
+            .attributes["maxUsers"]
+            ?.firstOrNull()
+            ?.toInt()
+            ?: throw IllegalStateException("maxUsers is not defined in group ${authAccount.veoClient.groupName}")
 
     private fun RealmResource.countEnabledUsers(authAccount: AuthenticatedAccount): Int =
         findAccounts(authAccount)
@@ -268,9 +261,7 @@ class AccountService(
         .apply { if (isAccountManager) add(getUserGroupPath("veo-accountmanagers")) }
 
     private fun RealmResource.groupActivated(veoClient: VeoClientId): Boolean =
-        groups().group(getGroupId(veoClient.groupName))
-            .toRepresentation()
-            .attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
+        getGroup(veoClient.groupName).attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
         dto.emailAddress.value
@@ -288,12 +279,14 @@ class AccountService(
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"
 
-    private fun RealmResource.getGroupId(groupName: String): String = findGroup(groupName)
-        ?.id
-        ?: throw IllegalStateException("Group with name '$groupName' not found")
+    private fun RealmResource.getGroupId(groupName: String): String = getGroup(groupName, true).id
 
-    private fun RealmResource.findGroup(groupName: String): GroupRepresentation? = groups()
-        .groups(groupName, 0, 1)
+    private fun RealmResource.getGroup(groupName: String, briefRepresentation: Boolean = false): GroupRepresentation =
+        findGroup(groupName, briefRepresentation)
+            ?: throw IllegalStateException("Group with name '$groupName' not found")
+
+    private fun RealmResource.findGroup(groupName: String, briefRepresentation: Boolean = false): GroupRepresentation? = groups()
+        .groups(groupName, 0, 1, briefRepresentation)
         .firstOrNull()
         ?.let { listOf(it) + it.subGroups }
         ?.firstOrNull { it.name == groupName }
