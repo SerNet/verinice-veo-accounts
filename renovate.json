@@ -4,7 +4,7 @@
   "automerge" : true,
   "automergeType" : "pr",
   "reviewers" : [
-    "jj"
+    "JJ"
   ],
   "packageRules" : [
     {
@@ -37,7 +37,8 @@
         "^com.github.jk1.dependency-license-report$",
         "^io.kotest:",
         "^org.testcontainers:",
-        "^gradle$"
+        "^gradle$",
+        "^gcr.io/kaniko-project/executor$"
       ],
       "postUpgradeTasks" : { }
     }
