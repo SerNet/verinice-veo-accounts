@@ -169,6 +169,12 @@ spotless {
             }
         })
     }
+    yaml {
+        target(".gitlab-ci.yml")
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
 }
 
 license {
@@ -198,12 +204,5 @@ springBoot {
                 )
             }
         }
-    }
-}
-
-if (rootProject.hasProperty("ci")) {
-    tasks.withType<Test> {
-        // Don't let failing tests fail the build, let the junit step in the Jenkins pipeline decide what to do
-        ignoreFailures = true
     }
 }
