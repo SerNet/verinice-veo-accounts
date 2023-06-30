@@ -88,7 +88,7 @@ docker_image:
   needs:
    - build
   image:
-    name: gcr.io/kaniko-project/executor:v1.11.0-debug
+    name: gcr.io/kaniko-project/executor:v1.12.1-debug
     entrypoint: [""]
 
   variables:
