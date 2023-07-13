@@ -20,7 +20,7 @@ build:
   stage: build
   script:
     - env
-    - ./gradlew -i -PciBuildNumer=$CI_PIPELINE_ID -PciJobName=$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME build -x check
+    - ./gradlew -i -PciBuildNumber=$CI_PIPELINE_ID -PciJobName=$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME build -x check
     - echo "PROJECT_VERSION=$(./gradlew -q properties --property version| awk '/^version:/ {print $2}')" >> variables.env
   artifacts:
     expire_in: 1 week
@@ -138,7 +138,7 @@ http_rest_tests:
     VEO_ACCOUNTS_RABBITMQ_ROUTING_KEY_PREFIX: VEO_TEST_PIPELINE_${CI_PIPELINE_ID}.
     VEO_ACCOUNTS_AUTH_APIKEYS_CLIENTINIT: $CLIENT_INIT_API_KEY
   script:
-    - ./gradlew -i -Dhttp.nonProxyHosts="localhost|veo-accounts" -PciBuildNumer=$CI_PIPELINE_ID -PciJobName=$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME restTest
+    - ./gradlew -i -Dhttp.nonProxyHosts="localhost|veo-accounts" -PciBuildNumber=$CI_PIPELINE_ID -PciJobName=$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME restTest
   artifacts:
     when: always
     reports:
