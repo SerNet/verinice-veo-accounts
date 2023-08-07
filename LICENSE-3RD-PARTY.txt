@@ -3848,7 +3848,7 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-52. Group: io.swagger.core.v3  Name: swagger-annotations-jakarta  Version: 2.2.9
+52. Group: io.swagger.core.v3  Name: swagger-annotations-jakarta  Version: 2.2.15
 
 Manifest Project URL: https://github.com/swagger-api/swagger-core/modules/swagger-annotations
 
@@ -4072,7 +4072,7 @@ Copy of the Apache 2.0 license can be found in `LICENSE` file.
 
 --------------------------------------------------------------------------------
 
-53. Group: io.swagger.core.v3  Name: swagger-core-jakarta  Version: 2.2.9
+53. Group: io.swagger.core.v3  Name: swagger-core-jakarta  Version: 2.2.15
 
 Manifest Project URL: https://github.com/swagger-api/swagger-core/modules/swagger-core
 
@@ -4296,7 +4296,7 @@ Copy of the Apache 2.0 license can be found in `LICENSE` file.
 
 --------------------------------------------------------------------------------
 
-54. Group: io.swagger.core.v3  Name: swagger-models-jakarta  Version: 2.2.9
+54. Group: io.swagger.core.v3  Name: swagger-models-jakarta  Version: 2.2.15
 
 Manifest Project URL: https://github.com/swagger-api/swagger-core/modules/swagger-models
 
@@ -14480,7 +14480,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-119. Group: org.springdoc  Name: springdoc-openapi-starter-common  Version: 2.1.0
+119. Group: org.springdoc  Name: springdoc-openapi-starter-common  Version: 2.2.0
 
 POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
 
@@ -14692,7 +14692,7 @@ Embedded license:
 
 --------------------------------------------------------------------------------
 
-120. Group: org.springdoc  Name: springdoc-openapi-starter-webmvc-api  Version: 2.1.0
+120. Group: org.springdoc  Name: springdoc-openapi-starter-webmvc-api  Version: 2.2.0
 
 POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
 
@@ -14904,7 +14904,7 @@ Embedded license:
 
 --------------------------------------------------------------------------------
 
-121. Group: org.springdoc  Name: springdoc-openapi-starter-webmvc-ui  Version: 2.1.0
+121. Group: org.springdoc  Name: springdoc-openapi-starter-webmvc-ui  Version: 2.2.0
 
 POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
 
@@ -22326,7 +22326,7 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-158. Group: org.webjars  Name: swagger-ui  Version: 4.18.2
+158. Group: org.webjars  Name: swagger-ui  Version: 5.2.0
 
 POM Project URL: http://webjars.org
 
@@ -22345,5 +22345,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Fri Jul 28 12:20:16 CEST 2023.
+This report was generated at Mon Aug 07 05:29:21 UTC 2023.
 
