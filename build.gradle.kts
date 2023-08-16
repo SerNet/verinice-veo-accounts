@@ -43,11 +43,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.security:spring-security-test")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
-    implementation("io.mockk:mockk:1.13.7")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("net.swiftzer.semver:semver:1.3.0")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
@@ -59,6 +57,10 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-property-jvm:$kotestVersion")
+
+    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("org.springframework.security:spring-security-test")
+
     testImplementation("org.testcontainers:rabbitmq:1.18.3")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
