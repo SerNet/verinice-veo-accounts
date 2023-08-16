@@ -38,7 +38,8 @@
         "^io.kotest:",
         "^org.testcontainers:",
         "^gradle$",
-        "^gcr.io/kaniko-project/executor$"
+        "^gcr.io/kaniko-project/executor$",
+        "^io.spring.dependency-management$"
       ],
       "postUpgradeTasks" : { }
     }
