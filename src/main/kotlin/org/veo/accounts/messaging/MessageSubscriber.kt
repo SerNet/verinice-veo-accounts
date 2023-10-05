@@ -46,7 +46,7 @@ class MessageSubscriber(
                     value = "\${veo.accounts.rabbitmq.queues.veo-subscriptions}",
                     exclusive = "false",
                     durable = "true",
-                    autoDelete = "\${veo.accounts.rabbitmq.queue.auto_delete}",
+                    autoDelete = "\${veo.accounts.rabbitmq.queue.autoDelete}",
                     arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
                 ),
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
