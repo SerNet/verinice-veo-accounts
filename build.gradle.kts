@@ -9,6 +9,8 @@ import org.cadixdev.gradle.licenser.header.HeaderFormatRegistry
 import org.eclipse.jgit.api.Git
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Calendar
+import kotlin.text.Regex
+import kotlin.text.RegexOption
 
 plugins {
     id("org.springframework.boot") version "3.1.4"
@@ -81,17 +83,20 @@ licenseReport {
     )
 }
 
-val reportTask = tasks.getByName("generateLicenseReport") as ReportTask
-// work around for license report not being updated when the project's version number changes
-// https://github.com/jk1/Gradle-License-Report/issues/223
-reportTask.outputs.apply {
-    upToDateWhen { false }
-    cacheIf { false }
-}
-task("copy3rdPartyLicenseFile") {
-    reportTask.finalizedBy(this)
+tasks.withType<ReportTask> {
+    outputs.apply {
+        // work around for license report not being updated when the project's version number changes
+        // https://github.com/jk1/Gradle-License-Report/issues/223
+        upToDateWhen { false }
+        cacheIf { false }
+    }
     doLast {
-        file(licenseFile3rdParty).writeText(file("${reportTask.config.outputDir}/$licenseFile3rdParty").readText())
+        val dateLinePattern = Regex("^This report was generated at.+$", RegexOption.MULTILINE)
+        val newLicenseText = file("${config.outputDir}/$licenseFile3rdParty").readText()
+        val licenseFile = file(licenseFile3rdParty)
+        if (licenseFile.readText().replace(dateLinePattern, "") != newLicenseText.replace(dateLinePattern, "")) {
+            licenseFile.writeText(newLicenseText)
+        }
     }
 }
 
