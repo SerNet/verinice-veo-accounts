@@ -12895,7 +12895,7 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-80. Group: org.jetbrains.kotlin  Name: kotlin-reflect  Version: 1.9.10
+80. Group: org.jetbrains.kotlin  Name: kotlin-reflect  Version: 1.9.20
 
 POM Project URL: https://kotlinlang.org/
 
@@ -12903,7 +12903,7 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-81. Group: org.jetbrains.kotlin  Name: kotlin-stdlib  Version: 1.9.10
+81. Group: org.jetbrains.kotlin  Name: kotlin-stdlib  Version: 1.9.20
 
 POM Project URL: https://kotlinlang.org/
 
@@ -12911,7 +12911,11 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-82. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-common  Version: 1.9.10
+82. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-common  Version: 1.9.20
+
+No license information found
+
+83. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-jdk7  Version: 1.9.20
 
 POM Project URL: https://kotlinlang.org/
 
@@ -12919,15 +12923,7 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 --------------------------------------------------------------------------------
 
-83. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-jdk7  Version: 1.9.10
-
-POM Project URL: https://kotlinlang.org/
-
-POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
-
---------------------------------------------------------------------------------
-
-84. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-jdk8  Version: 1.9.10
+84. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-jdk8  Version: 1.9.20
 
 POM Project URL: https://kotlinlang.org/
 
@@ -20594,5 +20590,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Thu Oct 19 14:26:58 UTC 2023.
+This report was generated at Tue Oct 31 06:28:05 UTC 2023.
 
