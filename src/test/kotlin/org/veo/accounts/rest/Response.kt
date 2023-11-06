@@ -31,6 +31,8 @@ class Response(
     val bodyAsListOfMaps get() = parseBody().asListOfMaps()
     val rawBody = entity.body
     val statusCode = entity.statusCode.value()
+
     fun getHeader(name: String): String? = entity.headers[name]?.firstOrNull()
+
     private fun parseBody(): Any = objectMapper.readValue(rawBody, Object::class.java)
 }

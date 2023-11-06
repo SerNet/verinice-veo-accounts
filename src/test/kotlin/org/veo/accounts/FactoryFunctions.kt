@@ -39,17 +39,16 @@ fun fullAccountDto(
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
-) =
-    FullAccountDto(
-        id,
-        Username(username),
-        EmailAddress(emailAddress),
-        FirstName(firstName),
-        LastName(lastName),
-        language?.let { Language(it) },
-        AssignableGroupSet(groups),
-        Enabled(enabled),
-    )
+) = FullAccountDto(
+    id,
+    Username(username),
+    EmailAddress(emailAddress),
+    FirstName(firstName),
+    LastName(lastName),
+    language?.let { Language(it) },
+    AssignableGroupSet(groups),
+    Enabled(enabled),
+)
 
 fun createAccountDto(
     emailAddress: String = "katie@test.test",
@@ -59,16 +58,15 @@ fun createAccountDto(
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
-) =
-    CreateAccountDto(
-        Username(username),
-        EmailAddress(emailAddress),
-        FirstName(firstName),
-        LastName(lastName),
-        language?.let { Language(it) },
-        AssignableGroupSet(groups),
-        Enabled(enabled),
-    )
+) = CreateAccountDto(
+    Username(username),
+    EmailAddress(emailAddress),
+    FirstName(firstName),
+    LastName(lastName),
+    language?.let { Language(it) },
+    AssignableGroupSet(groups),
+    Enabled(enabled),
+)
 
 fun updateAccountDto(
     emailAddress: String = "katie@test.test",
@@ -77,5 +75,13 @@ fun updateAccountDto(
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
     enabled: Boolean = true,
-) =
-    UpdateAccountDto(EmailAddress(emailAddress), FirstName(firstName), LastName(lastName), language?.let { Language(it) }, AssignableGroupSet(groups), Enabled(enabled))
+) = UpdateAccountDto(
+    EmailAddress(emailAddress),
+    FirstName(firstName),
+    LastName(lastName),
+    language?.let {
+        Language(it)
+    },
+    AssignableGroupSet(groups),
+    Enabled(enabled),
+)

@@ -21,4 +21,6 @@ import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Whether an account is active. A disabled account cannot authenticate with a service.")
-data class Enabled(@get:JsonValue val value: Boolean)
+data class Enabled(
+    @get:JsonValue val value: Boolean,
+)

@@ -23,23 +23,28 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.veo.accounts.AssignableGroup
 
 @ArraySchema(
-    arraySchema = Schema(
-        description = "Groups that an account can be manually assigned to using veo-accounts. Assignable groups " +
-            "grant additional privileges. Automatically assigned groups (e.g. veo client membership group) are " +
-            "not included in this collection.",
-    ),
+    arraySchema =
+        Schema(
+            description =
+                "Groups that an account can be manually assigned to using veo-accounts. Assignable groups " +
+                    "grant additional privileges. Automatically assigned groups (e.g. veo client membership group) are " +
+                    "not included in this collection.",
+        ),
     uniqueItems = true,
     schema = Schema(implementation = AssignableGroup::class),
 )
-data class AssignableGroupSet(@get:JsonValue val values: Set<AssignableGroup>) {
+data class AssignableGroupSet(
+    @get:JsonValue val values: Set<AssignableGroup>,
+) {
     val groupNames: List<String>
         get() = values.map { it.groupName }
 
     companion object {
         /** Creates an [AssignableGroupSet] from given group names. Non-assignable groups are omitted. */
-        fun byGroupNames(groupNames: List<String>): AssignableGroupSet = groupNames
-            .mapNotNull(AssignableGroup::byGroupNameOrNull)
-            .toSet()
-            .let { AssignableGroupSet(it) }
+        fun byGroupNames(groupNames: List<String>): AssignableGroupSet =
+            groupNames
+                .mapNotNull(AssignableGroup::byGroupNameOrNull)
+                .toSet()
+                .let { AssignableGroupSet(it) }
     }
 }

@@ -32,18 +32,19 @@ class GroupRestTest : AbstractRestTest() {
     @Test
     fun `groups can be managed`() {
         // when an account is created without groups
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-hans",
-                "firstName" to "Hans",
-                "lastName" to "Dance",
-                "emailAddress" to "$prefix-hans@test.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-hans",
+                    "firstName" to "Hans",
+                    "lastName" to "Dance",
+                    "emailAddress" to "$prefix-hans@test.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
         var accountBody = get("/$accountId", managerId).bodyAsMap
 
         // then it was saved only with the client group
@@ -69,18 +70,19 @@ class GroupRestTest : AbstractRestTest() {
     @Test
     fun `account can be created with groups`() {
         // when an account is created with group
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-hans",
-                "firstName" to "Hans",
-                "lastName" to "Dance",
-                "emailAddress" to "$prefix-hans@test.test",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-hans",
+                    "firstName" to "Hans",
+                    "lastName" to "Dance",
+                    "emailAddress" to "$prefix-hans@test.test",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // then it is assigned to group
         get("/$accountId", managerId).bodyAsMap.apply {
@@ -109,18 +111,19 @@ class GroupRestTest : AbstractRestTest() {
     @Test
     fun `account cannot join forbidden group`() {
         // given an account with no groups
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-hans",
-                "firstName" to "Hans",
-                "lastName" to "Dance",
-                "emailAddress" to "$prefix-hans@test.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-hans",
+                    "firstName" to "Hans",
+                    "lastName" to "Dance",
+                    "emailAddress" to "$prefix-hans@test.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // expect that adding it to admin group should fail
         put(

@@ -27,8 +27,9 @@ private const val MIN_LENGTH = 1
 private const val MAX_LENGTH = 256
 
 @Schema(
-    description = "Unique user account identifier, but not be confused with the generated account ID. Once chosen, usernames cannot be " +
-        "changed.",
+    description =
+        "Unique user account identifier, but not be confused with the generated account ID. Once chosen, usernames cannot be " +
+            "changed.",
     type = "string",
     minLength = MIN_LENGTH,
     maxLength = MAX_LENGTH,

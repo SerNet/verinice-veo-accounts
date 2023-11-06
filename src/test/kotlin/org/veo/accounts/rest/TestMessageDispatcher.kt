@@ -32,14 +32,20 @@ class TestMessageDispatcher(
     private val subscriptionRoutingKeyPrefix: String,
     private val rabbitTemplate: RabbitTemplate,
 ) {
-    fun sendMessage(routingKey: String, content: Map<String, *>) {
+    fun sendMessage(
+        routingKey: String,
+        content: Map<String, *>,
+    ) {
         send(
             "$subscriptionRoutingKeyPrefix$routingKey",
             om.writeValueAsString(content),
         )
     }
 
-    private fun send(routingKey: String, content: String) {
+    private fun send(
+        routingKey: String,
+        content: String,
+    ) {
         rabbitTemplate.convertAndSend(
             exchange,
             routingKey,

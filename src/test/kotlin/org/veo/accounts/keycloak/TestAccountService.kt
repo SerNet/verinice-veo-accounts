@@ -41,58 +41,74 @@ class TestAccountService(
 
     val testPassword = randomUUID().toString()
 
-    fun createManager(group: VeoClientId, roles: List<Role>, usernamePrefix: String): String = facade.perform {
-        UserRepresentation()
-            .apply {
-                username = "$usernamePrefix-account-${randomUUID()}"
-                isEnabled = true
-                isEmailVerified = true
-                groups = listOf(group.path)
-            }
-            .let { users().create(it) }
-            .getHeaderString("Location")
-            .substringAfterLast('/')
-            .also { assignRoles(it, roles) }
-            .also { assignTestPassword(it) }
-    }
+    fun createManager(
+        group: VeoClientId,
+        roles: List<Role>,
+        usernamePrefix: String,
+    ): String =
+        facade.perform {
+            UserRepresentation()
+                .apply {
+                    username = "$usernamePrefix-account-${randomUUID()}"
+                    isEnabled = true
+                    isEmailVerified = true
+                    groups = listOf(group.path)
+                }
+                .let { users().create(it) }
+                .getHeaderString("Location")
+                .substringAfterLast('/')
+                .also { assignRoles(it, roles) }
+                .also { assignTestPassword(it) }
+        }
 
-    fun updateMaxUsers(client: VeoClientId, maxUsers: Int) = facade.perform {
+    fun updateMaxUsers(
+        client: VeoClientId,
+        maxUsers: Int,
+    ) = facade.perform {
         findGroup(client.groupName)!!
             .singleAttribute("maxUsers", maxUsers.toString())
             .let { groups().group(it.id).update(it) }
     }
 
-    fun findAccount(accountId: String): UserRepresentation? = facade.perform {
-        try {
-            users().get(accountId).toRepresentation()
-        } catch (_: NotFoundException) {
-            null
+    fun findAccount(accountId: String): UserRepresentation? =
+        facade.perform {
+            try {
+                users().get(accountId).toRepresentation()
+            } catch (_: NotFoundException) {
+                null
+            }
         }
-    }
 
-    fun findGroup(groupName: String): GroupRepresentation? = facade.perform {
-        groups().groups(groupName, true, 0, 1, false).firstOrNull()
-    }
+    fun findGroup(groupName: String): GroupRepresentation? =
+        facade.perform {
+            groups().groups(groupName, true, 0, 1, false).firstOrNull()
+        }
 
-    fun accountInGroup(accountId: String, groupName: String): Boolean = facade.perform {
-        users().get(accountId).groups().any { it.name == groupName }
-    }
+    fun accountInGroup(
+        accountId: String,
+        groupName: String,
+    ): Boolean =
+        facade.perform {
+            users().get(accountId).groups().any { it.name == groupName }
+        }
 
-    fun getUsername(accountId: String): String = facade.perform {
-        users().get(accountId)
-            .toRepresentation()
-            .username
-    }
+    fun getUsername(accountId: String): String =
+        facade.perform {
+            users().get(accountId)
+                .toRepresentation()
+                .username
+        }
 
-    private fun RealmResource.assignTestPassword(accountId: String) = users()
-        .get(accountId)
-        .resetPassword(
-            CredentialRepresentation().apply {
-                isTemporary = false
-                type = "password"
-                value = testPassword
-            },
-        )
+    private fun RealmResource.assignTestPassword(accountId: String) =
+        users()
+            .get(accountId)
+            .resetPassword(
+                CredentialRepresentation().apply {
+                    isTemporary = false
+                    type = "password"
+                    value = testPassword
+                },
+            )
 
     private fun RealmResource.assignRoles(
         accountId: String,
@@ -102,7 +118,8 @@ class TestAccountService(
         .clientLevel(clientId)
         .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }
 
-    fun getAccountGroups(accountId: String): List<String> = facade.perform {
-        users().get(accountId).groups().map { it.name }
-    }
+    fun getAccountGroups(accountId: String): List<String> =
+        facade.perform {
+            users().get(accountId).groups().map { it.name }
+        }
 }

@@ -36,11 +36,12 @@ class CorsRestTest : AbstractRestTest() {
         val origin = "https://valid.verinice.example"
 
         // when getting from the correct origin
-        val result = get(
-            "/",
-            accountId,
-            headers = mapOf("Origin" to listOf(origin)),
-        )
+        val result =
+            get(
+                "/",
+                accountId,
+                headers = mapOf("Origin" to listOf(origin)),
+            )
 
         // the request was successful
         result.bodyAsListOfMaps shouldNotBe null
@@ -50,12 +51,13 @@ class CorsRestTest : AbstractRestTest() {
     @Test
     fun `get accounts with wrong origin header`() {
         // when getting from the wrong origin
-        val result = get(
-            "/",
-            accountId,
-            403,
-            mapOf("Origin" to listOf("https://invalid.notverinice.example")),
-        )
+        val result =
+            get(
+                "/",
+                accountId,
+                403,
+                mapOf("Origin" to listOf("https://invalid.notverinice.example")),
+            )
 
         // then an error is returned
         result.rawBody shouldBe "Invalid CORS request"
@@ -68,20 +70,23 @@ class CorsRestTest : AbstractRestTest() {
         val origin = "https://valid.verinice.example"
 
         // when making a pre-flight request
-        val result = options(
-            "/",
-            accountId,
-            headers = mapOf(
-                "Origin" to listOf(origin),
-                "Access-Control-Request-Method" to listOf("GET"),
-                "Access-Control-Request-Headers" to listOf(
-                    "Content-Type",
-                    "Authorization",
-                    "X-Ample",
-                    "X-Custom-Header",
-                ),
-            ),
-        )
+        val result =
+            options(
+                "/",
+                accountId,
+                headers =
+                    mapOf(
+                        "Origin" to listOf(origin),
+                        "Access-Control-Request-Method" to listOf("GET"),
+                        "Access-Control-Request-Headers" to
+                            listOf(
+                                "Content-Type",
+                                "Authorization",
+                                "X-Ample",
+                                "X-Custom-Header",
+                            ),
+                    ),
+            )
 
         // then CORS headers are returned
         result.getHeader("Access-Control-Allow-Origin") shouldBe origin

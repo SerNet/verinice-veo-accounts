@@ -48,7 +48,6 @@ import org.veo.accounts.keycloak.AccountService
 class AccountController(
     private val accountService: AccountService,
 ) {
-
     @Operation(description = "Get all accounts.")
     @GetMapping
     fun getAccounts(auth: Authentication): List<FullAccountDto> =
@@ -58,7 +57,10 @@ class AccountController(
 
     @Operation(description = "Get a single account.")
     @GetMapping("{id}")
-    fun getAccount(auth: Authentication, @PathVariable("id") id: AccountId): FullAccountDto =
+    fun getAccount(
+        auth: Authentication,
+        @PathVariable("id") id: AccountId,
+    ): FullAccountDto =
         accountService
             .getAccount(id, auth.parseAccount())
             .let { FullAccountDto(it) }
@@ -90,9 +92,10 @@ class AccountController(
         @Valid
         @RequestBody
         dto: CreateInitialAccountDto,
-    ): AccountCreatedDto = dto
-        .let { accountService.createInitialAccount(it) }
-        .let { id -> AccountCreatedDto(id) }
+    ): AccountCreatedDto =
+        dto
+            .let { accountService.createInitialAccount(it) }
+            .let { id -> AccountCreatedDto(id) }
 
     @Operation(description = "Create an account. Returns the new account's ID.")
     @PostMapping
@@ -102,9 +105,10 @@ class AccountController(
         @Valid
         @RequestBody
         dto: CreateAccountDto,
-    ): AccountCreatedDto = dto
-        .let { accountService.createAccount(it, auth.parseAccount()) }
-        .let { id -> AccountCreatedDto(id) }
+    ): AccountCreatedDto =
+        dto
+            .let { accountService.createAccount(it, auth.parseAccount()) }
+            .let { id -> AccountCreatedDto(id) }
 
     @Operation(description = "Update an account.")
     @PutMapping("{id}")
@@ -120,5 +124,8 @@ class AccountController(
     @Operation(description = "Delete an account.")
     @DeleteMapping("{id}")
     @ResponseStatus(NO_CONTENT)
-    fun deleteAccount(auth: Authentication, @PathVariable("id") id: AccountId) = accountService.deleteAccount(id, auth.parseAccount())
+    fun deleteAccount(
+        auth: Authentication,
+        @PathVariable("id") id: AccountId,
+    ) = accountService.deleteAccount(id, auth.parseAccount())
 }

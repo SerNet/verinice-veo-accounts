@@ -42,13 +42,14 @@ class MessageSubscriber(
     @RabbitListener(
         bindings = [
             QueueBinding(
-                value = Queue(
-                    value = "\${veo.accounts.rabbitmq.queues.veo-subscriptions}",
-                    exclusive = "false",
-                    durable = "true",
-                    autoDelete = "\${veo.accounts.rabbitmq.queue.autoDelete}",
-                    arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
-                ),
+                value =
+                    Queue(
+                        value = "\${veo.accounts.rabbitmq.queues.veo-subscriptions}",
+                        exclusive = "false",
+                        durable = "true",
+                        autoDelete = "\${veo.accounts.rabbitmq.queue.autoDelete}",
+                        arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
+                    ),
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
                 key = [
                     "\${veo.accounts.rabbitmq.routing_key_prefix}client_change",
@@ -56,17 +57,18 @@ class MessageSubscriber(
             ),
         ],
     )
-    fun handleMessage(message: String) = try {
-        om
-            .readTree(message)
-            .get("content")
-            .asText()
-            .let(om::readTree)
-            .let { handleMessage(it) }
-    } catch (ex: Throwable) {
-        log.error(ex) { "Handling failed for message: '$message'" }
-        throw RuntimeException(ex)
-    }
+    fun handleMessage(message: String) =
+        try {
+            om
+                .readTree(message)
+                .get("content")
+                .asText()
+                .let(om::readTree)
+                .let { handleMessage(it) }
+        } catch (ex: Throwable) {
+            log.error(ex) { "Handling failed for message: '$message'" }
+            throw RuntimeException(ex)
+        }
 
     private fun handleMessage(content: JsonNode) {
         content
@@ -82,22 +84,25 @@ class MessageSubscriber(
     }
 
     private fun handleClientChange(content: JsonNode) {
-        val client = content.get("clientId")
-            .asText()
-            .let { UUID.fromString(it) }
-            .let { VeoClientId(it) }
+        val client =
+            content.get("clientId")
+                .asText()
+                .let { UUID.fromString(it) }
+                .let { VeoClientId(it) }
         when (content.get("type").asText()) {
             "ACTIVATION" -> accountService.activateClient(client)
-            "CREATION" -> accountService.createClient(
-                client,
-                content.get("maxUnits").asInt(),
-                content.get("maxUsers").asInt(),
-            )
-            "MODIFICATION" -> accountService.updateClient(
-                client,
-                content.get("maxUnits")?.asInt(),
-                content.get("maxUsers")?.asInt(),
-            )
+            "CREATION" ->
+                accountService.createClient(
+                    client,
+                    content.get("maxUnits").asInt(),
+                    content.get("maxUsers").asInt(),
+                )
+            "MODIFICATION" ->
+                accountService.updateClient(
+                    client,
+                    content.get("maxUnits")?.asInt(),
+                    content.get("maxUsers")?.asInt(),
+                )
             "DEACTIVATION" -> accountService.deactivateClient(client)
             "DELETION" -> accountService.deleteClient(client)
         }

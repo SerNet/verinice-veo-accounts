@@ -32,18 +32,19 @@ class LanguageRestTest : AbstractRestTest() {
     @Test
     fun `language is optional`() {
         // when creating a user without specifying a language
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-default-language-user",
-                "firstName" to "Tina",
-                "lastName" to "Miner",
-                "emailAddress" to "$prefix-tn@language.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-default-language-user",
+                    "firstName" to "Tina",
+                    "lastName" to "Miner",
+                    "emailAddress" to "$prefix-tn@language.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // then no language should be persisted
         get("/$accountId", managerId).bodyAsMap["language"] shouldBe null

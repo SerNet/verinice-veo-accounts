@@ -23,13 +23,14 @@ import jakarta.validation.Validation
 private val validator = Validation.buildDefaultValidatorFactory().validator
 
 /** Performs JSR-380 [Validation] on target */
-fun Any.validate() = validator
-    .validate(this)
-    .let {
-        if (it.isNotEmpty()) {
-            throw ValidationException(it)
+fun Any.validate() =
+    validator
+        .validate(this)
+        .let {
+            if (it.isNotEmpty()) {
+                throw ValidationException(it)
+            }
         }
-    }
 
 class ValidationException(message: String) : Exception(message) {
     constructor(violations: Collection<ConstraintViolation<Any>>) : this(

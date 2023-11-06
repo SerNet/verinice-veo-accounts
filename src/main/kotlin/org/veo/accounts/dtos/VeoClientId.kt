@@ -30,8 +30,9 @@ private val CLIENT_GROUP_PATH_REGEX = Regex("^/$CLIENT_GROUP_PREFIX($UUID_PATTER
  * group mapping.
  */
 @Schema(
-    description = "UUID of a veo client. Each account is assigned to a client. Account managers can only manage accounts within their " +
-        "own client.",
+    description =
+        "UUID of a veo client. Each account is assigned to a client. Account managers can only manage accounts within their " +
+            "own client.",
 )
 data class VeoClientId(
     @get:JsonValue
@@ -39,10 +40,12 @@ data class VeoClientId(
 ) {
     val groupName = "$CLIENT_GROUP_PREFIX$clientId"
     val path = "/$groupName"
+
     override fun toString(): String = groupName
     companion object {
-        fun tryParse(groupPath: String): VeoClientId? = groupPath
-            .let { CLIENT_GROUP_PATH_REGEX.matchEntire(it) }
-            ?.let { VeoClientId(UUID.fromString(it.groups[1]!!.value)) }
+        fun tryParse(groupPath: String): VeoClientId? =
+            groupPath
+                .let { CLIENT_GROUP_PATH_REGEX.matchEntire(it) }
+                ?.let { VeoClientId(UUID.fromString(it.groups[1]!!.value)) }
     }
 }

@@ -48,13 +48,10 @@ private val log = KotlinLogging.logger { }
 class WebSecurity(
     @Value("\${veo.cors.origins}")
     private val origins: Array<String>,
-
     @Value("\${veo.cors.headers}")
     private val allowedHeaders: Array<String>,
-
     @Value("\${veo.accounts.keycloak.clients.service.name}")
     private val keycloakServiceClientName: String,
-
     @Value("\${veo.accounts.auth.apiKeys.clientInit}")
     protected val clientInitApiKey: String,
 ) {
@@ -88,18 +85,19 @@ class WebSecurity(
             }
             oauth2ResourceServer {
                 jwt {
-                    jwtAuthenticationConverter = JwtAuthenticationConverter().apply {
-                        setJwtGrantedAuthoritiesConverter { jwt ->
-                            jwt.getClaimAsMap("resource_access")
-                                ?.get(keycloakServiceClientName)
-                                ?.let { it as Map<*, *> }
-                                ?.get("roles")
-                                ?.let { it as Collection<*> }
-                                ?.map { it as String }
-                                ?.map { SimpleGrantedAuthority("ROLE_$it") }
-                                ?: emptyList()
+                    jwtAuthenticationConverter =
+                        JwtAuthenticationConverter().apply {
+                            setJwtGrantedAuthoritiesConverter { jwt ->
+                                jwt.getClaimAsMap("resource_access")
+                                    ?.get(keycloakServiceClientName)
+                                    ?.let { it as Map<*, *> }
+                                    ?.get("roles")
+                                    ?.let { it as Collection<*> }
+                                    ?.map { it as String }
+                                    ?.map { SimpleGrantedAuthority("ROLE_$it") }
+                                    ?: emptyList()
+                            }
                         }
-                    }
                 }
             }
         }

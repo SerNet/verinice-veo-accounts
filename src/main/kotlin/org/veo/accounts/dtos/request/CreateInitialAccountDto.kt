@@ -26,8 +26,9 @@ import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.VeoClientId
 
 @Schema(
-    description = "Veo user account information for creating the initial account in a client. Account ID is absent because it is " +
-        "generated.",
+    description =
+        "Veo user account information for creating the initial account in a client. Account ID is absent because it is " +
+            "generated.",
 )
 class CreateInitialAccountDto(
     val clientId: VeoClientId,

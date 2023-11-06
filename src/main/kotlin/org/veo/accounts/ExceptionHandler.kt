@@ -36,36 +36,38 @@ import org.veo.accounts.exceptions.AbstractMappedException
 @ControllerAdvice
 class ExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handle(exception: HttpMessageNotReadableException): ResponseEntity<String> =
-        handle(getParsingErrorMessage(exception), BAD_REQUEST)
+    fun handle(exception: HttpMessageNotReadableException): ResponseEntity<String> = handle(getParsingErrorMessage(exception), BAD_REQUEST)
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handle(exception: MethodArgumentNotValidException): ResponseEntity<String> =
-        handle(exception.message, BAD_REQUEST)
+    fun handle(exception: MethodArgumentNotValidException): ResponseEntity<String> = handle(exception.message, BAD_REQUEST)
 
     @ExceptionHandler(AbstractMappedException::class)
     fun handle(ex: AbstractMappedException) = handle(ex.message, ex.status)
 
-    private fun handle(message: String?, status: HttpStatus): ResponseEntity<String> {
+    private fun handle(
+        message: String?,
+        status: HttpStatus,
+    ): ResponseEntity<String> {
         return ResponseEntity<String>(message, status)
     }
 
-    private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? = ex.cause
-        .let { cause ->
-            when (cause) {
-                is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
-                is ValueInstantiationException -> cause.cause?.message
-                is MismatchedInputException ->
-                    cause
-                        .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
-                is JsonMappingException ->
-                    cause.originalMessage
-                is JsonParseException ->
-                    cause
-                        .location
-                        .run { "Invalid request body: JSON syntax error at line $lineNr, column $columnNr" }
-                else -> cause?.message
+    private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? =
+        ex.cause
+            .let { cause ->
+                when (cause) {
+                    is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
+                    is ValueInstantiationException -> cause.cause?.message
+                    is MismatchedInputException ->
+                        cause
+                            .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
+                    is JsonMappingException ->
+                        cause.originalMessage
+                    is JsonParseException ->
+                        cause
+                            .location
+                            .run { "Invalid request body: JSON syntax error at line $lineNr, column $columnNr" }
+                    else -> cause?.message
+                }
             }
-        }
-        ?: ex.message
+            ?: ex.message
 }

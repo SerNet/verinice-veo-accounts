@@ -19,13 +19,16 @@ package org.veo.accounts
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-enum class AssignableGroup(@get:JsonValue val groupName: String) {
+enum class AssignableGroup(
+    @get:JsonValue val groupName: String,
+) {
     VEO_WRITE_ACCESS("veo-write-access"),
     ;
 
     companion object {
         /** Returns [AssignableGroup] with given group name or null if none was found.*/
-        fun byGroupNameOrNull(groupName: String): AssignableGroup? = values()
-            .firstOrNull { it.groupName == groupName }
+        fun byGroupNameOrNull(groupName: String): AssignableGroup? =
+            values()
+                .firstOrNull { it.groupName == groupName }
     }
 }

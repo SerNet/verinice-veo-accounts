@@ -25,11 +25,11 @@ import org.veo.accounts.dtos.VeoClientId
 
 fun Authentication.parseAccount(): AuthenticatedAccount = AuthenticatedAccount(AccountId(name), getVeoClient())
 
-private fun Authentication.getVeoClient(): VeoClientId = token()
-    .getClaimAsStringList("groups")!!
-    .mapNotNull { VeoClientId.tryParse(it) }
-    .also { require(it.size == 1) { "Expected 1 client for the account. Got ${it.size}." } }
-    .first()
+private fun Authentication.getVeoClient(): VeoClientId =
+    token()
+        .getClaimAsStringList("groups")!!
+        .mapNotNull { VeoClientId.tryParse(it) }
+        .also { require(it.size == 1) { "Expected 1 client for the account. Got ${it.size}." } }
+        .first()
 
-private fun Authentication.token(): Jwt =
-    (this as JwtAuthenticationToken).token
+private fun Authentication.token(): Jwt = (this as JwtAuthenticationToken).token

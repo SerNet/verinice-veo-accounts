@@ -19,7 +19,7 @@ plugins {
     kotlin("jvm") version "1.9.20"
     kotlin("plugin.spring") version "1.9.20"
 
-    id("com.diffplug.spotless") version "6.21.0"
+    id("com.diffplug.spotless") version "6.22.0"
     id("org.cadixdev.licenser") version "0.6.1"
     jacoco
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
@@ -74,13 +74,15 @@ dependencies {
 
 val licenseFile3rdParty = "LICENSE-3RD-PARTY.txt"
 licenseReport {
-    renderers = arrayOf(
-        TextReportRenderer(licenseFile3rdParty),
-    )
+    renderers =
+        arrayOf(
+            TextReportRenderer(licenseFile3rdParty),
+        )
     projects = arrayOf(project)
-    filters = arrayOf(
-        LicenseBundleNormalizer(),
-    )
+    filters =
+        arrayOf(
+            LicenseBundleNormalizer(),
+        )
 }
 
 tasks.withType<ReportTask> {
@@ -167,15 +169,21 @@ spotless {
     }
     json {
         target("**/*.json")
-        addStep(object : FormatterStep {
-            override fun getName() = "format json"
-            override fun format(rawUnix: String, file: File): String {
-                val om = ObjectMapper()
-                return om.writer()
-                    .with(DefaultPrettyPrinter().apply { indentArraysWith(SYSTEM_LINEFEED_INSTANCE) })
-                    .writeValueAsString(om.readValue(rawUnix, Map::class.java))
-            }
-        })
+        addStep(
+            object : FormatterStep {
+                override fun getName() = "format json"
+
+                override fun format(
+                    rawUnix: String,
+                    file: File,
+                ): String {
+                    val om = ObjectMapper()
+                    return om.writer()
+                        .with(DefaultPrettyPrinter().apply { indentArraysWith(SYSTEM_LINEFEED_INSTANCE) })
+                        .writeValueAsString(om.readValue(rawUnix, Map::class.java))
+                }
+            },
+        )
     }
     yaml {
         target(".gitlab-ci.yml")
@@ -196,9 +204,10 @@ license {
         },
     )
 
-    ext["author"] = Git.open(project.rootDir).use {
-        it.getRepository().getConfig().getString("user", null, "name") ?: "<name>"
-    }
+    ext["author"] =
+        Git.open(project.rootDir).use {
+            it.getRepository().getConfig().getString("user", null, "name") ?: "<name>"
+        }
     ext["year"] = Calendar.getInstance().get(Calendar.YEAR)
 }
 

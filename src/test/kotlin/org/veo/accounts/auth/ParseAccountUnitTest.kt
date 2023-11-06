@@ -29,16 +29,19 @@ import java.util.UUID
 class ParseAccountUnitTest {
     @Test
     fun `parses valid token`() {
-        val auth = mockk<JwtAuthenticationToken> {
-            every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
-            every { token } returns mockk {
-                every { getClaimAsStringList("groups") } returns listOf(
-                    "veo-user",
-                    "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
-                    "some-random-other-group",
-                )
+        val auth =
+            mockk<JwtAuthenticationToken> {
+                every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
+                every { token } returns
+                    mockk {
+                        every { getClaimAsStringList("groups") } returns
+                            listOf(
+                                "veo-user",
+                                "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
+                                "some-random-other-group",
+                            )
+                    }
             }
-        }
 
         auth.parseAccount().apply {
             id shouldBe AccountId("32beff50-f073-495f-a86f-ebd1fc218551")
@@ -51,32 +54,38 @@ class ParseAccountUnitTest {
 
     @Test
     fun `does not accept token with multiple client groups`() {
-        val auth = mockk<JwtAuthenticationToken> {
-            every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
-            every { token } returns mockk {
-                every { getClaimAsStringList("groups") } returns listOf(
-                    "veo-user",
-                    "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
-                    "/veo_client:d7c687bc-46a5-4bfa-a29e-b63ca6a3ec54",
-                    "some-random-other-group",
-                )
+        val auth =
+            mockk<JwtAuthenticationToken> {
+                every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
+                every { token } returns
+                    mockk {
+                        every { getClaimAsStringList("groups") } returns
+                            listOf(
+                                "veo-user",
+                                "/veo_client:5201f42d-eee8-4d4e-a18f-2504cc0ce11e",
+                                "/veo_client:d7c687bc-46a5-4bfa-a29e-b63ca6a3ec54",
+                                "some-random-other-group",
+                            )
+                    }
             }
-        }
 
         shouldThrow<IllegalArgumentException> { auth.parseAccount() }
     }
 
     @Test
     fun `does not accept token without client groups`() {
-        val auth = mockk<JwtAuthenticationToken> {
-            every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
-            every { token } returns mockk {
-                every { getClaimAsStringList("groups") } returns listOf(
-                    "veo-user",
-                    "some-random-other-group",
-                )
+        val auth =
+            mockk<JwtAuthenticationToken> {
+                every { name } returns "32beff50-f073-495f-a86f-ebd1fc218551"
+                every { token } returns
+                    mockk {
+                        every { getClaimAsStringList("groups") } returns
+                            listOf(
+                                "veo-user",
+                                "some-random-other-group",
+                            )
+                    }
             }
-        }
 
         shouldThrow<IllegalArgumentException> { auth.parseAccount() }
     }

@@ -31,32 +31,31 @@ import java.util.concurrent.ConcurrentHashMap
 internal class TestAuthenticator(
     @Value("\${veo.accounts.keycloak.serverUrl}")
     private val keycloakUrl: String,
-
     @Value("\${veo.accounts.keycloak.realm}")
     private val realm: String,
-
     @Value("\${veo.accounts.keycloak.clients.auth.name}")
     private val clientName: String,
-
     @Value("\${veo.accounts.keycloak.clients.auth.secret}")
     private val clientSecret: String,
-
     @Value("\${veo.accounts.keycloak.proxyHost:#{null}}")
     private val proxyHost: String?,
-
     @Value("\${veo.accounts.keycloak.proxyPort:#{3128}}")
     private val proxyPort: Int,
 ) {
     private val userTokenCache = ConcurrentHashMap<String, String>()
 
-    fun getToken(username: String, password: String): String = userTokenCache.computeIfAbsent(username) {
-        HttpClientBuilder.create()
-            .apply { proxyHost?.let { setProxy(HttpHost(it, proxyPort)) } }
-            .build()
-            .use {
-                AuthzClient.create(Configuration(keycloakUrl, realm, clientName, mapOf("secret" to clientSecret), it))
-                    .obtainAccessToken(username, password)
-                    .token
-            }
-    }
+    fun getToken(
+        username: String,
+        password: String,
+    ): String =
+        userTokenCache.computeIfAbsent(username) {
+            HttpClientBuilder.create()
+                .apply { proxyHost?.let { setProxy(HttpHost(it, proxyPort)) } }
+                .build()
+                .use {
+                    AuthzClient.create(Configuration(keycloakUrl, realm, clientName, mapOf("secret" to clientSecret), it))
+                        .obtainAccessToken(username, password)
+                        .token
+                }
+        }
 }

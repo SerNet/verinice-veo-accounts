@@ -43,58 +43,57 @@ private val log = logger {}
 class KeycloakFacade(
     @Value("\${veo.accounts.keycloak.serverUrl}")
     private val serverUrl: String,
-
     @Value("\${veo.accounts.keycloak.realm}")
     private val realmName: String,
-
     /**
      * Name of the keycloak service client for this application. This is equivalent to the OAuth "client ID", but it is
      * not to be confused with the "client ID" in keycloak which is a UUID.
      */
     @Value("\${veo.accounts.keycloak.clients.service.name}")
     private val clientName: String,
-
     @Value("\${veo.accounts.keycloak.clients.service.secret}")
     private val secret: String,
-
     @Value("\${veo.accounts.keycloak.proxyHost:#{null}}")
     private val proxyHost: String?,
-
     @Value("\${veo.accounts.keycloak.proxyPort:#{3128}}")
     private val proxyPort: Int,
 ) {
-    private val realm = builder()
-        .serverUrl(serverUrl)
-        .realm(realmName)
-        .grantType(CLIENT_CREDENTIALS)
-        .clientId(clientName)
-        .clientSecret(secret)
-        .resteasyClient(buildClient())
-        .build()
-        .realm(realmName)
+    private val realm =
+        builder()
+            .serverUrl(serverUrl)
+            .realm(realmName)
+            .grantType(CLIENT_CREDENTIALS)
+            .clientId(clientName)
+            .clientSecret(secret)
+            .resteasyClient(buildClient())
+            .build()
+            .realm(realmName)
 
-    fun <R> perform(action: RealmResource.() -> R): R = try {
-        action(realm)
-    } catch (ex: AbstractMappedException) {
-        // mapped exceptions can pass
-        throw ex
-    } catch (ex: KeycloakException) {
-        // exceptions thrown by this function are also safe
-        throw ex
-    } catch (ex: Throwable) {
-        // everything else may contain secrets and must not pass
-        log.error("Unexpected keycloak communication error", ex)
-        throw KeycloakException()
-    }
+    fun <R> perform(action: RealmResource.() -> R): R =
+        try {
+            action(realm)
+        } catch (ex: AbstractMappedException) {
+            // mapped exceptions can pass
+            throw ex
+        } catch (ex: KeycloakException) {
+            // exceptions thrown by this function are also safe
+            throw ex
+        } catch (ex: Throwable) {
+            // everything else may contain secrets and must not pass
+            log.error("Unexpected keycloak communication error", ex)
+            throw KeycloakException()
+        }
 
-    fun parseResourceId(response: Response): String = response
-        .getHeaderString("Location")
-        ?.substringAfterLast('/')
-        ?: throw IllegalStateException("Failed parsing ID")
+    fun parseResourceId(response: Response): String =
+        response
+            .getHeaderString("Location")
+            ?.substringAfterLast('/')
+            ?: throw IllegalStateException("Failed parsing ID")
 
-    private fun buildClient(): Client = (ClientBuilder.newBuilder() as ResteasyClientBuilder)
-        .apply { proxyHost?.let { defaultProxy(it, proxyPort, "http") } }
-        .build()
+    private fun buildClient(): Client =
+        (ClientBuilder.newBuilder() as ResteasyClientBuilder)
+            .apply { proxyHost?.let { defaultProxy(it, proxyPort, "http") } }
+            .build()
 
     /**
      * Exception type for unexpected things that went wrong when talking to keycloak. This is used so no details

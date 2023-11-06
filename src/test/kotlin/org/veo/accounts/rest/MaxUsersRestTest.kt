@@ -86,102 +86,110 @@ class MaxUsersRestTest : AbstractRestTest() {
     }
 
     @Test
-    fun `shrinking maxUsers is handled`(): Unit = runBlocking(IO) {
-        // Given a manager, two more enabled accounts and one disabled account
-        val account2Id = postAccount("two", true).bodyAsMap["id"]
-        val account3Id = postAccount("three", true).bodyAsMap["id"]
-        val account4Id = postAccount("four", false).bodyAsMap["id"]
+    fun `shrinking maxUsers is handled`(): Unit =
+        runBlocking(IO) {
+            // Given a manager, two more enabled accounts and one disabled account
+            val account2Id = postAccount("two", true).bodyAsMap["id"]
+            val account3Id = postAccount("three", true).bodyAsMap["id"]
+            val account4Id = postAccount("four", false).bodyAsMap["id"]
 
-        // when reducing the maximum amount of accounts to 2
-        updateMaxUsers(client, 2)
+            // when reducing the maximum amount of accounts to 2
+            updateMaxUsers(client, 2)
 
-        // then an existing account can still be modified
-        get("/$account2Id", managerId).bodyAsMap.let {
-            it["firstName"] = "Neo"
-            put("/$account2Id", managerId, it)
-        }
+            // then an existing account can still be modified
+            get("/$account2Id", managerId).bodyAsMap.let {
+                it["firstName"] = "Neo"
+                put("/$account2Id", managerId, it)
+            }
 
-        // and enabling a disabled account is forbidden
-        get("/$account4Id", managerId).bodyAsMap.let {
-            it["enabled"] = true
-            put("/$account4Id", managerId, it, 403)
+            // and enabling a disabled account is forbidden
+            get("/$account4Id", managerId).bodyAsMap.let {
+                it["enabled"] = true
+                put("/$account4Id", managerId, it, 403)
+                    .rawBody shouldBe "Your veo license only allows up to 2 enabled account(s)"
+            }
+
+            // and adding another enabled account is forbidden
+            postAccount("five", true, 403)
                 .rawBody shouldBe "Your veo license only allows up to 2 enabled account(s)"
+
+            // when deleting two enabled accounts
+            delete("/$account2Id", managerId)
+            delete("/$account3Id", managerId)
+
+            // then a disabled account can be enabled
+            get("/$account4Id", managerId).bodyAsMap.let {
+                it["enabled"] = true
+                put("/$account4Id", managerId, it)
+            }
+
+            // when deleting one enabled account
+            delete("/$account4Id", managerId)
+
+            // then a new enabled account can be created
+            postAccount("five", true)
         }
-
-        // and adding another enabled account is forbidden
-        postAccount("five", true, 403)
-            .rawBody shouldBe "Your veo license only allows up to 2 enabled account(s)"
-
-        // when deleting two enabled accounts
-        delete("/$account2Id", managerId)
-        delete("/$account3Id", managerId)
-
-        // then a disabled account can be enabled
-        get("/$account4Id", managerId).bodyAsMap.let {
-            it["enabled"] = true
-            put("/$account4Id", managerId, it)
-        }
-
-        // when deleting one enabled account
-        delete("/$account4Id", managerId)
-
-        // then a new enabled account can be created
-        postAccount("five", true)
-    }
 
     /** The timing in this test is unpredictable. It may produce false successful results. */
     @Test
-    fun `maxUsers cannot be exceeded using simultaneous POSTs`() = runBlocking(IO) {
-        // When trying to create many accounts at once and waiting for all operations to finish
-        var failedAttempts = 0
-        (1..20)
-            .map { i ->
-                async {
-                    when (postAccount("user$i", true, null).statusCode) {
-                        403 -> failedAttempts++
-                        201 -> Unit
-                        else -> throw IllegalStateException()
+    fun `maxUsers cannot be exceeded using simultaneous POSTs`() =
+        runBlocking(IO) {
+            // When trying to create many accounts at once and waiting for all operations to finish
+            var failedAttempts = 0
+            (1..20)
+                .map { i ->
+                    async {
+                        when (postAccount("user$i", true, null).statusCode) {
+                            403 -> failedAttempts++
+                            201 -> Unit
+                            else -> throw IllegalStateException()
+                        }
                     }
                 }
-            }
-            .forEach { it.await() }
+                .forEach { it.await() }
 
-        // then the maximum amount of enabled accounts has not been exceeded
-        failedAttempts shouldBe 18
-        get("/", managerId).bodyAsListOfMaps.size shouldBe 2
-    }
+            // then the maximum amount of enabled accounts has not been exceeded
+            failedAttempts shouldBe 18
+            get("/", managerId).bodyAsListOfMaps.size shouldBe 2
+        }
 
     /** The timing in this test is unpredictable. It may produce false successful results. */
     @Test
-    fun `maxUsers cannot be exceeded using simultaneous PUTs`() = runBlocking(IO) {
-        // Given many disabled accounts
-        val accounts = (1..20)
-            .map { postAccount("user$it", false).bodyAsMap["id"] }
-            .map { get("/$it", managerId).bodyAsMap }
+    fun `maxUsers cannot be exceeded using simultaneous PUTs`() =
+        runBlocking(IO) {
+            // Given many disabled accounts
+            val accounts =
+                (1..20)
+                    .map { postAccount("user$it", false).bodyAsMap["id"] }
+                    .map { get("/$it", managerId).bodyAsMap }
 
-        // when trying to enable all accounts at once and waiting for all operations to finish
-        var failedAttempts = 0
-        accounts
-            .map {
-                async {
-                    it["enabled"] = true
-                    when (put("/${it["id"]}", managerId, it, null).statusCode) {
-                        403 -> failedAttempts++
-                        204 -> Unit
-                        else -> throw IllegalStateException()
+            // when trying to enable all accounts at once and waiting for all operations to finish
+            var failedAttempts = 0
+            accounts
+                .map {
+                    async {
+                        it["enabled"] = true
+                        when (put("/${it["id"]}", managerId, it, null).statusCode) {
+                            403 -> failedAttempts++
+                            204 -> Unit
+                            else -> throw IllegalStateException()
+                        }
                     }
                 }
-            }
-            .forEach { it.await() }
+                .forEach { it.await() }
 
-        // then the maximum amount of enabled accounts has not been exceeded
-        failedAttempts shouldBe 18
-        get("/", managerId).bodyAsListOfMaps
-            .filter { it["enabled"] == true }
-            .size shouldBe 2
-    }
+            // then the maximum amount of enabled accounts has not been exceeded
+            failedAttempts shouldBe 18
+            get("/", managerId).bodyAsListOfMaps
+                .filter { it["enabled"] == true }
+                .size shouldBe 2
+        }
 
-    private fun postAccount(username: String, enabled: Boolean, expectedStatus: Int? = 201) = post(
+    private fun postAccount(
+        username: String,
+        enabled: Boolean,
+        expectedStatus: Int? = 201,
+    ) = post(
         "/",
         managerId,
         mapOf(

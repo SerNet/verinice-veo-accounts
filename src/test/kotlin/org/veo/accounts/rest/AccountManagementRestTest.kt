@@ -37,19 +37,20 @@ class AccountManagementRestTest : AbstractRestTest() {
     @Test
     fun `CRUD an account`() {
         // expect that an account can be created
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-hans",
-                "emailAddress" to "$prefix-hans@test.test",
-                "firstName" to "Hans",
-                "lastName" to "Dance",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-                "language" to "de",
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-hans",
+                    "emailAddress" to "$prefix-hans@test.test",
+                    "firstName" to "Hans",
+                    "lastName" to "Dance",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                    "language" to "de",
+                ),
+            ).bodyAsMap["id"]
         accountId shouldNotBe null
 
         // and retrieved
@@ -180,18 +181,19 @@ class AccountManagementRestTest : AbstractRestTest() {
     @Test
     fun `usernames cannot be updated`() {
         // given an existing user
-        val accountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-power-user",
-                "firstName" to "Tara",
-                "lastName" to "Rattan",
-                "emailAddress" to "$prefix-user@power.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-power-user",
+                    "firstName" to "Tara",
+                    "lastName" to "Rattan",
+                    "emailAddress" to "$prefix-user@power.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // when trying to change the username
         put(

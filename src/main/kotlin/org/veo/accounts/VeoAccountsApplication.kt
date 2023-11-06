@@ -41,32 +41,38 @@ const val SECURITY_SCHEME_OAUTH = "OAuth2"
     type = OAUTH2,
     `in` = HEADER,
     description = "openidconnect Login",
-    flows = OAuthFlows(
-        implicit = OAuthFlow(
-            authorizationUrl = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth",
+    flows =
+        OAuthFlows(
+            implicit =
+                OAuthFlow(
+                    authorizationUrl = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth",
+                ),
         ),
-    ),
 )
 @OpenAPIDefinition(
-    info = Info(
-        title = "verinice.veo-accounts API",
-        description = "OpenAPI documentation for verinice.veo-accounts.",
-        license = License(
-            name = "GNU Affero General Public License",
-            url = "https://www.gnu.org/licenses/agpl-3.0.html.en",
+    info =
+        Info(
+            title = "verinice.veo-accounts API",
+            description = "OpenAPI documentation for verinice.veo-accounts.",
+            license =
+                License(
+                    name = "GNU Affero General Public License",
+                    url = "https://www.gnu.org/licenses/agpl-3.0.html.en",
+                ),
+            contact =
+                Contact(
+                    url = "http://verinice.com",
+                    email = "verinice@sernet.de",
+                ),
         ),
-        contact = Contact(
-            url = "http://verinice.com",
-            email = "verinice@sernet.de",
-        ),
-    ),
 )
 class VeoAccountsApplication {
     @Bean
     @Primary
-    fun objectMapper(): ObjectMapper = ObjectMapper()
-        .findAndRegisterModules()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+    fun objectMapper(): ObjectMapper =
+        ObjectMapper()
+            .findAndRegisterModules()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
 }
 
 fun main(args: Array<String>) {

@@ -35,20 +35,23 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
     @Test
     fun `initial account can be created`() {
         // when the initial account is created in the blank client
-        val accountId = post(
-            "/initial",
-            body = mapOf(
-                "clientId" to client.clientId,
-                "username" to "$prefix-primus",
-                "firstName" to "Primus",
-                "lastName" to "Sinus",
-                "emailAddress" to "$prefix-ps@initial.test",
-                "language" to "la",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
-        ).bodyAsMap["id"] as String
+        val accountId =
+            post(
+                "/initial",
+                body =
+                    mapOf(
+                        "clientId" to client.clientId,
+                        "username" to "$prefix-primus",
+                        "firstName" to "Primus",
+                        "lastName" to "Sinus",
+                        "emailAddress" to "$prefix-ps@initial.test",
+                        "language" to "la",
+                    ),
+                headers =
+                    mapOf(
+                        "Authorization" to listOf(clientInitApiKey),
+                    ),
+            ).bodyAsMap["id"] as String
 
         // then it has been saved
         findAccount(accountId)!!.apply {
@@ -60,26 +63,29 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
         }
 
         // and it has been assigned to the correct groups
-        findAccountGroupNames(accountId) shouldContainExactlyInAnyOrder listOf(
-            "veo-user",
-            "veo-write-access",
-            "veo-accountmanagers",
-            "veo_client:${client.clientId}",
-        )
+        findAccountGroupNames(accountId) shouldContainExactlyInAnyOrder
+            listOf(
+                "veo-user",
+                "veo-write-access",
+                "veo-accountmanagers",
+                "veo_client:${client.clientId}",
+            )
 
         // expect trying to create another initial account in the same client to fail
         post(
             "/initial",
-            body = mapOf(
-                "clientId" to client.clientId,
-                "username" to "$prefix-secondary",
-                "firstName" to "Secondary",
-                "lastName" to "Mary",
-                "emailAddress" to "$prefix-sm@initial.test",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
+            body =
+                mapOf(
+                    "clientId" to client.clientId,
+                    "username" to "$prefix-secondary",
+                    "firstName" to "Secondary",
+                    "lastName" to "Mary",
+                    "emailAddress" to "$prefix-sm@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "Authorization" to listOf(clientInitApiKey),
+                ),
             expectedStatus = 409,
         ).rawBody shouldBe "Target client already contains accounts, cannot create initial account"
     }
@@ -89,16 +95,18 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
         // expect creating initial account for non-existing client group to fail
         post(
             "/initial",
-            body = mapOf(
-                "clientId" to randomUUID(),
-                "username" to "$prefix-primus",
-                "firstName" to "Primus",
-                "lastName" to "Sinus",
-                "emailAddress" to "$prefix-ps@initial.test",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
+            body =
+                mapOf(
+                    "clientId" to randomUUID(),
+                    "username" to "$prefix-primus",
+                    "firstName" to "Primus",
+                    "lastName" to "Sinus",
+                    "emailAddress" to "$prefix-ps@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "Authorization" to listOf(clientInitApiKey),
+                ),
             expectedStatus = 422,
         ).rawBody shouldBe "Target veo client does not exist"
     }
@@ -108,47 +116,53 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
         // given an existing account in another client
         post(
             "/initial",
-            body = mapOf(
-                "clientId" to createVeoClientGroup().clientId,
-                "username" to "$prefix-kelly",
-                "firstName" to "Kelly",
-                "lastName" to "Elly",
-                "emailAddress" to "$prefix-ke@initial.test",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
+            body =
+                mapOf(
+                    "clientId" to createVeoClientGroup().clientId,
+                    "username" to "$prefix-kelly",
+                    "firstName" to "Kelly",
+                    "lastName" to "Elly",
+                    "emailAddress" to "$prefix-ke@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "Authorization" to listOf(clientInitApiKey),
+                ),
         )
 
         // expect that reusing the existing username for this client's initial user will fail
         post(
             "/initial",
-            body = mapOf(
-                "clientId" to client.clientId,
-                "username" to "$prefix-kelly",
-                "firstName" to "Kirk",
-                "lastName" to "Elly",
-                "emailAddress" to "$prefix-kirk@initial.test",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
+            body =
+                mapOf(
+                    "clientId" to client.clientId,
+                    "username" to "$prefix-kelly",
+                    "firstName" to "Kirk",
+                    "lastName" to "Elly",
+                    "emailAddress" to "$prefix-kirk@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "Authorization" to listOf(clientInitApiKey),
+                ),
             expectedStatus = 409,
         ).rawBody shouldBe "Username or email address already taken"
 
         // and that reusing the existing email address for this client's initial user will fail
         post(
             "/initial",
-            body = mapOf(
-                "clientId" to client.clientId,
-                "username" to "$prefix-kirke",
-                "firstName" to "Kirk",
-                "lastName" to "Elly",
-                "emailAddress" to "$prefix-ke@initial.test",
-            ),
-            headers = mapOf(
-                "Authorization" to listOf(clientInitApiKey),
-            ),
+            body =
+                mapOf(
+                    "clientId" to client.clientId,
+                    "username" to "$prefix-kirke",
+                    "firstName" to "Kirk",
+                    "lastName" to "Elly",
+                    "emailAddress" to "$prefix-ke@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "Authorization" to listOf(clientInitApiKey),
+                ),
             expectedStatus = 409,
         ).rawBody shouldBe "Username or email address already taken"
     }

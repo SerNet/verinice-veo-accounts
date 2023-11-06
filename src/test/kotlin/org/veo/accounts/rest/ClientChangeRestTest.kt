@@ -85,44 +85,47 @@ class ClientChangeRestTest : AbstractRestTest() {
     @Test
     fun `deactivates client`() {
         // given some accounts within the client
-        val danAccountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-dan",
-                "emailAddress" to "$prefix-dan@test.test",
-                "firstName" to "Dan",
-                "lastName" to "Man",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
-        val sydAccountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-syd",
-                "emailAddress" to "$prefix-syd@test.test",
-                "firstName" to "Syd",
-                "lastName" to "Did",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to false,
-            ),
-        ).bodyAsMap["id"] as String
+        val danAccountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-dan",
+                    "emailAddress" to "$prefix-dan@test.test",
+                    "firstName" to "Dan",
+                    "lastName" to "Man",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
+        val sydAccountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-syd",
+                    "emailAddress" to "$prefix-syd@test.test",
+                    "firstName" to "Syd",
+                    "lastName" to "Did",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to false,
+                ),
+            ).bodyAsMap["id"] as String
 
         // and an account in the other client
-        val otherClientAccountId = post(
-            "/",
-            otherManagerId,
-            mapOf(
-                "username" to "$prefix-kim",
-                "emailAddress" to "$prefix-kim@test.test",
-                "firstName" to "Kim",
-                "lastName" to "Dim",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
+        val otherClientAccountId =
+            post(
+                "/",
+                otherManagerId,
+                mapOf(
+                    "username" to "$prefix-kim",
+                    "emailAddress" to "$prefix-kim@test.test",
+                    "firstName" to "Kim",
+                    "lastName" to "Dim",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
 
         // expect all accounts to be in the veo-user group
         accountInGroup(danAccountId, "veo-user") shouldBe true
@@ -147,18 +150,19 @@ class ClientChangeRestTest : AbstractRestTest() {
         accountInGroup(otherClientAccountId, "veo-user") shouldBe true
 
         // when creating a new user in the deactivated veo client group
-        val timAccountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-tim",
-                "emailAddress" to "$prefix-tim@test.test",
-                "firstName" to "Tim",
-                "lastName" to "Sim",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
+        val timAccountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-tim",
+                    "emailAddress" to "$prefix-tim@test.test",
+                    "firstName" to "Tim",
+                    "lastName" to "Sim",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
 
         // then it is not assigned to the veo-user group
         // TODO VEO-1859 uncomment once keycloak no longer automatically assigns veo-user role
@@ -180,18 +184,19 @@ class ClientChangeRestTest : AbstractRestTest() {
         }
 
         // when creating a new user in the activated veo client group
-        val catAccountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-cat",
-                "emailAddress" to "$prefix-cat@test.test",
-                "firstName" to "Cat",
-                "lastName" to "Rat",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
+        val catAccountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-cat",
+                    "emailAddress" to "$prefix-cat@test.test",
+                    "firstName" to "Cat",
+                    "lastName" to "Rat",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
 
         // then it should be in the veo-user group
         accountInGroup(catAccountId, "veo-user") shouldBe true
@@ -232,44 +237,47 @@ class ClientChangeRestTest : AbstractRestTest() {
     @Test
     fun `deletes client`() {
         // given some accounts within the client
-        val clientAccount1Id = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-dan",
-                "emailAddress" to "$prefix-dan@test.test",
-                "firstName" to "Dan",
-                "lastName" to "Man",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
-        val clientAccount2Id = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-syd",
-                "emailAddress" to "$prefix-syd@test.test",
-                "firstName" to "Syd",
-                "lastName" to "Did",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
+        val clientAccount1Id =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-dan",
+                    "emailAddress" to "$prefix-dan@test.test",
+                    "firstName" to "Dan",
+                    "lastName" to "Man",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
+        val clientAccount2Id =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-syd",
+                    "emailAddress" to "$prefix-syd@test.test",
+                    "firstName" to "Syd",
+                    "lastName" to "Did",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
 
         // and an account in the other client
-        val otherClientAccountId = post(
-            "/",
-            otherManagerId,
-            mapOf(
-                "username" to "$prefix-kim",
-                "emailAddress" to "$prefix-kim@test.test",
-                "firstName" to "Kim",
-                "lastName" to "Dim",
-                "groups" to listOf("veo-write-access"),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"] as String
+        val otherClientAccountId =
+            post(
+                "/",
+                otherManagerId,
+                mapOf(
+                    "username" to "$prefix-kim",
+                    "emailAddress" to "$prefix-kim@test.test",
+                    "firstName" to "Kim",
+                    "lastName" to "Dim",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"] as String
 
         // expect the clients to be populated
         accountExists(managerId) shouldBe true

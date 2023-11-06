@@ -52,42 +52,51 @@ class AccountService(
     @Value("\${veo.accounts.keycloak.mailing.enabled}")
     private val mailingEnabled: Boolean,
 ) {
-    fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> = facade.perform {
-        findAccounts(authAccount)
+    fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
+        facade.perform {
+            findAccounts(authAccount)
+                // Self-management is not supported
+                .filter { it.id != authAccount.id.toString() }
+                .onEach { loadGroups(it) }
+        }
+
+    fun getAccount(
+        id: AccountId,
+        authAccount: AuthenticatedAccount,
+    ): UserRepresentation =
+        facade.perform {
             // Self-management is not supported
-            .filter { it.id != authAccount.id.toString() }
-            .onEach { loadGroups(it) }
-    }
-
-    fun getAccount(id: AccountId, authAccount: AuthenticatedAccount): UserRepresentation = facade.perform {
-        // Self-management is not supported
-        if (id == authAccount.id) throw ResourceNotFoundException()
-        users().get(id.toString())
-            .let { userResource ->
-                try {
-                    userResource.toRepresentation()
-                } catch (_: NotFoundException) {
-                    throw ResourceNotFoundException()
+            if (id == authAccount.id) throw ResourceNotFoundException()
+            users().get(id.toString())
+                .let { userResource ->
+                    try {
+                        userResource.toRepresentation()
+                    } catch (_: NotFoundException) {
+                        throw ResourceNotFoundException()
+                    }
                 }
+                .also { loadGroups(it) }
+                .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
+        }
+
+    fun createInitialAccount(dto: CreateInitialAccountDto): AccountId =
+        performSynchronized(dto.clientId) {
+            if (findGroup(dto.clientId.groupName, true) == null) {
+                throw UnprocessableDtoException("Target veo client does not exist")
             }
-            .also { loadGroups(it) }
-            .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
-    }
+            if (findAccounts(dto.clientId).isNotEmpty()) {
+                throw ConflictException("Target client already contains accounts, cannot create initial account")
+            }
 
-    fun createInitialAccount(dto: CreateInitialAccountDto): AccountId = performSynchronized(dto.clientId) {
-        if (findGroup(dto.clientId.groupName, true) == null) {
-            throw UnprocessableDtoException("Target veo client does not exist")
-        }
-        if (findAccounts(dto.clientId).isNotEmpty()) {
-            throw ConflictException("Target client already contains accounts, cannot create initial account")
+            dtoToInitialUser(dto)
+                .also { log.info { "Creating initial account ${it.username} for ${dto.clientId}" } }
+                .let { createAccount(it) }
         }
 
-        dtoToInitialUser(dto)
-            .also { log.info { "Creating initial account ${it.username} for ${dto.clientId}" } }
-            .let { createAccount(it) }
-    }
-
-    fun createAccount(dto: CreateAccountDto, authAccount: AuthenticatedAccount): AccountId =
+    fun createAccount(
+        dto: CreateAccountDto,
+        authAccount: AuthenticatedAccount,
+    ): AccountId =
         performSynchronized(authAccount) {
             dto
                 .apply {
@@ -100,69 +109,81 @@ class AccountService(
                 .let { createAccount(it) }
         }
 
-    private fun RealmResource.createAccount(userRepresentation: UserRepresentation): AccountId = userRepresentation
-        .let { users().create(it) }
-        .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
-        .apply { check(status == 201) { "Unexpected user creation response $status" } }
-        .let(facade::parseResourceId)
-        .also { sendEmail(it) }
-        .let { AccountId(it) }
+    private fun RealmResource.createAccount(userRepresentation: UserRepresentation): AccountId =
+        userRepresentation
+            .let { users().create(it) }
+            .apply { if (status == 409) throw ConflictException("Username or email address already taken") }
+            .apply { check(status == 201) { "Unexpected user creation response $status" } }
+            .let(facade::parseResourceId)
+            .also { sendEmail(it) }
+            .let { AccountId(it) }
 
-    fun updateAccount(id: AccountId, dto: UpdateAccountDto, authAccount: AuthenticatedAccount) =
-        performSynchronized(authAccount) {
-            getAccount(id, authAccount)
-                .apply {
-                    if (!isEnabled && dto.enabled.value) {
-                        checkMaxUsersNotExhausted(authAccount)
+    fun updateAccount(
+        id: AccountId,
+        dto: UpdateAccountDto,
+        authAccount: AuthenticatedAccount,
+    ) = performSynchronized(authAccount) {
+        getAccount(id, authAccount)
+            .apply {
+                if (!isEnabled && dto.enabled.value) {
+                    checkMaxUsersNotExhausted(authAccount)
+                }
+            }
+            .also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
+            .apply { update(dto) }
+            .also {
+                try {
+                    users().get(id.toString()).update(it)
+                } catch (ex: ClientErrorException) {
+                    if (ex.response.status == 409) {
+                        throw ConflictException("Email address already taken")
                     }
+                    throw ex
                 }
-                .also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
-                .apply { update(dto) }
-                .also {
-                    try {
-                        users().get(id.toString()).update(it)
-                    } catch (ex: ClientErrorException) {
-                        if (ex.response.status == 409) {
-                            throw ConflictException("Email address already taken")
-                        }
-                        throw ex
-                    }
-                }
-                .also { user ->
-                    dto.groups
-                        .groupNames
-                        .filter { !user.groups.contains(it) }
-                        .forEach { users().get(user.id).joinGroup(getGroupId(it)) }
-                }
-                .also { user ->
-                    AssignableGroupSet.byGroupNames(user.groups)
-                        .values
-                        .filter { !dto.groups.values.contains(it) }
-                        .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
-                }
-                .run { if (!isEmailVerified) sendEmail(id.toString()) }
-        }
+            }
+            .also { user ->
+                dto.groups
+                    .groupNames
+                    .filter { !user.groups.contains(it) }
+                    .forEach { users().get(user.id).joinGroup(getGroupId(it)) }
+            }
+            .also { user ->
+                AssignableGroupSet.byGroupNames(user.groups)
+                    .values
+                    .filter { !dto.groups.values.contains(it) }
+                    .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
+            }
+            .run { if (!isEmailVerified) sendEmail(id.toString()) }
+    }
 
-    fun deleteAccount(id: AccountId, authAccount: AuthenticatedAccount) = performSynchronized(authAccount) {
+    fun deleteAccount(
+        id: AccountId,
+        authAccount: AuthenticatedAccount,
+    ) = performSynchronized(authAccount) {
         getAccount(id, authAccount)
             .also { log.info { "Deleting account ${it.username} in ${authAccount.veoClient}" } }
             .also { users().delete(id.toString()) }
             .run { }
     }
 
-    fun deactivateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
-        getGroup(veoClient.groupName)
-            .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
-            .also { groups().group(it.id).update(it) }
-            .let { groups().group(it.id).members() }
-            .map { users().get(it.id) }
-            .filter { userResource -> userResource.groups().any { it.name == "veo-user" } }
-            .forEach {
-                it.leaveGroup(getGroupId("veo-user"))
-            }
-    }
+    fun deactivateClient(veoClient: VeoClientId) =
+        performSynchronized(veoClient) {
+            getGroup(veoClient.groupName)
+                .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
+                .also { groups().group(it.id).update(it) }
+                .let { groups().group(it.id).members() }
+                .map { users().get(it.id) }
+                .filter { userResource -> userResource.groups().any { it.name == "veo-user" } }
+                .forEach {
+                    it.leaveGroup(getGroupId("veo-user"))
+                }
+        }
 
-    fun createClient(client: VeoClientId, maxUnits: Int, maxUsers: Int) = performSynchronized(client) {
+    fun createClient(
+        client: VeoClientId,
+        maxUnits: Int,
+        maxUsers: Int,
+    ) = performSynchronized(client) {
         log.info("Creating veo client group ${client.groupName}")
         GroupRepresentation()
             .apply {
@@ -174,17 +195,22 @@ class AccountService(
             .run {}
     }
 
-    fun activateClient(veoClient: VeoClientId) = performSynchronized(veoClient) {
-        getGroup(veoClient.groupName)
-            .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
-            .also { groups().group(it.id).update(it) }
-            .let { groups().group(it.id).members() }
-            .forEach {
-                users().get(it.id).joinGroup(getGroupId("veo-user"))
-            }
-    }
+    fun activateClient(veoClient: VeoClientId) =
+        performSynchronized(veoClient) {
+            getGroup(veoClient.groupName)
+                .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
+                .also { groups().group(it.id).update(it) }
+                .let { groups().group(it.id).members() }
+                .forEach {
+                    users().get(it.id).joinGroup(getGroupId("veo-user"))
+                }
+        }
 
-    fun updateClient(client: VeoClientId, maxUnits: Int?, maxUsers: Int?) = performSynchronized(client) {
+    fun updateClient(
+        client: VeoClientId,
+        maxUnits: Int?,
+        maxUsers: Int?,
+    ) = performSynchronized(client) {
         getGroup(client.groupName)
             .apply {
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
@@ -193,24 +219,31 @@ class AccountService(
             .let { groups().group(it.id).update(it) }
     }
 
-    fun deleteClient(client: VeoClientId) = performSynchronized(client) {
-        log.info("Deleting veo client group ${client.groupName}")
-        groups().group(getGroupId(client.groupName)).run {
-            members().forEach {
-                users().delete(it.id)
+    fun deleteClient(client: VeoClientId) =
+        performSynchronized(client) {
+            log.info("Deleting veo client group ${client.groupName}")
+            groups().group(getGroupId(client.groupName)).run {
+                members().forEach {
+                    users().delete(it.id)
+                }
+                remove()
             }
-            remove()
         }
-    }
 
-    private fun <T> performSynchronized(authAccount: AuthenticatedAccount, block: RealmResource.() -> T): T =
-        performSynchronized(authAccount.veoClient, block)
+    private fun <T> performSynchronized(
+        authAccount: AuthenticatedAccount,
+        block: RealmResource.() -> T,
+    ): T = performSynchronized(authAccount.veoClient, block)
 
-    private fun <T> performSynchronized(client: VeoClientId, block: RealmResource.() -> T): T = facade.perform {
-        synchronized(client.groupName.intern()) {
-            block()
+    private fun <T> performSynchronized(
+        client: VeoClientId,
+        block: RealmResource.() -> T,
+    ): T =
+        facade.perform {
+            synchronized(client.groupName.intern()) {
+                block()
+            }
         }
-    }
 
     private fun RealmResource.findAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
         findAccounts(authAccount.veoClient)
@@ -239,7 +272,10 @@ class AccountService(
             .filter { it.isEnabled }
             .size
 
-    private fun RealmResource.dtoToUser(dto: CreateAccountDto, authAccount: AuthenticatedAccount) = UserRepresentation().apply {
+    private fun RealmResource.dtoToUser(
+        dto: CreateAccountDto,
+        authAccount: AuthenticatedAccount,
+    ) = UserRepresentation().apply {
         username = dto.username.value
         email = dto.emailAddress.value
         firstName = dto.firstName.value
@@ -249,15 +285,16 @@ class AccountService(
         isEnabled = dto.enabled.value
     }
 
-    private fun RealmResource.dtoToInitialUser(dto: CreateInitialAccountDto) = UserRepresentation().apply {
-        username = dto.username.value
-        email = dto.emailAddress.value
-        firstName = dto.firstName.value
-        lastName = dto.lastName.value
-        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
-        groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
-        isEnabled = true
-    }
+    private fun RealmResource.dtoToInitialUser(dto: CreateInitialAccountDto) =
+        UserRepresentation().apply {
+            username = dto.username.value
+            email = dto.emailAddress.value
+            firstName = dto.firstName.value
+            lastName = dto.lastName.value
+            singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
+            groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
+            isEnabled = true
+        }
 
     private fun RealmResource.getGroupsForNewAccount(
         veoClient: VeoClientId,
@@ -290,22 +327,30 @@ class AccountService(
 
     private fun RealmResource.getGroupId(groupName: String): String = getGroup(groupName, true).id
 
-    private fun RealmResource.getGroup(groupName: String, briefRepresentation: Boolean = false): GroupRepresentation =
+    private fun RealmResource.getGroup(
+        groupName: String,
+        briefRepresentation: Boolean = false,
+    ): GroupRepresentation =
         findGroup(groupName, briefRepresentation)
             ?: throw IllegalStateException("Group with name '$groupName' not found")
 
-    private fun RealmResource.findGroup(groupName: String, briefRepresentation: Boolean = false): GroupRepresentation? = groups()
-        .groups(groupName, 0, 1, briefRepresentation)
-        .firstOrNull()
-        ?.let { listOf(it) + it.subGroups }
-        ?.firstOrNull { it.name == groupName }
+    private fun RealmResource.findGroup(
+        groupName: String,
+        briefRepresentation: Boolean = false,
+    ): GroupRepresentation? =
+        groups()
+            .groups(groupName, 0, 1, briefRepresentation)
+            .firstOrNull()
+            ?.let { listOf(it) + it.subGroups }
+            ?.firstOrNull { it.name == groupName }
 
-    private fun RealmResource.sendEmail(accountId: String) = accountId
-        .let { users().get(accountId).toRepresentation() }
-        .apply { if (!isEnabled) return }
-        .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
-        .also { log.debug { "Determined email actions for user $accountId: $it" } }
-        .let { if (mailingEnabled) users().get(accountId).executeActionsEmail(it) }
+    private fun RealmResource.sendEmail(accountId: String) =
+        accountId
+            .let { users().get(accountId).toRepresentation() }
+            .apply { if (!isEnabled) return }
+            .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
+            .also { log.debug { "Determined email actions for user $accountId: $it" } }
+            .let { if (mailingEnabled) users().get(accountId).executeActionsEmail(it) }
 
     private fun RealmResource.loadGroups(user: UserRepresentation) {
         user.apply {

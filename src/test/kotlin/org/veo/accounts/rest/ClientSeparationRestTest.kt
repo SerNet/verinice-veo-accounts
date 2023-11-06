@@ -35,18 +35,19 @@ class ClientSeparationRestTest : AbstractRestTest() {
     @Test
     fun `created account cannot be accessed by another client`() {
         // when an account is created in client 1
-        val accountId = post(
-            "/",
-            client1ManagerId,
-            mapOf(
-                "username" to "$prefix-louis",
-                "firstName" to "Louis",
-                "lastName" to "King",
-                "emailAddress" to "$prefix-louis@client1.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val accountId =
+            post(
+                "/",
+                client1ManagerId,
+                mapOf(
+                    "username" to "$prefix-louis",
+                    "firstName" to "Louis",
+                    "lastName" to "King",
+                    "emailAddress" to "$prefix-louis@client1.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // then client 1 manager can access it
         get("/$accountId", client1ManagerId).bodyAsMap["username"] shouldBe "$prefix-louis"

@@ -108,18 +108,19 @@ class UniquenessRestTest : AbstractRestTest() {
                 "enabled" to true,
             ),
         )
-        val secondAccountId = post(
-            "/",
-            managerId,
-            mapOf(
-                "username" to "$prefix-glowcake",
-                "firstName" to "Glowy",
-                "lastName" to "Cakey",
-                "emailAddress" to "$prefix-special@glowcake.test",
-                "groups" to emptyList<String>(),
-                "enabled" to true,
-            ),
-        ).bodyAsMap["id"]
+        val secondAccountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-glowcake",
+                    "firstName" to "Glowy",
+                    "lastName" to "Cakey",
+                    "emailAddress" to "$prefix-special@glowcake.test",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
 
         // expect that updating the second account with the first account's email address will fail
         put(

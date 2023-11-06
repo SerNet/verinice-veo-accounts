@@ -79,18 +79,19 @@ abstract class AbstractRestTest {
         @JvmStatic
         fun setupAll() {
             if (rabbit == null && System.getenv("SPRING_RABBITMQ_HOST") == null) {
-                rabbit = GenericContainer("rabbitmq:3-management")
-                    .withExposedPorts(5672, 15672)
-                    .waitingFor(forListeningPort())
-                    .apply { start() }
-                    .apply {
-                        System.getProperties().putAll(
-                            mapOf(
-                                "spring.rabbitmq.host" to host,
-                                "spring.rabbitmq.port" to getMappedPort(5672),
-                            ),
-                        )
-                    }
+                rabbit =
+                    GenericContainer("rabbitmq:3-management")
+                        .withExposedPorts(5672, 15672)
+                        .waitingFor(forListeningPort())
+                        .apply { start() }
+                        .apply {
+                            System.getProperties().putAll(
+                                mapOf(
+                                    "spring.rabbitmq.host" to host,
+                                    "spring.rabbitmq.port" to getMappedPort(5672),
+                                ),
+                            )
+                        }
             }
         }
     }
@@ -116,7 +117,10 @@ abstract class AbstractRestTest {
             }
     }
 
-    protected fun createVeoClientGroup(maxUsers: Int = MAX_VALUE, maxUnits: Int = MAX_VALUE): VeoClientId =
+    protected fun createVeoClientGroup(
+        maxUsers: Int = MAX_VALUE,
+        maxUnits: Int = MAX_VALUE,
+    ): VeoClientId =
         VeoClientId(randomUUID())
             .apply {
                 sendMessage(
@@ -132,21 +136,39 @@ abstract class AbstractRestTest {
             }
             .also { createdVeoClients.add(it) }
 
-    protected fun createManager(group: VeoClientId, roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE)): String =
-        testAccountService.createManager(group, roles, prefix)
+    protected fun createManager(
+        group: VeoClientId,
+        roles: List<Role> = listOf(CREATE, READ, UPDATE, DELETE),
+    ): String = testAccountService.createManager(group, roles, prefix)
 
-    protected fun updateMaxUsers(group: VeoClientId, maxUsers: Int) {
+    protected fun updateMaxUsers(
+        group: VeoClientId,
+        maxUsers: Int,
+    ) {
         testAccountService.updateMaxUsers(group, maxUsers)
     }
 
-    protected fun options(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
-        exchange(HttpMethod.OPTIONS, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
+    protected fun options(
+        url: String,
+        authAccountId: String? = null,
+        expectedStatus: Int? = 200,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response = exchange(HttpMethod.OPTIONS, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
-    protected fun get(url: String, authAccountId: String? = null, expectedStatus: Int? = 200, headers: Map<String, List<String>> = emptyMap()): Response =
-        exchange(HttpMethod.GET, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
+    protected fun get(
+        url: String,
+        authAccountId: String? = null,
+        expectedStatus: Int? = 200,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response = exchange(HttpMethod.GET, url, authAccountId, headers = headers, expectedStatus = expectedStatus)
 
-    protected fun post(url: String, authAccountId: String? = null, body: Any? = null, expectedStatus: Int? = 201, headers: Map<String, List<String>> = emptyMap()): Response =
-        postRaw(url, authAccountId, serialize(body), expectedStatus, headers)
+    protected fun post(
+        url: String,
+        authAccountId: String? = null,
+        body: Any? = null,
+        expectedStatus: Int? = 201,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response = postRaw(url, authAccountId, serialize(body), expectedStatus, headers)
 
     protected fun postRaw(
         url: String,
@@ -154,8 +176,7 @@ abstract class AbstractRestTest {
         body: String?,
         expectedStatus: Int? = 201,
         headers: Map<String, List<String>> = emptyMap(),
-    ): Response =
-        exchange(HttpMethod.POST, url, authAccountId, body, headers, expectedStatus)
+    ): Response = exchange(HttpMethod.POST, url, authAccountId, body, headers, expectedStatus)
 
     protected fun put(
         url: String,
@@ -163,13 +184,20 @@ abstract class AbstractRestTest {
         body: Any?,
         expectedStatus: Int? = 204,
         headers: Map<String, List<String>> = emptyMap(),
-    ): Response =
-        exchange(HttpMethod.PUT, url, authAccountId, serialize(body), headers, expectedStatus)
+    ): Response = exchange(HttpMethod.PUT, url, authAccountId, serialize(body), headers, expectedStatus)
 
-    protected fun delete(url: String, authAccountId: String? = null, expectedStatus: Int? = 204, headers: Map<String, List<String>> = emptyMap()): Response =
-        exchange(HttpMethod.DELETE, url, authAccountId, null, headers, expectedStatus)
+    protected fun delete(
+        url: String,
+        authAccountId: String? = null,
+        expectedStatus: Int? = 204,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response = exchange(HttpMethod.DELETE, url, authAccountId, null, headers, expectedStatus)
 
-    protected fun sendMessage(routingKey: String, content: Map<String, *>, completionAssertion: () -> Unit) {
+    protected fun sendMessage(
+        routingKey: String,
+        content: Map<String, *>,
+        completionAssertion: () -> Unit,
+    ) {
         testMessageDispatcher.sendMessage(routingKey, content)
         await().atMost(5, SECONDS).until {
             try {
@@ -189,7 +217,10 @@ abstract class AbstractRestTest {
 
     protected fun findGroup(groupName: String): GroupRepresentation? = testAccountService.findGroup(groupName)
 
-    protected fun accountInGroup(accountId: String, groupName: String): Boolean = testAccountService.accountInGroup(accountId, groupName)
+    protected fun accountInGroup(
+        accountId: String,
+        groupName: String,
+    ): Boolean = testAccountService.accountInGroup(accountId, groupName)
 
     private fun exchange(
         method: HttpMethod,
@@ -216,13 +247,17 @@ abstract class AbstractRestTest {
 
     private fun serialize(body: Any?): String? = body?.let { jacksonObjectMapper().writeValueAsString(it) }
 
-    private fun buildHeaders(headerMap: Map<String, List<String>>, authAccountId: String?) = HttpHeaders()
+    private fun buildHeaders(
+        headerMap: Map<String, List<String>>,
+        authAccountId: String?,
+    ) = HttpHeaders()
         .apply { set("Content-Type", "application/json") }
         .apply { authAccountId?.let { set("Authorization", "Bearer " + getToken(it)) } }
         .apply { headerMap.forEach { (key, values) -> set(key, values) } }
 
-    private fun getToken(authAccountId: String): String = testAuthenticator.getToken(
-        testAccountService.getUsername(authAccountId),
-        testAccountService.testPassword,
-    )
+    private fun getToken(authAccountId: String): String =
+        testAuthenticator.getToken(
+            testAccountService.getUsername(authAccountId),
+            testAccountService.testPassword,
+        )
 }
