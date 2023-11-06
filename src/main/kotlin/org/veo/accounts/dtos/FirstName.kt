@@ -22,18 +22,18 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import org.veo.accounts.validate
 
-private const val minLength = 1
-private const val maxLength = 256
+private const val MIN_LENGTH = 1
+private const val MAX_LENGTH = 256
 
 @Schema(
     description = "User's given name",
     type = "string",
-    minLength = minLength,
-    maxLength = maxLength,
+    minLength = MIN_LENGTH,
+    maxLength = MAX_LENGTH,
     example = "Katie",
 )
 data class FirstName(
-    @field:Size(min = minLength, max = maxLength)
+    @field:Size(min = MIN_LENGTH, max = MAX_LENGTH)
     @get:JsonValue
     val value: String,
 ) {

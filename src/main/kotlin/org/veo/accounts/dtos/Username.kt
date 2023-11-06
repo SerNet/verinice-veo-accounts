@@ -23,19 +23,20 @@ import jakarta.validation.constraints.Size
 import org.springframework.validation.annotation.Validated
 import org.veo.accounts.validate
 
-private const val minLength = 1
-private const val maxLength = 256
+private const val MIN_LENGTH = 1
+private const val MAX_LENGTH = 256
 
 @Schema(
-    description = "Unique user account identifier, but not be confused with the generated account ID. Once chosen, usernames cannot be changed.",
+    description = "Unique user account identifier, but not be confused with the generated account ID. Once chosen, usernames cannot be " +
+        "changed.",
     type = "string",
-    minLength = minLength,
-    maxLength = maxLength,
+    minLength = MIN_LENGTH,
+    maxLength = MAX_LENGTH,
     example = "ksmith",
 )
 @Validated
 data class Username(
-    @field:Size(min = minLength, max = maxLength)
+    @field:Size(min = MIN_LENGTH, max = MAX_LENGTH)
     @get:JsonValue
     val value: String,
 ) {

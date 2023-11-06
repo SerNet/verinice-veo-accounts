@@ -24,18 +24,18 @@ import org.veo.accounts.ValidationException
 import org.veo.accounts.validate
 import java.util.Locale
 
-private const val minLength = 2
-private const val maxLength = 2
+private const val MIN_LENGTH = 2
+private const val MAX_LENGTH = 2
 
 @Schema(
     description = "User's preferred language (ISO 639-1 code)",
     type = "string",
-    minLength = minLength,
-    maxLength = maxLength,
+    minLength = MIN_LENGTH,
+    maxLength = MAX_LENGTH,
     example = "de",
 )
 class Language(
-    @field:Size(min = minLength, max = maxLength)
+    @field:Size(min = MIN_LENGTH, max = MAX_LENGTH)
     @get:JsonValue
     val value: String,
 ) {

@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 
-private const val uuidPattern = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
-private const val clientGroupPrefix = "veo_client:"
-private val clientGroupPathRegex = Regex("^/$clientGroupPrefix($uuidPattern)$")
+private const val UUID_PATTERN = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
+private const val CLIENT_GROUP_PREFIX = "veo_client:"
+private val CLIENT_GROUP_PATH_REGEX = Regex("^/$CLIENT_GROUP_PREFIX($UUID_PATTERN)$")
 
 /**
  * Not to be confused with the keycloak client. Each keycloak user account can be assigned to one veo client with a
@@ -36,12 +36,12 @@ data class VeoClientId(
     @get:JsonValue
     val clientId: UUID,
 ) {
-    val groupName = "$clientGroupPrefix$clientId"
+    val groupName = "$CLIENT_GROUP_PREFIX$clientId"
     val path = "/$groupName"
     override fun toString(): String = groupName
     companion object {
         fun tryParse(groupPath: String): VeoClientId? = groupPath
-            .let { clientGroupPathRegex.matchEntire(it) }
+            .let { CLIENT_GROUP_PATH_REGEX.matchEntire(it) }
             ?.let { VeoClientId(UUID.fromString(it.groups[1]!!.value)) }
     }
 }

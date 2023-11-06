@@ -21,14 +21,14 @@ import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
 import java.net.URI
 
-private const val minLength = 1
-private const val maxLength = 2000
+private const val MIN_LENGTH = 1
+private const val MAX_LENGTH = 2000
 
 @Schema(
     description = "A resource's URI",
     type = "string",
-    minLength = minLength,
-    maxLength = maxLength,
+    minLength = MIN_LENGTH,
+    maxLength = MAX_LENGTH,
     example = "https://<api.example.org>/veo/accounts/6d071be3-ca56-4c2a-8fba-1a80596e3403",
 )
 data class Link(
@@ -36,6 +36,6 @@ data class Link(
     val value: URI,
 ) {
     init {
-        require(value.toString().length in minLength until maxLength)
+        require(value.toString().length in MIN_LENGTH until MAX_LENGTH)
     }
 }
