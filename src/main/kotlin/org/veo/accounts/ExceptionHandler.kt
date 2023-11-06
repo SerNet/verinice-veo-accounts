@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-// TODO stop using MissingKotlinParameterException
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION") // TODO stop using MissingKotlinParameterException
 
 package org.veo.accounts
 
