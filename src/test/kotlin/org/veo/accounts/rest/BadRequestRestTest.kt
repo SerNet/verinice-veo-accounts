@@ -55,7 +55,8 @@ class BadRequestRestTest : AbstractRestTest() {
               }
             """,
             400,
-        ).rawBody shouldBe "Illegal unquoted character ((CTRL-CHAR, code 10)): has to be escaped using backslash to be included in string value"
+        ).rawBody shouldBe "Illegal unquoted character ((CTRL-CHAR, code 10)): has to be escaped using backslash to be included in " +
+            "string value"
     }
 
     @Test
@@ -88,7 +89,8 @@ class BadRequestRestTest : AbstractRestTest() {
                 "enabled" to false,
             ),
             400,
-        ).rawBody shouldBe "Cannot deserialize value of type `AssignableGroup` from String \"veo-night-access\": not one of the values accepted for Enum class: [veo-write-access]"
+        ).rawBody shouldBe "Cannot deserialize value of type `AssignableGroup` from String \"veo-night-access\": not one of the values " +
+            "accepted for Enum class: [veo-write-access]"
     }
 
     @Test
