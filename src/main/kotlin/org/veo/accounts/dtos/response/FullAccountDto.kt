@@ -17,6 +17,7 @@
  */
 package org.veo.accounts.dtos.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -53,5 +54,7 @@ class FullAccountDto(
         AssignableGroupSet.byGroupNames(user.groups),
         Enabled(user.isEnabled),
     )
-    val _self = Link(URI.create("${ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()}/$id"))
+
+    @JsonProperty(value = "_self")
+    val self = Link(URI.create("${ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()}/$id"))
 }
