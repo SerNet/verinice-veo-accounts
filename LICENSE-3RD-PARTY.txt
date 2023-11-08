@@ -1,5 +1,5 @@
 
-Dependency License Report for veo-accounts 0.18.0
+Dependency License Report for veo-accounts 0.19.0-SNAPSHOT
 
 1. Group: ch.qos.logback  Name: logback-classic  Version: 1.4.11
 
@@ -20590,5 +20590,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Wed Nov 08 12:57:23 CET 2023.
+This report was generated at Wed Nov 08 14:04:34 CET 2023.
 
