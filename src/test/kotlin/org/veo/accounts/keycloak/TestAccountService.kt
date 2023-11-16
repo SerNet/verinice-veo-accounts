@@ -17,6 +17,7 @@
  */
 package org.veo.accounts.keycloak
 
+import jakarta.ws.rs.NotFoundException
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.GroupRepresentation
@@ -28,7 +29,6 @@ import org.springframework.stereotype.Component
 import org.veo.accounts.Role
 import org.veo.accounts.dtos.VeoClientId
 import java.util.UUID.randomUUID
-import javax.ws.rs.NotFoundException
 
 @Component
 @Profile("resttest")

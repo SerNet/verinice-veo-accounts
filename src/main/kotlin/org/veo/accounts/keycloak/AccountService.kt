@@ -17,6 +17,8 @@
  */
 package org.veo.accounts.keycloak
 
+import jakarta.ws.rs.ClientErrorException
+import jakarta.ws.rs.NotFoundException
 import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.GroupRepresentation
@@ -35,8 +37,6 @@ import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ExceedingMaxUsersException
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
-import javax.ws.rs.ClientErrorException
-import javax.ws.rs.NotFoundException
 
 private val log = logger {}
 

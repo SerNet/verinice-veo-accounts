@@ -17,6 +17,9 @@
  */
 package org.veo.accounts.keycloak
 
+import jakarta.ws.rs.client.Client
+import jakarta.ws.rs.client.ClientBuilder
+import jakarta.ws.rs.core.Response
 import mu.KotlinLogging.logger
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS
@@ -27,9 +30,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.veo.accounts.exceptions.AbstractMappedException
-import javax.ws.rs.client.Client
-import javax.ws.rs.client.ClientBuilder
-import javax.ws.rs.core.Response
 
 private val log = logger {}
 
