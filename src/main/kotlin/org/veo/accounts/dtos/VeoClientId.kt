@@ -42,6 +42,7 @@ data class VeoClientId(
     val path = "/$groupName"
 
     override fun toString(): String = groupName
+
     companion object {
         fun tryParse(groupPath: String): VeoClientId? =
             groupPath
