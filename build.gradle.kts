@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.keycloak:keycloak-admin-client:22.0.5")
+    implementation("org.keycloak:keycloak-admin-client:23.0.3")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -66,7 +66,7 @@ dependencies {
     testImplementation("org.testcontainers:rabbitmq:1.19.3")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    testImplementation("org.keycloak:keycloak-authz-client:22.0.5")
+    testImplementation("org.keycloak:keycloak-authz-client:23.0.3")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
