@@ -292,7 +292,7 @@ class AccountService(
         email = dto.emailAddress.value
         firstName = dto.firstName.value
         lastName = dto.lastName.value
-        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
+        singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
         groups = getGroupsForNewAccount(authAccount.veoClient, dto.groups)
         isEnabled = dto.enabled.value
     }
@@ -303,7 +303,7 @@ class AccountService(
             email = dto.emailAddress.value
             firstName = dto.firstName.value
             lastName = dto.lastName.value
-            singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
+            singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
             groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
             isEnabled = true
         }
@@ -332,7 +332,7 @@ class AccountService(
         firstName = dto.firstName.value
         lastName = dto.lastName.value
         isEnabled = dto.enabled.value
-        singleAttribute(ATTRIBUTE_LOCALE, dto.language?.value)
+        singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
     }
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"
