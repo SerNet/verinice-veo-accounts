@@ -60,7 +60,11 @@ Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
 
 4. Group: com.fasterxml.jackson  Name: jackson-bom  Version: 2.15.4
 
-No license information found
+POM Project URL: https://github.com/FasterXML/jackson-bom
+
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
 
 5. Group: com.fasterxml.jackson.core  Name: jackson-annotations  Version: 2.15.4
 
@@ -7298,7 +7302,11 @@ permitted.
 
 42. Group: net.swiftzer.semver  Name: semver  Version: 2.0.0
 
-No license information found
+POM Project URL: https://github.com/swiftzer/semver
+
+POM License: MIT License - https://opensource.org/licenses/MIT
+
+--------------------------------------------------------------------------------
 
 43. Group: net.swiftzer.semver  Name: semver-jvm  Version: 2.0.0
 
@@ -15333,7 +15341,11 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 78. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-common  Version: 1.9.23
 
-No license information found
+POM Project URL: https://kotlinlang.org/
+
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
 
 79. Group: org.jetbrains.kotlin  Name: kotlin-stdlib-jdk7  Version: 1.9.23
 
@@ -15353,11 +15365,19 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 
 81. Group: org.jetbrains.kotlinx  Name: kotlinx-serialization-bom  Version: 1.6.3
 
-No license information found
+POM Project URL: https://github.com/Kotlin/kotlinx.serialization
+
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
 
 82. Group: org.jetbrains.kotlinx  Name: kotlinx-serialization-core  Version: 1.6.3
 
-No license information found
+POM Project URL: https://github.com/Kotlin/kotlinx.serialization
+
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
 
 83. Group: org.jetbrains.kotlinx  Name: kotlinx-serialization-core-jvm  Version: 1.6.3
 
@@ -23026,5 +23046,5 @@ POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICEN
 --------------------------------------------------------------------------------
 
 
-This report was generated at Fri Apr 12 12:29:10 UTC 2024.
+This report was generated at Mon Apr 15 09:29:17 UTC 2024.
 
