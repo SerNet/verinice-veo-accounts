@@ -129,6 +129,8 @@ docker_image:
 
 http_rest_tests:
   stage: integration_test
+  needs:
+   - docker_image
   rules:
     - !reference [.verification, rules]
   services:
