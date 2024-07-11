@@ -32,14 +32,5 @@
         ]
       }
     }
-  ],
-  "postUpgradeTasks" : {
-    "commands" : [
-      "./gradlew generateLicenseReport"
-    ],
-    "fileFilters" : [
-      "LICENSE-3RD-PARTY.txt"
-    ],
-    "executionMode" : "update"
-  }
+  ]
 }
