@@ -24,6 +24,7 @@ import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup.VEO_WRITE_ACCESS
 import org.veo.accounts.auth.AuthenticatedAccount
@@ -192,7 +193,14 @@ class AccountService(
                 singleAttribute("maxUsers", maxUsers.toString())
             }
             .let { groups().add(it) }
-            .run {}
+            .run {
+                if (!HttpStatusCode.valueOf(status).is2xxSuccessful) {
+                    log.error { "Failed to create veo client group $client, unexpected status code $status" }
+                    log.error { "Keycloak response: ${readEntity(String::class.java)}" }
+                    throw InternalError()
+                }
+                log.info("Created veo client group $client")
+            }
     }
 
     fun activateClient(veoClient: VeoClientId) =
