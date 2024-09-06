@@ -23,7 +23,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.VeoClientId
 
-fun Authentication.parseAccount(): AuthenticatedAccount = AuthenticatedAccount(AccountId(name), getVeoClient())
+fun Authentication.parseAccount(): AuthenticatedAccount = AuthenticatedAccountImpl(AccountId(name), getVeoClient())
 
 private fun Authentication.getVeoClient(): VeoClientId =
     token()
@@ -33,3 +33,5 @@ private fun Authentication.getVeoClient(): VeoClientId =
         .first()
 
 private fun Authentication.token(): Jwt = (this as JwtAuthenticationToken).token
+
+private data class AuthenticatedAccountImpl(override val id: AccountId, override val veoClient: VeoClientId) : AuthenticatedAccount
