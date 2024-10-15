@@ -52,6 +52,10 @@ class AccountService(
     private val facade: KeycloakFacade,
     @Value("\${veo.accounts.keycloak.mailing.enabled}")
     private val mailingEnabled: Boolean,
+    @Value("\${veo.accounts.keycloak.mailing.actionsRedirectUrl}")
+    private val mailActionsRedirectUrl: String,
+    @Value("\${veo.accounts.keycloak.clients.auth.name}")
+    private val userAuthKeycloakClient: String,
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
         facade.perform {
@@ -358,7 +362,12 @@ class AccountService(
             .apply { if (!isEnabled) return }
             .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
             .also { log.debug { "Determined email actions for user $accountId: $it" } }
-            .let { if (mailingEnabled) users().get(accountId).executeActionsEmail(it) }
+            .also { log.debug { "Mailing keycloak client: $userAuthKeycloakClient" } }
+            .also { log.debug { "Mailing actions redirect URL: $mailActionsRedirectUrl" } }
+            .let {
+                    actions ->
+                if (mailingEnabled) users().get(accountId).executeActionsEmail(userAuthKeycloakClient, mailActionsRedirectUrl, actions)
+            }
 
     private fun RealmResource.loadGroups(user: UserRepresentation) {
         user.apply {
