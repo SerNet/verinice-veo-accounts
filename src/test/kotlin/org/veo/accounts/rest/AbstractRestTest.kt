@@ -133,8 +133,7 @@ abstract class AbstractRestTest {
                         "type" to "CREATION",
                     ),
                 ) { findGroup(groupName) shouldNotBe null }
-            }
-            .also { createdVeoClients.add(it) }
+            }.also { createdVeoClients.add(it) }
 
     protected fun createManager(
         group: VeoClientId,
@@ -230,7 +229,8 @@ abstract class AbstractRestTest {
         headers: Map<String, List<String>> = emptyMap(),
         expectedStatus: Int?,
     ): Response =
-        testRestTemplate.exchange(buildUrl(uri), method, buildHttpEntity(body, headers, authAccountId), String::class.java)
+        testRestTemplate
+            .exchange(buildUrl(uri), method, buildHttpEntity(body, headers, authAccountId), String::class.java)
             .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
             .let { Response(it) }
 

@@ -19,4 +19,6 @@ package org.veo.accounts.dtos.response
 
 import org.veo.accounts.dtos.AccountId
 
-class AccountCreatedDto(val id: AccountId)
+class AccountCreatedDto(
+    val id: AccountId,
+)

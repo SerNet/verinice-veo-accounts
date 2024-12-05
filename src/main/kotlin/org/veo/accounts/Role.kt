@@ -17,7 +17,9 @@
  */
 package org.veo.accounts
 
-enum class Role(val roleName: String) {
+enum class Role(
+    val roleName: String,
+) {
     CREATE("account:create"),
     READ("account:read"),
     UPDATE("account:update"),

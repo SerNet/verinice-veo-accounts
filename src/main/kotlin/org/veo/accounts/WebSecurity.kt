@@ -88,7 +88,8 @@ class WebSecurity(
                     jwtAuthenticationConverter =
                         JwtAuthenticationConverter().apply {
                             setJwtGrantedAuthoritiesConverter { jwt ->
-                                jwt.getClaimAsMap("resource_access")
+                                jwt
+                                    .getClaimAsMap("resource_access")
                                     ?.get(keycloakServiceClientName)
                                     ?.let { it as Map<*, *> }
                                     ?.get("roles")

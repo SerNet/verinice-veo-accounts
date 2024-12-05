@@ -145,8 +145,7 @@ class MaxUsersRestTest : AbstractRestTest() {
                             else -> throw IllegalStateException()
                         }
                     }
-                }
-                .forEach { it.await() }
+                }.forEach { it.await() }
 
             // then the maximum amount of enabled accounts has not been exceeded
             failedAttempts shouldBe 18
@@ -175,12 +174,12 @@ class MaxUsersRestTest : AbstractRestTest() {
                             else -> throw IllegalStateException()
                         }
                     }
-                }
-                .forEach { it.await() }
+                }.forEach { it.await() }
 
             // then the maximum amount of enabled accounts has not been exceeded
             failedAttempts shouldBe 18
-            get("/", managerId).bodyAsListOfMaps
+            get("/", managerId)
+                .bodyAsListOfMaps
                 .filter { it["enabled"] == true }
                 .size shouldBe 2
         }

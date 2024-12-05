@@ -21,14 +21,8 @@ package org.veo.accounts
 
 // Convenience functions for casting things in deserialized JSON response bodies.
 
-fun Any?.asMap(): MutableMap<String, Any> {
-    return this as MutableMap<String, Any>
-}
+fun Any?.asMap(): MutableMap<String, Any> = this as MutableMap<String, Any>
 
-fun Any?.asNestedMap(): MutableMap<String, MutableMap<String, Any>> {
-    return this as MutableMap<String, MutableMap<String, Any>>
-}
+fun Any?.asNestedMap(): MutableMap<String, MutableMap<String, Any>> = this as MutableMap<String, MutableMap<String, Any>>
 
-fun Any?.asListOfMaps(): MutableList<MutableMap<String, Any>> {
-    return this as MutableList<MutableMap<String, Any>>
-}
+fun Any?.asListOfMaps(): MutableList<MutableMap<String, Any>> = this as MutableList<MutableMap<String, Any>>

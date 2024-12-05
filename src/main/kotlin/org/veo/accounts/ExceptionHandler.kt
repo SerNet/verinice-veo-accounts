@@ -47,9 +47,7 @@ class ExceptionHandler {
     private fun handle(
         message: String?,
         status: HttpStatus,
-    ): ResponseEntity<String> {
-        return ResponseEntity<String>(message, status)
-    }
+    ): ResponseEntity<String> = ResponseEntity<String>(message, status)
 
     private fun getParsingErrorMessage(ex: HttpMessageNotReadableException): String? =
         ex.cause

@@ -65,7 +65,8 @@ class AccountManagementRestTest : AbstractRestTest() {
         }
 
         // and found in the list
-        get("/", managerId).bodyAsListOfMaps
+        get("/", managerId)
+            .bodyAsListOfMaps
             .first { it["id"] == accountId }
             .also { hans ->
                 hans["username"] shouldBe "$prefix-hans"

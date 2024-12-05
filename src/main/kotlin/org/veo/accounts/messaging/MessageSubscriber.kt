@@ -85,7 +85,8 @@ class MessageSubscriber(
 
     private fun handleClientChange(content: JsonNode) {
         val client =
-            content.get("clientId")
+            content
+                .get("clientId")
                 .asText()
                 .let { UUID.fromString(it) }
                 .let { VeoClientId(it) }

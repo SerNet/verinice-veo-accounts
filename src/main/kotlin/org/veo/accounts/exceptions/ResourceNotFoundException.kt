@@ -19,4 +19,6 @@ package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.NOT_FOUND
 
-class ResourceNotFoundException(message: String = "Resource not found") : AbstractMappedException(message, NOT_FOUND)
+class ResourceNotFoundException(
+    message: String = "Resource not found",
+) : AbstractMappedException(message, NOT_FOUND)

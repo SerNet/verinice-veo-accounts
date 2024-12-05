@@ -19,8 +19,9 @@ package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.FORBIDDEN
 
-class ExceedingMaxUsersException(maxUsers: Int) :
-    AbstractMappedException(
+class ExceedingMaxUsersException(
+    maxUsers: Int,
+) : AbstractMappedException(
         "Your veo license only allows up to $maxUsers enabled account(s)",
         FORBIDDEN,
     )

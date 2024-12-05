@@ -49,11 +49,13 @@ internal class TestAuthenticator(
         password: String,
     ): String =
         userTokenCache.computeIfAbsent(username) {
-            HttpClientBuilder.create()
+            HttpClientBuilder
+                .create()
                 .apply { proxyHost?.let { setProxy(HttpHost(it, proxyPort)) } }
                 .build()
                 .use {
-                    AuthzClient.create(Configuration(keycloakUrl, realm, clientName, mapOf("secret" to clientSecret), it))
+                    AuthzClient
+                        .create(Configuration(keycloakUrl, realm, clientName, mapOf("secret" to clientSecret), it))
                         .obtainAccessToken(username, password)
                         .token
                 }

@@ -32,7 +32,9 @@ fun Any.validate() =
             }
         }
 
-class ValidationException(message: String) : Exception(message) {
+class ValidationException(
+    message: String,
+) : Exception(message) {
     constructor(violations: Collection<ConstraintViolation<Any>>) : this(
         violations.joinToString("; ") {
             "Invalid ${it.rootBeanClass.simpleName}: ${it.message}"

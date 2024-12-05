@@ -19,4 +19,6 @@ package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.FORBIDDEN
 
-class ForbiddenOperationException(msg: String) : AbstractMappedException(msg, FORBIDDEN)
+class ForbiddenOperationException(
+    msg: String,
+) : AbstractMappedException(msg, FORBIDDEN)

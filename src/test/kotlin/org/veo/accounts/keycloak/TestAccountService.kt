@@ -53,8 +53,7 @@ class TestAccountService(
                     isEnabled = true
                     isEmailVerified = true
                     groups = listOf(group.path)
-                }
-                .let { users().create(it) }
+                }.let { users().create(it) }
                 .getHeaderString("Location")
                 .substringAfterLast('/')
                 .also { assignRoles(it, roles) }
@@ -94,7 +93,8 @@ class TestAccountService(
 
     fun getUsername(accountId: String): String =
         facade.perform {
-            users().get(accountId)
+            users()
+                .get(accountId)
                 .toRepresentation()
                 .username
         }
@@ -113,7 +113,8 @@ class TestAccountService(
     private fun RealmResource.assignRoles(
         accountId: String,
         roles: List<Role>,
-    ) = users().get(accountId)
+    ) = users()
+        .get(accountId)
         .roles()
         .clientLevel(clientId)
         .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }

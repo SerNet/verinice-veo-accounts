@@ -19,4 +19,6 @@ package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
-class UnprocessableDtoException(msg: String) : AbstractMappedException(msg, UNPROCESSABLE_ENTITY)
+class UnprocessableDtoException(
+    msg: String,
+) : AbstractMappedException(msg, UNPROCESSABLE_ENTITY)

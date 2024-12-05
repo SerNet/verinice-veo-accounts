@@ -19,4 +19,6 @@ package org.veo.accounts.exceptions
 
 import org.springframework.http.HttpStatus.CONFLICT
 
-class ConflictException(msg: String) : AbstractMappedException(msg, CONFLICT)
+class ConflictException(
+    msg: String,
+) : AbstractMappedException(msg, CONFLICT)

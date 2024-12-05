@@ -34,4 +34,7 @@ private fun Authentication.getVeoClient(): VeoClientId =
 
 private fun Authentication.token(): Jwt = (this as JwtAuthenticationToken).token
 
-private data class AuthenticatedAccountImpl(override val id: AccountId, override val veoClient: VeoClientId) : AuthenticatedAccount
+private data class AuthenticatedAccountImpl(
+    override val id: AccountId,
+    override val veoClient: VeoClientId,
+) : AuthenticatedAccount

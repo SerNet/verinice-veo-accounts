@@ -72,15 +72,15 @@ class AccountService(
         facade.perform {
             // Self-management is not supported
             if (id == authAccount.id) throw ResourceNotFoundException()
-            users().get(id.toString())
+            users()
+                .get(id.toString())
                 .let { userResource ->
                     try {
                         userResource.toRepresentation()
                     } catch (_: NotFoundException) {
                         throw ResourceNotFoundException()
                     }
-                }
-                .also { loadGroups(it) }
+                }.also { loadGroups(it) }
                 .apply { if (!groups.contains(authAccount.veoClient.groupName)) throw ResourceNotFoundException() }
         }
 
@@ -108,8 +108,7 @@ class AccountService(
                     if (enabled.value) {
                         checkMaxUsersNotExhausted(authAccount)
                     }
-                }
-                .let { dtoToUser(it, authAccount) }
+                }.let { dtoToUser(it, authAccount) }
                 .also { log.info { "Creating new account ${it.username} in ${authAccount.veoClient}" } }
                 .let { createAccount(it) }
         }
@@ -133,8 +132,7 @@ class AccountService(
                 if (!isEnabled && dto.enabled.value) {
                     checkMaxUsersNotExhausted(authAccount)
                 }
-            }
-            .also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
+            }.also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
             .apply { update(dto) }
             .also {
                 try {
@@ -145,20 +143,18 @@ class AccountService(
                     }
                     throw ex
                 }
-            }
-            .also { user ->
+            }.also { user ->
                 dto.groups
                     .groupNames
                     .filter { !user.groups.contains(it) }
                     .forEach { users().get(user.id).joinGroup(getGroupId(it)) }
-            }
-            .also { user ->
-                AssignableGroupSet.byGroupNames(user.groups)
+            }.also { user ->
+                AssignableGroupSet
+                    .byGroupNames(user.groups)
                     .values
                     .filter { !dto.groups.values.contains(it) }
                     .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
-            }
-            .run { if (!isEmailVerified) sendEmail(id.toString()) }
+            }.run { if (!isEmailVerified) sendEmail(id.toString()) }
     }
 
     fun deleteAccount(
@@ -195,8 +191,7 @@ class AccountService(
                 name = client.groupName
                 singleAttribute("maxUnits", maxUnits.toString())
                 singleAttribute("maxUsers", maxUsers.toString())
-            }
-            .let { groups().add(it) }
+            }.let { groups().add(it) }
             .run {
                 if (!HttpStatusCode.valueOf(status).is2xxSuccessful) {
                     log.error { "Failed to create veo client group $client, unexpected status code $status" }
@@ -227,8 +222,7 @@ class AccountService(
             .apply {
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
                 maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
-            }
-            .let { groups().group(it.id).update(it) }
+            }.let { groups().group(it.id).update(it) }
     }
 
     fun deleteClient(client: VeoClientId) =
@@ -364,8 +358,7 @@ class AccountService(
             .also { log.debug { "Determined email actions for user $accountId: $it" } }
             .also { log.debug { "Mailing keycloak client: $userAuthKeycloakClient" } }
             .also { log.debug { "Mailing actions redirect URL: $mailActionsRedirectUrl" } }
-            .let {
-                    actions ->
+            .let { actions ->
                 if (mailingEnabled) users().get(accountId).executeActionsEmail(userAuthKeycloakClient, mailActionsRedirectUrl, actions)
             }
 

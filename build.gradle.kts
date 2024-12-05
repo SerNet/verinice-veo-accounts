@@ -99,9 +99,10 @@ tasks.register("restTest", Test::class.java) {
         includeTestsMatching("org.veo.accounts.rest.*")
     }
 
-    inputs.property("veoAccountsBaseUrl") {
-        System.getenv("VEO_ACCOUNTS_RESTTEST_BASEURL")
-    }.optional(true)
+    inputs
+        .property("veoAccountsBaseUrl") {
+            System.getenv("VEO_ACCOUNTS_RESTTEST_BASEURL")
+        }.optional(true)
 
     systemProperties(
         System.getProperties().mapKeys { it.key as String }.filterKeys {
@@ -128,10 +129,10 @@ spotless {
         replaceRegex("Excessive line breaks", "\n{3,}", "\n\n")
     }
     kotlin {
-        ktlint()
+        ktlint("1.5.0")
     }
     kotlinGradle {
-        ktlint()
+        ktlint("1.5.0")
     }
     json {
         target("**/*.json")
@@ -144,7 +145,8 @@ spotless {
                     file: File,
                 ): String {
                     val om = ObjectMapper()
-                    return om.writer()
+                    return om
+                        .writer()
                         .with(DefaultPrettyPrinter().apply { indentArraysWith(SYSTEM_LINEFEED_INSTANCE) })
                         .writeValueAsString(om.readValue(rawUnix, Map::class.java))
                 }

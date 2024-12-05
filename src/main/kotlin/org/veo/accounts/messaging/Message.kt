@@ -17,4 +17,8 @@
  */
 package org.veo.accounts.messaging
 
-class Message(val routingKey: String, val id: Long, val content: String)
+class Message(
+    val routingKey: String,
+    val id: Long,
+    val content: String,
+)

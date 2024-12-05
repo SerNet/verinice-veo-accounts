@@ -40,7 +40,8 @@ class MessageSubscriberTest {
 
     @Test
     fun `listeners don't return anything`() {
-        MessageSubscriber::class.functions
+        MessageSubscriber::class
+            .functions
             .filter { it.annotations.filterIsInstance<RabbitListener>().isNotEmpty() }
             .forEach { it.returnType.toStr() shouldBe "kotlin.Unit" }
     }
