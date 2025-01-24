@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Calendar
 
 plugins {
-    id("org.springframework.boot") version "3.4.1"
+    id("org.springframework.boot") version "3.4.2"
 
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.spring") version "2.1.0"
