@@ -10,8 +10,8 @@ import java.util.Calendar
 plugins {
     id("org.springframework.boot") version "3.4.2"
 
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.spring") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
+    kotlin("plugin.spring") version "2.1.10"
 
     id("com.diffplug.spotless") version "6.25.0"
     id("org.cadixdev.licenser") version "0.6.1"
