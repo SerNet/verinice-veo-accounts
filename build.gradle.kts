@@ -1,7 +1,3 @@
-import com.diffplug.spotless.FormatterStep
-import com.fasterxml.jackson.core.util.DefaultIndenter.SYSTEM_LINEFEED_INSTANCE
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.cadixdev.gradle.licenser.header.HeaderFormatRegistry
 import org.eclipse.jgit.api.Git
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -136,22 +132,8 @@ spotless {
     }
     json {
         target("**/*.json")
-        addStep(
-            object : FormatterStep {
-                override fun getName() = "format json"
-
-                override fun format(
-                    rawUnix: String,
-                    file: File,
-                ): String {
-                    val om = ObjectMapper()
-                    return om
-                        .writer()
-                        .with(DefaultPrettyPrinter().apply { indentArraysWith(SYSTEM_LINEFEED_INSTANCE) })
-                        .writeValueAsString(om.readValue(rawUnix, Map::class.java))
-                }
-            },
-        )
+        gson().indentWithSpaces(2)
+        endWithNewline()
     }
     yaml {
         target(".gitlab-ci.yml")

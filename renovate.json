@@ -1,33 +1,33 @@
 {
-  "$schema" : "https://docs.renovatebot.com/renovate-schema.json",
-  "assignAutomerge" : true,
-  "automerge" : true,
-  "automergeType" : "pr",
-  "reviewers" : [
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "assignAutomerge": true,
+  "automerge": true,
+  "automergeType": "pr",
+  "reviewers": [
     "JJ"
   ],
-  "packageRules" : [
+  "packageRules": [
     {
-      "matchPackagePatterns" : [
+      "matchPackagePatterns": [
         "^org.jetbrains.kotlin"
       ],
-      "groupName" : "Kotlin"
+      "groupName": "Kotlin"
     },
     {
-      "matchPackagePatterns" : [
+      "matchPackagePatterns": [
         "^org.keycloak:"
       ],
-      "groupName" : "Keycloak Client"
+      "groupName": "Keycloak Client"
     },
     {
-      "matchPackagePatterns" : [
+      "matchPackagePatterns": [
         "^com.diffplug.spotless"
       ],
-      "postUpgradeTasks" : {
-        "commands" : [
+      "postUpgradeTasks": {
+        "commands": [
           "./gradlew spotlessApply"
         ],
-        "fileFilters" : [
+        "fileFilters": [
           "**/*"
         ]
       }
