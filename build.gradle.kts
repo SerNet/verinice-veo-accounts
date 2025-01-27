@@ -125,10 +125,10 @@ spotless {
         replaceRegex("Excessive line breaks", "\n{3,}", "\n\n")
     }
     kotlin {
-        ktlint("1.5.0")
+        ktlint()
     }
     kotlinGradle {
-        ktlint("1.5.0")
+        ktlint()
     }
     json {
         target("**/*.json")
