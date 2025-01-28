@@ -17,11 +17,14 @@
  */
 package org.veo.accounts.rest
 
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
 import org.veo.accounts.Role.READ
 import org.veo.accounts.Role.UPDATE
+import org.veo.accounts.asListOfMaps
+import org.veo.accounts.asMap
 import java.util.UUID.randomUUID
 
 class SecurityRestTest : AbstractRestTest() {
@@ -121,4 +124,42 @@ class SecurityRestTest : AbstractRestTest() {
         get("/v3/api-docs", expectedStatus = 200)
         get("/v3/api-docs/swagger-config", expectedStatus = 200)
     }
+
+    @Test
+    fun `authorization methods are documented`() {
+        val docs = get("/v3/api-docs").bodyAsMap
+
+        docs["components"].asMap()["securitySchemes"].asMap().let {
+            it["OAuth2"].asMap()["type"] shouldBe "oauth2"
+            it["ClientInitApiKey"].asMap()["type"] shouldBe "apiKey"
+        }
+
+        val endpointDocs =
+            docs["paths"].asMap().flatMap { pathEntry ->
+                pathEntry.value.asMap().map { endpointEntry ->
+                    EndpointDoc(
+                        pathEntry.key,
+                        endpointEntry.key,
+                        endpointEntry.value
+                            .asMap()["security"]
+                            .asListOfMaps()
+                            .flatMap { it.keys },
+                    )
+                }
+            }
+
+        endpointDocs.forEach {
+            if (it.path == "/initial" && it.httpMethod == "post") {
+                it.securitySchemes shouldBe listOf("ClientInitApiKey")
+            } else {
+                it.securitySchemes shouldBe listOf("OAuth2")
+            }
+        }
+    }
+
+    data class EndpointDoc(
+        val path: String,
+        val httpMethod: String,
+        val securitySchemes: List<String>,
+    )
 }

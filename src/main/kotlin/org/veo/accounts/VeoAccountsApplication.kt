@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.APIKEY
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.OAUTH2
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
 const val SECURITY_SCHEME_OAUTH = "OAuth2"
+const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
 
 @SpringBootApplication
 @SecurityScheme(
@@ -48,6 +50,15 @@ const val SECURITY_SCHEME_OAUTH = "OAuth2"
                     authorizationUrl = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth",
                 ),
         ),
+)
+@SecurityScheme(
+    name = SECURITY_SCHEME_CLIENT_INIT_API_KEY,
+    type = APIKEY,
+    `in` = HEADER,
+    description =
+        "Client initialization API key - only subscription services should know this key. " +
+            "It is required for creating the initial account for a client. " +
+            "The initial user may then authenticate with OAuth2 and create additional accounts in their client.",
 )
 @OpenAPIDefinition(
     info =

@@ -18,7 +18,6 @@
 package org.veo.accounts
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.CREATED
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController
 import org.veo.accounts.auth.parseAccount
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.request.CreateAccountDto
-import org.veo.accounts.dtos.request.CreateInitialAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.AccountCreatedDto
 import org.veo.accounts.dtos.response.FullAccountDto
@@ -64,38 +62,6 @@ class AccountController(
         accountService
             .getAccount(id, auth.parseAccount())
             .let { FullAccountDto(it) }
-
-    @Operation(
-        description = "Create the initial account for a client. Returns the new account's ID.",
-        responses = [
-            ApiResponse(
-                responseCode = "201",
-                description = "Initial account created",
-            ),
-            ApiResponse(
-                responseCode = "409",
-                description = "Username or email address already taken",
-            ),
-            ApiResponse(
-                responseCode = "409",
-                description = "Accounts already exist in target veo client",
-            ),
-            ApiResponse(
-                responseCode = "422",
-                description = "Target veo client does not exist",
-            ),
-        ],
-    )
-    @PostMapping(path = ["initial"])
-    @ResponseStatus(CREATED)
-    fun createInitialAccount(
-        @Valid
-        @RequestBody
-        dto: CreateInitialAccountDto,
-    ): AccountCreatedDto =
-        dto
-            .let { accountService.createInitialAccount(it) }
-            .let { id -> AccountCreatedDto(id) }
 
     @Operation(description = "Create an account. Returns the new account's ID.")
     @PostMapping
