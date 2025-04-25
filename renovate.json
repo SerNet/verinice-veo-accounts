@@ -8,21 +8,18 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "^org.jetbrains.kotlin"
-      ],
-      "groupName": "Kotlin"
+      "groupName": "Kotlin",
+      "matchPackageNames": [
+        "/^org.jetbrains.kotlin/"
+      ]
     },
     {
-      "matchPackagePatterns": [
-        "^org.keycloak:"
-      ],
-      "groupName": "Keycloak Client"
+      "groupName": "Keycloak Client",
+      "matchPackageNames": [
+        "/^org.keycloak:/"
+      ]
     },
     {
-      "matchPackagePatterns": [
-        "^com.diffplug.spotless"
-      ],
       "postUpgradeTasks": {
         "commands": [
           "./gradlew spotlessApply"
@@ -30,7 +27,10 @@
         "fileFilters": [
           "**/*"
         ]
-      }
+      },
+      "matchPackageNames": [
+        "/^com.diffplug.spotless/"
+      ]
     }
   ]
 }
