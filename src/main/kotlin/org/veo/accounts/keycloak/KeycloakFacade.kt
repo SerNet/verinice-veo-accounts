@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.veo.accounts.auth.AuthenticatedAccount
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.exceptions.AbstractMappedException
 
 private val log = logger {}
@@ -82,6 +84,21 @@ class KeycloakFacade(
             // everything else may contain secrets and must not pass
             log.error("Unexpected keycloak communication error", ex)
             throw KeycloakException()
+        }
+
+    fun <T> performSynchronized(
+        authAccount: AuthenticatedAccount,
+        block: RealmResource.() -> T,
+    ): T = performSynchronized(authAccount.veoClient, block)
+
+    fun <T> performSynchronized(
+        client: VeoClientId,
+        block: RealmResource.() -> T,
+    ): T =
+        perform {
+            synchronized(client.groupName.intern()) {
+                block()
+            }
         }
 
     fun parseResourceId(response: Response): String =

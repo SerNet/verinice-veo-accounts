@@ -85,7 +85,7 @@ class AccountService(
         }
 
     fun createInitialAccount(dto: CreateInitialAccountDto): AccountId =
-        performSynchronized(dto.clientId) {
+        facade.performSynchronized(dto.clientId) {
             if (findGroup(dto.clientId.groupName, true) == null) {
                 throw UnprocessableDtoException("Target veo client does not exist")
             }
@@ -102,7 +102,7 @@ class AccountService(
         dto: CreateAccountDto,
         authAccount: AuthenticatedAccount,
     ): AccountId =
-        performSynchronized(authAccount) {
+        facade.performSynchronized(authAccount) {
             dto
                 .apply {
                     if (enabled.value) {
@@ -126,7 +126,7 @@ class AccountService(
         id: AccountId,
         dto: UpdateAccountDto,
         authAccount: AuthenticatedAccount,
-    ) = performSynchronized(authAccount) {
+    ) = facade.performSynchronized(authAccount) {
         getAccount(id, authAccount)
             .apply {
                 if (!isEnabled && dto.enabled.value) {
@@ -160,7 +160,7 @@ class AccountService(
     fun deleteAccount(
         id: AccountId,
         authAccount: AuthenticatedAccount,
-    ) = performSynchronized(authAccount) {
+    ) = facade.performSynchronized(authAccount) {
         getAccount(id, authAccount)
             .also { log.info { "Deleting account ${it.username} in ${authAccount.veoClient}" } }
             .also { users().delete(id.toString()) }
@@ -168,7 +168,7 @@ class AccountService(
     }
 
     fun deactivateClient(veoClient: VeoClientId) =
-        performSynchronized(veoClient) {
+        facade.performSynchronized(veoClient) {
             getGroup(veoClient.groupName)
                 .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
                 .also { groups().group(it.id).update(it) }
@@ -184,7 +184,7 @@ class AccountService(
         client: VeoClientId,
         maxUnits: Int,
         maxUsers: Int,
-    ) = performSynchronized(client) {
+    ) = facade.performSynchronized(client) {
         log.info("Creating veo client group ${client.groupName}")
         GroupRepresentation()
             .apply {
@@ -203,7 +203,7 @@ class AccountService(
     }
 
     fun activateClient(veoClient: VeoClientId) =
-        performSynchronized(veoClient) {
+        facade.performSynchronized(veoClient) {
             getGroup(veoClient.groupName)
                 .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
                 .also { groups().group(it.id).update(it) }
@@ -217,7 +217,7 @@ class AccountService(
         client: VeoClientId,
         maxUnits: Int?,
         maxUsers: Int?,
-    ) = performSynchronized(client) {
+    ) = facade.performSynchronized(client) {
         getGroup(client.groupName)
             .apply {
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
@@ -226,28 +226,13 @@ class AccountService(
     }
 
     fun deleteClient(client: VeoClientId) =
-        performSynchronized(client) {
+        facade.performSynchronized(client) {
             log.info("Deleting veo client group ${client.groupName}")
             groups().group(getGroupId(client.groupName)).run {
                 members().forEach {
                     users().delete(it.id)
                 }
                 remove()
-            }
-        }
-
-    private fun <T> performSynchronized(
-        authAccount: AuthenticatedAccount,
-        block: RealmResource.() -> T,
-    ): T = performSynchronized(authAccount.veoClient, block)
-
-    private fun <T> performSynchronized(
-        client: VeoClientId,
-        block: RealmResource.() -> T,
-    ): T =
-        facade.perform {
-            synchronized(client.groupName.intern()) {
-                block()
             }
         }
 
