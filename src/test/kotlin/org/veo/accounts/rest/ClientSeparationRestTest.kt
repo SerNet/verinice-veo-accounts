@@ -77,4 +77,42 @@ class ClientSeparationRestTest : AbstractRestTest() {
         delete("/$accountId", client2ManagerId, 404)
         get("/$accountId", client1ManagerId)
     }
+
+    @Test
+    fun `created access group cannot be accessed by another client`() {
+        // when an access group is created in client 1
+        val accessGroupId =
+            post(
+                "/access-groups",
+                client1ManagerId,
+                mapOf(
+                    "name" to "Private group",
+                ),
+            ).bodyAsMap["id"]
+
+        // then client 1 manager can access it
+        get("/access-groups/$accessGroupId", client1ManagerId).bodyAsMap["name"] shouldBe "Private group"
+
+        // and client 2 manager cannot access it
+        get("/access-groups/$accessGroupId", client2ManagerId, 404).rawBody shouldBe "Access group $accessGroupId not found"
+
+        // and client 2 manager cannot see it in the list
+        get("/access-groups", client2ManagerId).bodyAsListOfMaps shouldHaveSize 0
+
+        // and client 2 cannot update it
+        put(
+            "/access-groups/$accessGroupId",
+            client2ManagerId,
+            mapOf(
+                "name" to "Kidnapped group",
+            ),
+            404,
+        ).rawBody shouldBe "Access group $accessGroupId not found"
+
+        // and client 2 cannot delete it
+        delete("/access-groups/$accessGroupId", client2ManagerId, 404).rawBody shouldBe "Access group $accessGroupId not found"
+
+        // and it remains untouched
+        get("/access-groups/$accessGroupId", client1ManagerId).bodyAsMap["name"] == "Private group"
+    }
 }

@@ -17,9 +17,13 @@
  */
 package org.veo.accounts.rest
 
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.veo.accounts.asMap
+import java.util.UUID.randomUUID
 
 class GroupRestTest : AbstractRestTest() {
     lateinit var managerId: String
@@ -65,6 +69,75 @@ class GroupRestTest : AbstractRestTest() {
 
         // then the group was removed
         accountBody["groups"] shouldBe emptyList<String>()
+    }
+
+    @Test
+    fun `access groups can be managed`() {
+        // given
+        val unitId1 = randomUUID().toString()
+        val unitId2 = randomUUID().toString()
+
+        // when creating an access group
+        val accessGroup1Id =
+            post(
+                "/access-groups",
+                managerId,
+                mapOf(
+                    "name" to "Early access",
+                    "units" to
+                        mapOf(
+                            unitId1 to "READ_ONLY",
+                            unitId2 to "READ_WRITE",
+                        ),
+                ),
+            ).bodyAsMap["id"]
+
+        // then it can be retrieved
+        get("/access-groups/$accessGroup1Id", managerId).bodyAsMap.let {
+            it["id"] shouldBe accessGroup1Id
+            it["name"] shouldBe "Early access"
+            it["units"] shouldBe
+                mapOf(
+                    unitId1 to "READ_ONLY",
+                    unitId2 to "READ_WRITE",
+                )
+            (it["_self"] as String) shouldMatch "https?://.*/access-groups/$accessGroup1Id"
+        }
+
+        // when updating the group
+        get("/access-groups/$accessGroup1Id", managerId).bodyAsMap.let {
+            it["name"] = "Earlier access"
+            it["units"].asMap().put(unitId1, "READ_WRITE")
+            put(it["_self"] as String, managerId, it)
+        }
+
+        // then the changes have been applied
+        get("/access-groups/$accessGroup1Id", managerId).bodyAsMap.let {
+            it["name"] shouldBe "Earlier access"
+            it["units"].asMap().get(unitId1) shouldBe "READ_WRITE"
+        }
+
+        // when creating another access group
+        post(
+            "/access-groups",
+            managerId,
+            mapOf(
+                "name" to "Supergroup",
+                "units" to
+                    mapOf(
+                        unitId2 to "READ_ONLY",
+                    ),
+            ),
+        )
+        // both can be retrieved
+        get("/access-groups", managerId).bodyAsListOfMaps.map { it["name"] } shouldContainExactlyInAnyOrder
+            listOf("Earlier access", "Supergroup")
+
+        // when deleting an access group
+        delete("/access-groups/$accessGroup1Id", managerId)
+
+        // then it is gone
+        get("/access-groups/$accessGroup1Id", managerId, 404).rawBody shouldBe "Access group $accessGroup1Id not found"
     }
 
     @Test

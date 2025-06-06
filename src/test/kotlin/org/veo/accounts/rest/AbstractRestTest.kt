@@ -49,7 +49,7 @@ import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.Int.Companion.MAX_VALUE
 
-@ActiveProfiles(value = ["resttest"])
+@ActiveProfiles(value = ["resttest", "local"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
 abstract class AbstractRestTest {
     private val createdVeoClients = mutableListOf<VeoClientId>()
@@ -134,6 +134,15 @@ abstract class AbstractRestTest {
                     ),
                 ) { findGroup(groupName) shouldNotBe null }
             }.also { createdVeoClients.add(it) }
+
+    protected fun createAccessGroup(userId: String): String =
+        post(
+            "/access-groups",
+            userId,
+            mapOf(
+                "name" to "Some group",
+            ),
+        ).bodyAsMap["id"] as String
 
     protected fun createManager(
         group: VeoClientId,

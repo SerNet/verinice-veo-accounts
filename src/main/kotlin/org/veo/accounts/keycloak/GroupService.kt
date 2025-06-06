@@ -22,7 +22,9 @@ import org.keycloak.representations.idm.GroupRepresentation
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup
+import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.VeoClientId
+import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
 
 private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
@@ -32,6 +34,65 @@ private val log = logger {}
 class GroupService(
     private val facade: KeycloakFacade,
 ) {
+    fun findAccessGroups(client: VeoClientId): List<GroupRepresentation> =
+        facade.perform {
+            groups()
+                .group(getClientGroup(client).id)
+                .getSubGroups(0, Int.MAX_VALUE, false)
+                .filter { AccessGroupSurrogateId.byGroupName(it.name) != null }
+        }
+
+    fun getAccessGroup(
+        ref: AccessGroupSurrogateId,
+        client: VeoClientId,
+        notFoundExConstructor: (String) -> Throwable = ::ResourceNotFoundException,
+    ): GroupRepresentation =
+        facade.perform {
+            groups().group(getClientGroup(client).id).getSubGroups(ref.groupName, true, 0, 1, false).firstOrNull()
+                ?: throw notFoundExConstructor("Access group $ref not found")
+        }
+
+    fun createAccessGroup(
+        attributes: Map<String, List<String>>,
+        client: VeoClientId,
+    ): AccessGroupSurrogateId =
+        facade.performSynchronized(client) {
+            val surrogateId = AccessGroupSurrogateId()
+            log.info("Creating access group $surrogateId")
+            groups()
+                .group(getClientGroup(client).id)
+                .subGroup(
+                    GroupRepresentation().also {
+                        it.name = surrogateId.groupName
+                        it.attributes = attributes
+                    },
+                ).apply { if (status != 201) throw InternalError(readEntity(String::class.java)) }
+            surrogateId
+        }
+
+    fun updateAccessGroup(
+        surrogateId: AccessGroupSurrogateId,
+        newAttributes: Map<String, List<String>>,
+        client: VeoClientId,
+    ): Unit =
+        facade.performSynchronized(client) {
+            log.info("Updating access group $surrogateId")
+            groups().group(getAccessGroup(surrogateId, client).id).run {
+                val rep = toRepresentation()
+                rep.attributes = rep.attributes + newAttributes
+                update(rep)
+            }
+        }
+
+    fun deleteAccessGroup(
+        surrogateId: AccessGroupSurrogateId,
+        client: VeoClientId,
+    ) = facade.performSynchronized(client) {
+        getAccessGroup(surrogateId, client).apply {
+            groups().group(id).remove()
+        }
+    }
+
     fun getAssignableGroup(group: AssignableGroup): GroupRepresentation =
         findGroup(group.groupName) ?: throw IllegalStateException("Assignable group $group not found")
 
