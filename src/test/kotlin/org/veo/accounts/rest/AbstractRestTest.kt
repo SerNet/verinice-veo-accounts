@@ -231,8 +231,14 @@ abstract class AbstractRestTest {
     ): Response =
         testRestTemplate
             .exchange(buildUrl(uri), method, buildHttpEntity(body, headers, authAccountId), String::class.java)
-            .apply { expectedStatus?.let { statusCode.value() shouldBe it } }
             .let { Response(it) }
+            .also {
+                if (expectedStatus != null && it.statusCode != expectedStatus) {
+                    throw AssertionError(
+                        "$method $uri: Expected status code $expectedStatus, but received ${it.statusCode}:\n${it.rawBody}",
+                    )
+                }
+            }
 
     private fun buildUrl(uri: String): String = if (uri.startsWith("http")) uri else baseUrl + uri
 
