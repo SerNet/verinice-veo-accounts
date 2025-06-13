@@ -87,7 +87,7 @@ class AccountService(
     fun createInitialAccount(dto: CreateInitialAccountDto): AccountId =
         facade.performSynchronized(dto.clientId) {
             if (findGroup(dto.clientId.groupName, true) == null) {
-                throw UnprocessableDtoException("Target veo client does not exist")
+                throw UnprocessableDtoException("Client ${dto.clientId} not found")
             }
             if (findAccounts(dto.clientId).isNotEmpty()) {
                 throw ConflictException("Target client already contains accounts, cannot create initial account")

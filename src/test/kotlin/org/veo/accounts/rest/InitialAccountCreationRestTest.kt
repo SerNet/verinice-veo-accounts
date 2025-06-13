@@ -93,11 +93,12 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
     @Test
     fun `client group must exist`() {
         // expect creating initial account for non-existing client group to fail
+        val randomUUID = randomUUID()
         post(
             "/initial",
             body =
                 mapOf(
-                    "clientId" to randomUUID(),
+                    "clientId" to randomUUID,
                     "username" to "$prefix-primus",
                     "firstName" to "Primus",
                     "lastName" to "Sinus",
@@ -108,7 +109,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                     "Authorization" to listOf(clientInitApiKey),
                 ),
             expectedStatus = 422,
-        ).rawBody shouldBe "Target veo client does not exist"
+        ).rawBody shouldBe "Client $randomUUID not found"
     }
 
     @Test
