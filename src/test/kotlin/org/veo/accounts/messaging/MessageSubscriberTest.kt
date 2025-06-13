@@ -28,15 +28,15 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.veo.accounts.dtos.VeoClientId
-import org.veo.accounts.keycloak.AccountService
+import org.veo.accounts.keycloak.GroupService
 import java.util.UUID
 import kotlin.reflect.full.functions
 
 private val om = jacksonObjectMapper()
 
 class MessageSubscriberTest {
-    private val accountService = mockk<AccountService>()
-    private val sut = MessageSubscriber(accountService)
+    private val groupService = mockk<GroupService>()
+    private val sut = MessageSubscriber(groupService)
 
     @Test
     fun `listeners don't return anything`() {
@@ -48,7 +48,7 @@ class MessageSubscriberTest {
 
     @Test
     fun `handles client creation`() {
-        every { accountService.createClient(any(), any(), any()) } just Runs
+        every { groupService.createClient(any(), any(), any()) } just Runs
 
         // when a client deletion message is received
         sut.handleMessage(
@@ -62,12 +62,12 @@ class MessageSubscriberTest {
         )
 
         // then the client is created
-        verify { accountService.createClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")), 6, 7) }
+        verify { groupService.createClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")), 6, 7) }
     }
 
     @Test
     fun `handles client activation`() {
-        every { accountService.activateClient(any()) } just Runs
+        every { groupService.activateClient(any()) } just Runs
 
         // when a client deletion message is received
         sut.handleMessage(
@@ -79,12 +79,12 @@ class MessageSubscriberTest {
         )
 
         // then the client is activated
-        verify { accountService.activateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { groupService.activateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     @Test
     fun `handles client deactivation`() {
-        every { accountService.deactivateClient(any()) } just Runs
+        every { groupService.deactivateClient(any()) } just Runs
 
         // when a client deletion message is received
         sut.handleMessage(
@@ -96,12 +96,12 @@ class MessageSubscriberTest {
         )
 
         // then the client is deactivated
-        verify { accountService.deactivateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { groupService.deactivateClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     @Test
     fun `handles client deletion`() {
-        every { accountService.deleteClient(any()) } just Runs
+        every { groupService.deleteClient(any()) } just Runs
 
         // when a client deletion message is received
         sut.handleMessage(
@@ -113,7 +113,7 @@ class MessageSubscriberTest {
         )
 
         // then the client is deleted
-        verify { accountService.deleteClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+        verify { groupService.deleteClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
     }
 
     private fun message(vararg properties: Pair<String, Any>): String =

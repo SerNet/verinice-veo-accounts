@@ -28,7 +28,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import org.veo.accounts.dtos.VeoClientId
-import org.veo.accounts.keycloak.AccountService
+import org.veo.accounts.keycloak.GroupService
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -37,7 +37,7 @@ private val om = jacksonObjectMapper()
 @Component
 @ConditionalOnProperty(value = ["veo.accounts.rabbitmq.subscribe"], havingValue = "true")
 class MessageSubscriber(
-    private val accountService: AccountService,
+    private val groupService: GroupService,
 ) {
     @RabbitListener(
         bindings = [
@@ -91,21 +91,21 @@ class MessageSubscriber(
                 .let { UUID.fromString(it) }
                 .let { VeoClientId(it) }
         when (content.get("type").asText()) {
-            "ACTIVATION" -> accountService.activateClient(client)
+            "ACTIVATION" -> groupService.activateClient(client)
             "CREATION" ->
-                accountService.createClient(
+                groupService.createClient(
                     client,
                     content.get("maxUnits").asInt(),
                     content.get("maxUsers").asInt(),
                 )
             "MODIFICATION" ->
-                accountService.updateClient(
+                groupService.updateClient(
                     client,
                     content.get("maxUnits")?.asInt(),
                     content.get("maxUsers")?.asInt(),
                 )
-            "DEACTIVATION" -> accountService.deactivateClient(client)
-            "DELETION" -> accountService.deleteClient(client)
+            "DEACTIVATION" -> groupService.deactivateClient(client)
+            "DELETION" -> groupService.deleteClient(client)
         }
     }
 }

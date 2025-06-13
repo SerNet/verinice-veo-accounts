@@ -21,10 +21,8 @@ import jakarta.ws.rs.ClientErrorException
 import jakarta.ws.rs.NotFoundException
 import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RealmResource
-import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup.VEO_WRITE_ACCESS
 import org.veo.accounts.auth.AuthenticatedAccount
@@ -37,11 +35,9 @@ import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ExceedingMaxUsersException
 import org.veo.accounts.exceptions.ResourceNotFoundException
-import org.veo.accounts.exceptions.UnprocessableDtoException
 
 private val log = logger {}
 
-private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
 const val ATTRIBUTE_LOCALE = "locale"
 
 /** Performs account-related actions on keycloak. Do not perform such actions without this service. */
@@ -50,6 +46,7 @@ class AccountService(
     @Value("\${veo.accounts.keycloak.userSuperGroupName}")
     private val userSuperGroupName: String,
     private val facade: KeycloakFacade,
+    private val groupService: GroupService,
     @Value("\${veo.accounts.keycloak.mailing.enabled}")
     private val mailingEnabled: Boolean,
     @Value("\${veo.accounts.keycloak.mailing.actionsRedirectUrl}")
@@ -86,9 +83,7 @@ class AccountService(
 
     fun createInitialAccount(dto: CreateInitialAccountDto): AccountId =
         facade.performSynchronized(dto.clientId) {
-            if (findGroup(dto.clientId.groupName, true) == null) {
-                throw UnprocessableDtoException("Client ${dto.clientId} not found")
-            }
+            groupService.getClientGroup(dto.clientId)
             if (findAccounts(dto.clientId).isNotEmpty()) {
                 throw ConflictException("Target client already contains accounts, cannot create initial account")
             }
@@ -145,15 +140,15 @@ class AccountService(
                 }
             }.also { user ->
                 dto.groups
-                    .groupNames
-                    .filter { !user.groups.contains(it) }
-                    .forEach { users().get(user.id).joinGroup(getGroupId(it)) }
+                    .values
+                    .filter { !user.groups.contains(it.groupName) }
+                    .forEach { users().get(user.id).joinGroup(groupService.getAssignableGroup(it).id) }
             }.also { user ->
                 AssignableGroupSet
                     .byGroupNames(user.groups)
                     .values
                     .filter { !dto.groups.values.contains(it) }
-                    .forEach { users().get(user.id).leaveGroup(getGroupId(it.groupName)) }
+                    .forEach { users().get(user.id).leaveGroup(groupService.getAssignableGroup(it).id) }
             }.run { if (!isEmailVerified) sendEmail(id.toString()) }
     }
 
@@ -167,81 +162,12 @@ class AccountService(
             .run { }
     }
 
-    fun deactivateClient(veoClient: VeoClientId) =
-        facade.performSynchronized(veoClient) {
-            getGroup(veoClient.groupName)
-                .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
-                .also { groups().group(it.id).update(it) }
-                .let { groups().group(it.id).members() }
-                .map { users().get(it.id) }
-                .filter { userResource -> userResource.groups().any { it.name == "veo-user" } }
-                .forEach {
-                    it.leaveGroup(getGroupId("veo-user"))
-                }
-        }
-
-    fun createClient(
-        client: VeoClientId,
-        maxUnits: Int,
-        maxUsers: Int,
-    ) = facade.performSynchronized(client) {
-        log.info("Creating veo client group ${client.groupName}")
-        GroupRepresentation()
-            .apply {
-                name = client.groupName
-                singleAttribute("maxUnits", maxUnits.toString())
-                singleAttribute("maxUsers", maxUsers.toString())
-            }.let { groups().add(it) }
-            .run {
-                if (!HttpStatusCode.valueOf(status).is2xxSuccessful) {
-                    log.error { "Failed to create veo client group $client, unexpected status code $status" }
-                    log.error { "Keycloak response: ${readEntity(String::class.java)}" }
-                    throw InternalError()
-                }
-                log.info("Created veo client group $client")
-            }
-    }
-
-    fun activateClient(veoClient: VeoClientId) =
-        facade.performSynchronized(veoClient) {
-            getGroup(veoClient.groupName)
-                .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
-                .also { groups().group(it.id).update(it) }
-                .let { groups().group(it.id).members() }
-                .forEach {
-                    users().get(it.id).joinGroup(getGroupId("veo-user"))
-                }
-        }
-
-    fun updateClient(
-        client: VeoClientId,
-        maxUnits: Int?,
-        maxUsers: Int?,
-    ) = facade.performSynchronized(client) {
-        getGroup(client.groupName)
-            .apply {
-                maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
-                maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
-            }.let { groups().group(it.id).update(it) }
-    }
-
-    fun deleteClient(client: VeoClientId) =
-        facade.performSynchronized(client) {
-            log.info("Deleting veo client group ${client.groupName}")
-            groups().group(getGroupId(client.groupName)).run {
-                members().forEach {
-                    users().delete(it.id)
-                }
-                remove()
-            }
-        }
-
     private fun RealmResource.findAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
         findAccounts(authAccount.veoClient)
 
     private fun RealmResource.findAccounts(veoClient: VeoClientId): List<UserRepresentation> =
         groups()
-            .group(getGroupId(veoClient.groupName))
+            .group(groupService.getClientGroup(veoClient, true).id)
             .members()
 
     private fun RealmResource.checkMaxUsersNotExhausted(authAccount: AuthenticatedAccount) =
@@ -251,8 +177,9 @@ class AccountService(
             }
         }
 
-    private fun RealmResource.getMaxUsers(authAccount: AuthenticatedAccount): Int =
-        getGroup(authAccount.veoClient.groupName)
+    private fun getMaxUsers(authAccount: AuthenticatedAccount): Int =
+        groupService
+            .getClientGroup(authAccount.veoClient)
             .attributes["maxUsers"]
             ?.firstOrNull()
             ?.toInt()
@@ -263,7 +190,7 @@ class AccountService(
             .filter { it.isEnabled }
             .size
 
-    private fun RealmResource.dtoToUser(
+    private fun dtoToUser(
         dto: CreateAccountDto,
         authAccount: AuthenticatedAccount,
     ) = UserRepresentation().apply {
@@ -276,7 +203,7 @@ class AccountService(
         isEnabled = dto.enabled.value
     }
 
-    private fun RealmResource.dtoToInitialUser(dto: CreateInitialAccountDto) =
+    private fun dtoToInitialUser(dto: CreateInitialAccountDto) =
         UserRepresentation().apply {
             username = dto.username.value
             email = dto.emailAddress.value
@@ -287,18 +214,15 @@ class AccountService(
             isEnabled = true
         }
 
-    private fun RealmResource.getGroupsForNewAccount(
+    private fun getGroupsForNewAccount(
         veoClient: VeoClientId,
         assignableGroups: AssignableGroupSet,
         isAccountManager: Boolean = false,
     ) = mutableListOf<String>()
         .apply { addAll(assignableGroups.groupNames.map(::getUserGroupPath)) }
         .apply { add(veoClient.groupName) }
-        .apply { if (groupActivated(veoClient)) add(getUserGroupPath("veo-user")) }
+        .apply { if (groupService.clientIsActive(veoClient)) add(getUserGroupPath("veo-user")) }
         .apply { if (isAccountManager) add(getUserGroupPath("veo-accountmanagers")) }
-
-    private fun RealmResource.groupActivated(veoClient: VeoClientId): Boolean =
-        getGroup(veoClient.groupName).attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
 
     private fun UserRepresentation.update(dto: UpdateAccountDto) {
         dto.emailAddress.value
@@ -315,25 +239,6 @@ class AccountService(
     }
 
     private fun getUserGroupPath(groupName: String): String = "$userSuperGroupName/$groupName"
-
-    private fun RealmResource.getGroupId(groupName: String): String = getGroup(groupName, true).id
-
-    private fun RealmResource.getGroup(
-        groupName: String,
-        briefRepresentation: Boolean = false,
-    ): GroupRepresentation =
-        findGroup(groupName, briefRepresentation)
-            ?: throw IllegalStateException("Group with name '$groupName' not found")
-
-    private fun RealmResource.findGroup(
-        groupName: String,
-        briefRepresentation: Boolean = false,
-    ): GroupRepresentation? =
-        groups()
-            .groups(groupName, 0, 1, briefRepresentation)
-            .firstOrNull()
-            ?.let { listOf(it) + it.subGroups }
-            ?.firstOrNull { it.name == groupName }
 
     private fun RealmResource.sendEmail(accountId: String) =
         accountId
