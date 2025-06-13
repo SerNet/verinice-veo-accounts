@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import org.veo.accounts.dtos.AccessGroupSurrogateIdSet
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
@@ -42,6 +43,7 @@ class FullAccountDto(
     val lastName: LastName?,
     val language: Language?,
     val groups: AssignableGroupSet,
+    val accessGroups: AccessGroupSurrogateIdSet,
     val enabled: Enabled,
 ) {
     constructor(user: UserRepresentation) : this(
@@ -52,6 +54,7 @@ class FullAccountDto(
         user.lastName?.let { LastName(it) },
         user.firstAttribute(ATTRIBUTE_LOCALE)?.let { Language(it) },
         AssignableGroupSet.byGroupNames(user.groups),
+        AccessGroupSurrogateIdSet.byGroupNames(user.groups),
         Enabled(user.isEnabled),
     )
 

@@ -17,6 +17,8 @@
  */
 package org.veo.accounts
 
+import org.veo.accounts.dtos.AccessGroupSurrogateId
+import org.veo.accounts.dtos.AccessGroupSurrogateIdSet
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
@@ -38,6 +40,7 @@ fun fullAccountDto(
     lastName: String = "Smith",
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
+    accessGroups: Set<AccessGroupSurrogateId> = emptySet(),
     enabled: Boolean = true,
 ) = FullAccountDto(
     id,
@@ -47,6 +50,7 @@ fun fullAccountDto(
     LastName(lastName),
     language?.let { Language(it) },
     AssignableGroupSet(groups),
+    AccessGroupSurrogateIdSet(accessGroups),
     Enabled(enabled),
 )
 
@@ -57,6 +61,7 @@ fun createAccountDto(
     lastName: String = "Smith",
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
+    accessGroups: Set<AccessGroupSurrogateId> = emptySet(),
     enabled: Boolean = true,
 ) = CreateAccountDto(
     Username(username),
@@ -65,6 +70,7 @@ fun createAccountDto(
     LastName(lastName),
     language?.let { Language(it) },
     AssignableGroupSet(groups),
+    AccessGroupSurrogateIdSet(accessGroups),
     Enabled(enabled),
 )
 
@@ -74,6 +80,7 @@ fun updateAccountDto(
     lastName: String = "Smith",
     language: String? = "en",
     groups: Set<AssignableGroup> = emptySet(),
+    accessGroups: Set<AccessGroupSurrogateId> = emptySet(),
     enabled: Boolean = true,
 ) = UpdateAccountDto(
     EmailAddress(emailAddress),
@@ -83,5 +90,6 @@ fun updateAccountDto(
         Language(it)
     },
     AssignableGroupSet(groups),
+    AccessGroupSurrogateIdSet(accessGroups),
     Enabled(enabled),
 )

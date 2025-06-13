@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.veo.accounts.asMap
 import java.util.UUID.randomUUID
+import kotlin.collections.emptyList
 
 class GroupRestTest : AbstractRestTest() {
     lateinit var managerId: String
@@ -142,7 +143,12 @@ class GroupRestTest : AbstractRestTest() {
 
     @Test
     fun `account can be created with groups`() {
-        // when an account is created with group
+        // given some access groups
+        val accessGroup1Id = createAccessGroup(managerId)
+        val accessGroup2Id = createAccessGroup(managerId)
+        val accessGroup3Id = createAccessGroup(managerId)
+
+        // when an account is created with groups
         val accountId =
             post(
                 "/",
@@ -153,13 +159,36 @@ class GroupRestTest : AbstractRestTest() {
                     "lastName" to "Dance",
                     "emailAddress" to "$prefix-hans@test.test",
                     "groups" to listOf("veo-write-access"),
+                    "accessGroups" to listOf(accessGroup1Id, accessGroup2Id),
                     "enabled" to true,
                 ),
             ).bodyAsMap["id"]
 
-        // then it is assigned to group
-        get("/$accountId", managerId).bodyAsMap.apply {
-            get("groups") shouldBe listOf("veo-write-access")
+        // then it is assigned to groups
+        get("/$accountId", managerId).bodyAsMap.let {
+            it["groups"] shouldBe listOf("veo-write-access")
+            (it["accessGroups"] as List<*>) shouldContainExactlyInAnyOrder listOf(accessGroup1Id, accessGroup2Id)
+        }
+
+        // when the account's memberships are changed
+        get("/$accountId", managerId).bodyAsMap.also {
+            it["groups"] = emptyList<String>()
+            it["accessGroups"] = listOf(accessGroup1Id, accessGroup3Id)
+            put("/$accountId", managerId, it)
+        }
+
+        // then it is assigned to other groups
+        get("/$accountId", managerId).bodyAsMap.let {
+            it["groups"] shouldBe emptyList<String>()
+            (it["accessGroups"] as List<*>) shouldContainExactlyInAnyOrder listOf(accessGroup1Id, accessGroup3Id)
+        }
+
+        // when deleting an access group
+        delete("/access-groups/$accessGroup1Id", managerId)
+
+        // then it is removed from the account
+        get("/$accountId", managerId).bodyAsMap.let {
+            it["accessGroups"] shouldBe listOf(accessGroup3Id)
         }
     }
 
@@ -211,5 +240,27 @@ class GroupRestTest : AbstractRestTest() {
             ),
             400,
         )
+    }
+
+    @Test
+    fun `account cannot join absent access group`() {
+        // given an absent access group id
+        val randomAccessGroupId = randomUUID()
+
+        // expect a group assignment to fail
+        post(
+            "/",
+            managerId,
+            mapOf(
+                "username" to "$prefix-lance",
+                "firstName" to "Lance",
+                "lastName" to "Stance",
+                "emailAddress" to "$prefix-lance@test.test",
+                "groups" to emptyList<String>(),
+                "accessGroups" to listOf(randomAccessGroupId),
+                "enabled" to true,
+            ),
+            422,
+        ).rawBody shouldBe "Access group $randomAccessGroupId not found"
     }
 }

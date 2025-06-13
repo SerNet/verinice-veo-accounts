@@ -18,6 +18,7 @@
 package org.veo.accounts.dtos.request
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.veo.accounts.dtos.AccessGroupSurrogateIdSet
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.EmailAddress
 import org.veo.accounts.dtos.Enabled
@@ -34,5 +35,6 @@ class CreateAccountDto(
     val lastName: LastName,
     val language: Language?,
     val groups: AssignableGroupSet,
+    val accessGroups: AccessGroupSurrogateIdSet = AccessGroupSurrogateIdSet(),
     val enabled: Enabled,
 )

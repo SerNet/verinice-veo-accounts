@@ -115,4 +115,67 @@ class ClientSeparationRestTest : AbstractRestTest() {
         // and it remains untouched
         get("/access-groups/$accessGroupId", client1ManagerId).bodyAsMap["name"] == "Private group"
     }
+
+    @Test
+    fun `users cannot join access groups from other clients`() {
+        // given an access group in client 1
+        val accessGroupId =
+            post(
+                "/access-groups",
+                client1ManagerId,
+                mapOf(
+                    "name" to "Secret group",
+                ),
+            ).bodyAsMap["id"]
+
+        // expect that a new user in the same client can join it
+        post(
+            "/",
+            client1ManagerId,
+            mapOf(
+                "username" to "good-guy",
+                "emailAddress" to "$prefix-good-guy@example",
+                "firstName" to "Guy",
+                "lastName" to "Good",
+                "groups" to emptyList<String>(),
+                "accessGroups" to listOf(accessGroupId),
+                "enabled" to true,
+            ),
+        )
+
+        // but a new user in client 2 cannot join
+        post(
+            "/",
+            client2ManagerId,
+            mapOf(
+                "username" to "bad-gal",
+                "emailAddress" to "$prefix-bad-gal@example",
+                "firstName" to "Gabriella",
+                "lastName" to "Baden",
+                "groups" to emptyList<String>(),
+                "accessGroups" to listOf(accessGroupId),
+                "enabled" to true,
+            ),
+            422,
+        ).rawBody shouldBe "Access group $accessGroupId not found"
+
+        // and an existing user in client 2 cannot join, either
+        val client2AccountId =
+            post(
+                "/",
+                client2ManagerId,
+                mapOf(
+                    "username" to "new-guy",
+                    "emailAddress" to "$prefix-new-guy@example",
+                    "firstName" to "Guy",
+                    "lastName" to "Newman",
+                    "groups" to emptyList<String>(),
+                    "enabled" to true,
+                ),
+            ).bodyAsMap["id"]
+        get("/$client2AccountId", client2ManagerId).bodyAsMap.let {
+            it["accessGroups"] = listOf(accessGroupId)
+            put("/$client2AccountId", client2ManagerId, it, 422).rawBody shouldBe "Access group $accessGroupId not found"
+        }
+    }
 }

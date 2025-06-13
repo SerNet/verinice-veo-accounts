@@ -52,6 +52,16 @@ class GroupService(
                 ?: throw notFoundExConstructor("Access group $ref not found")
         }
 
+    fun getAccessGroups(
+        surrogateIds: Collection<AccessGroupSurrogateId>,
+        client: VeoClientId,
+    ): List<GroupRepresentation> {
+        val allGroups = findAccessGroups(client)
+        return surrogateIds.map { surrogateId ->
+            allGroups.find { it.name == surrogateId.groupName } ?: throw UnprocessableDtoException("Access group $surrogateId not found")
+        }
+    }
+
     fun createAccessGroup(
         attributes: Map<String, List<String>>,
         client: VeoClientId,

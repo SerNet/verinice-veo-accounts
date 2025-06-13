@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup.VEO_WRITE_ACCESS
 import org.veo.accounts.auth.AuthenticatedAccount
+import org.veo.accounts.dtos.AccessGroupSurrogateId
+import org.veo.accounts.dtos.AccessGroupSurrogateIdSet
 import org.veo.accounts.dtos.AccountId
 import org.veo.accounts.dtos.AssignableGroupSet
 import org.veo.accounts.dtos.VeoClientId
@@ -149,6 +151,17 @@ class AccountService(
                     .values
                     .filter { !dto.groups.values.contains(it) }
                     .forEach { users().get(user.id).leaveGroup(groupService.getAssignableGroup(it).id) }
+            }.also { user ->
+                dto.accessGroups
+                    .filter { !user.groups.contains(it.groupName) }
+                    .let { groupService.getAccessGroups(it, authAccount.veoClient) }
+                    .forEach { users().get(user.id).joinGroup(it.id) }
+            }.also { user ->
+                AccessGroupSurrogateIdSet
+                    .byGroupNames(user.groups)
+                    .filter { !dto.accessGroups.contains(it) }
+                    .let { groupService.getAccessGroups(it, authAccount.veoClient) }
+                    .forEach { users().get(user.id).leaveGroup(it.id) }
             }.run { if (!isEmailVerified) sendEmail(id.toString()) }
     }
 
@@ -199,7 +212,7 @@ class AccountService(
         firstName = dto.firstName.value
         lastName = dto.lastName.value
         singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
-        groups = getGroupsForNewAccount(authAccount.veoClient, dto.groups)
+        groups = getGroupsForNewAccount(authAccount.veoClient, dto.groups, dto.accessGroups)
         isEnabled = dto.enabled.value
     }
 
@@ -210,16 +223,18 @@ class AccountService(
             firstName = dto.firstName.value
             lastName = dto.lastName.value
             singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
-            groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), true)
+            groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), emptySet(), true)
             isEnabled = true
         }
 
     private fun getGroupsForNewAccount(
         veoClient: VeoClientId,
         assignableGroups: AssignableGroupSet,
+        accessGroups: Collection<AccessGroupSurrogateId>,
         isAccountManager: Boolean = false,
     ) = mutableListOf<String>()
         .apply { addAll(assignableGroups.groupNames.map(::getUserGroupPath)) }
+        .apply { addAll(groupService.getAccessGroups(accessGroups, veoClient).map { it.path }) }
         .apply { add(veoClient.groupName) }
         .apply { if (groupService.clientIsActive(veoClient)) add(getUserGroupPath("veo-user")) }
         .apply { if (isAccountManager) add(getUserGroupPath("veo-accountmanagers")) }
