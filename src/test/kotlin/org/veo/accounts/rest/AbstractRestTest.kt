@@ -181,7 +181,7 @@ abstract class AbstractRestTest {
     protected fun postRaw(
         url: String,
         authAccountId: String? = null,
-        body: String?,
+        body: String? = null,
         expectedStatus: Int? = 201,
         headers: Map<String, List<String>> = emptyMap(),
     ): Response = exchange(HttpMethod.POST, url, authAccountId, body, headers, expectedStatus)
