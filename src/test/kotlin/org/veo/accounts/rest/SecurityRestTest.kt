@@ -18,6 +18,7 @@
 package org.veo.accounts.rest
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.Test
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
@@ -28,77 +29,81 @@ import org.veo.accounts.asMap
 import java.util.UUID.randomUUID
 
 class SecurityRestTest : AbstractRestTest() {
+    private val randomUuid = randomUUID()
+
     @Test
     fun `all API calls are forbidden without authorization`() {
         get("/", null, 401)
-        get("/${randomUUID()}", null, 401)
+        get("/$randomUuid", null, 401)
         post("/", null, null, 401)
-        put("/${randomUUID()}", null, null, 401)
-        delete("/${randomUUID()}", null, 401)
+        put("/$randomUuid", null, null, 401)
+        delete("/$randomUuid", null, 401)
     }
 
     @Test
     fun `CRUD managers have full access`() {
         val managerId = createManager(createVeoClientGroup())
 
-        get("/", managerId, 200)
-        get("/${randomUUID()}", managerId, 404)
-        post("/", managerId, null, 400)
-        put("/${randomUUID()}", managerId, null, 400)
-        delete("/${randomUUID()}", managerId, 404)
+        get("/", managerId, 200).rawBody shouldBe "[]"
+        get("/$randomUuid", managerId, 404).rawBody shouldBe "Resource not found"
+        post("/", managerId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
+        put("/$randomUuid", managerId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
+        delete("/$randomUuid", managerId, 404).rawBody shouldBe "Resource not found"
     }
 
     @Test
     fun `readers have limited access`() {
         val readerId = createManager(createVeoClientGroup(), roles = listOf(READ))
 
-        get("/", readerId, 200)
-        get("/${randomUUID()}", readerId, 404)
+        get("/", readerId, 200).rawBody shouldBe "[]"
+        get("/$randomUuid", readerId, 404).rawBody shouldBe "Resource not found"
 
         post("/", readerId, null, 403)
-        put("/${randomUUID()}", readerId, null, 403)
-        delete("/${randomUUID()}", readerId, 403)
+        put("/$randomUuid", readerId, null, 403)
+        delete("/$randomUuid", readerId, 403)
     }
 
     @Test
     fun `creators have limited access`() {
         val creatorId = createManager(createVeoClientGroup(), roles = listOf(CREATE))
 
-        post("/", creatorId, null, 400)
+        post("/", creatorId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
 
         get("/", creatorId, 403)
-        get("/${randomUUID()}", creatorId, 403)
-        put("/${randomUUID()}", creatorId, null, 403)
-        delete("/${randomUUID()}", creatorId, 403)
+        get("/$randomUuid", creatorId, 403)
+        put("/$randomUuid", creatorId, null, 403)
+        delete("/$randomUuid", creatorId, 403)
     }
 
     @Test
     fun `updaters have limited access`() {
         val updaterId = createManager(createVeoClientGroup(), roles = listOf(UPDATE))
 
-        put("/${randomUUID()}", updaterId, null, 400)
+        put("/$randomUuid", updaterId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
 
         get("/", updaterId, 403)
-        get("/${randomUUID()}", updaterId, 403)
+        get("/$randomUuid", updaterId, 403)
         post("/", updaterId, null, 403)
-        delete("/${randomUUID()}", updaterId, 403)
+        delete("/$randomUuid", updaterId, 403)
     }
 
     @Test
     fun `deleters have limited access`() {
         val deleterId = createManager(createVeoClientGroup(), roles = listOf(DELETE))
 
-        delete("/${randomUUID()}", deleterId, 404)
+        delete("/$randomUuid", deleterId, 404).rawBody shouldBe "Resource not found"
 
         get("/", deleterId, 403)
-        get("/${randomUUID()}", deleterId, 403)
+        get("/$randomUuid", deleterId, 403)
         post("/", deleterId, null, 403)
-        put("/${randomUUID()}", deleterId, null, 403)
+        put("/$randomUuid", deleterId, null, 403)
     }
 
     @Test
     fun `API key works for initial account creation`() {
-        post("/initial", headers = mapOf("Authorization" to listOf(clientInitApiKey)), expectedStatus = 400)
+        post("/initial", headers = mapOf("Authorization" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
+            Regex("Required request body is missing.*")
+
         post("/initial", headers = mapOf("Authorization" to listOf("wrongKey")), expectedStatus = 401)
         post("/initial", expectedStatus = 401)
     }
@@ -108,10 +113,10 @@ class SecurityRestTest : AbstractRestTest() {
         val headers = mapOf("Authorization" to listOf(clientInitApiKey))
 
         get("/", headers = headers, expectedStatus = 401)
-        get("/${randomUUID()}", headers = headers, expectedStatus = 401)
+        get("/$randomUuid", headers = headers, expectedStatus = 401)
         post("/", headers = headers, expectedStatus = 401)
-        put("/${randomUUID()}", null, null, headers = headers, expectedStatus = 401)
-        delete("/${randomUUID()}", headers = headers, expectedStatus = 401)
+        put("/$randomUuid", null, null, headers = headers, expectedStatus = 401)
+        delete("/$randomUuid", headers = headers, expectedStatus = 401)
     }
 
     @Test

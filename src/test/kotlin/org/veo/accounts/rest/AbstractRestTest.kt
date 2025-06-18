@@ -189,7 +189,7 @@ abstract class AbstractRestTest {
     protected fun put(
         url: String,
         authAccountId: String? = null,
-        body: Any?,
+        body: Any? = null,
         expectedStatus: Int? = 204,
         headers: Map<String, List<String>> = emptyMap(),
     ): Response = exchange(HttpMethod.PUT, url, authAccountId, serialize(body), headers, expectedStatus)
