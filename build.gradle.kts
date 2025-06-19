@@ -54,7 +54,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.14.2")
     testImplementation("org.springframework.security:spring-security-test")
 
-    testImplementation("org.testcontainers:rabbitmq:1.21.1")
+    testImplementation("org.testcontainers:rabbitmq:1.21.2")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.keycloak:keycloak-authz-client:26.0.4")
