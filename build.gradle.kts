@@ -1,13 +1,12 @@
 import org.cadixdev.gradle.licenser.header.HeaderFormatRegistry
 import org.eclipse.jgit.api.Git
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Calendar
 
 plugins {
     id("org.springframework.boot") version "3.5.3"
 
-    kotlin("jvm") version "2.1.21"
-    kotlin("plugin.spring") version "2.1.21"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.spring") version "2.2.0"
 
     id("com.diffplug.spotless") version "7.0.4"
     id("org.cadixdev.licenser") version "0.6.1"
@@ -72,10 +71,10 @@ tasks.withType<Test> {
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
+kotlin {
+    compilerOptions {
         allWarningsAsErrors = true
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+        freeCompilerArgs = listOf("-Xjsr305=strict ", "-Xannotation-default-target=param-property")
     }
 }
 
