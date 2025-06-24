@@ -118,7 +118,7 @@ spotless {
     format("misc") {
         target("**/*.md", "**/*.gitignore", "**/*.properties")
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
         endWithNewline()
         replaceRegex("Excessive line breaks", "\n{3,}", "\n\n")
     }
@@ -136,7 +136,7 @@ spotless {
     yaml {
         target(".gitlab-ci.yml")
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
         endWithNewline()
     }
 }
