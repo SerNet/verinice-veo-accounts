@@ -3,7 +3,7 @@ import org.eclipse.jgit.api.Git
 import java.util.Calendar
 
 plugins {
-    id("org.springframework.boot") version "3.5.3"
+    id("org.springframework.boot") version "3.5.4"
 
     kotlin("jvm") version "2.2.0"
     kotlin("plugin.spring") version "2.2.0"
