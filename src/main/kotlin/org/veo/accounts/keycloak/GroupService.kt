@@ -26,6 +26,7 @@ import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
+import kotlin.getValue
 
 private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
 private val log = logger {}
@@ -172,6 +173,37 @@ class GroupService(
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
                 maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
             }.let { groups().group(it.id).update(it) }
+    }
+
+    fun updateClient(
+        client: VeoClientId,
+        newRoles: Collection<String>,
+    ) = facade.performSynchronized(client) {
+        getClientGroup(client)
+            .let {
+                val allRoles by lazy { roles().list() }
+                val currentRoleNames = it.realmRoles
+                val rolesToRemove =
+                    currentRoleNames
+                        .filter { !newRoles.contains(it) }
+                        .map { roleName -> allRoles.find { it.name == roleName } }
+                val rolesToAdd =
+                    newRoles
+                        .filter { !currentRoleNames.contains(it) }
+                        .map { roleName -> allRoles.find { it.name == roleName } }
+                groups()
+                    .group(it.id)
+                    .roles()
+                    .realmLevel()
+                    .apply {
+                        if (rolesToAdd.isNotEmpty()) {
+                            add(rolesToAdd)
+                        }
+                        if (rolesToRemove.isNotEmpty()) {
+                            remove(rolesToRemove)
+                        }
+                    }
+            }
     }
 
     fun deleteClient(client: VeoClientId) =

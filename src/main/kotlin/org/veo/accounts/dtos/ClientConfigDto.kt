@@ -1,6 +1,6 @@
 /**
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2025  Jonas Jordan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,14 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts
+package org.veo.accounts.dtos
 
-enum class Role(
-    val roleName: String,
+import com.fasterxml.jackson.annotation.JsonIgnore
+import io.swagger.v3.oas.annotations.media.Schema
+import org.keycloak.representations.idm.GroupRepresentation
+import org.veo.accounts.Role
+
+@Schema(description = "Configuration parameters for a veo client")
+class ClientConfigDto(
+    val restrictUnitAccess: Boolean,
 ) {
-    CREATE("account:create"),
-    READ("account:read"),
-    UPDATE("account:update"),
-    DELETE("account:delete"),
-    UNIT_ACCESS_RESTRICTION("unit_access_restriction"),
+    constructor(clientGroup: GroupRepresentation) : this(
+        clientGroup.realmRoles.contains(Role.UNIT_ACCESS_RESTRICTION.roleName),
+    )
+
+    @JsonIgnore
+    fun toRoleNames(): List<String> = if (restrictUnitAccess) listOf(Role.UNIT_ACCESS_RESTRICTION.roleName) else emptyList()
 }

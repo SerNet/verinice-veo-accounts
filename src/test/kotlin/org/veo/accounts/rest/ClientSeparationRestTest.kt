@@ -178,4 +178,20 @@ class ClientSeparationRestTest : AbstractRestTest() {
             put("/$client2AccountId", client2ManagerId, it, 422).rawBody shouldBe "Access group $accessGroupId not found"
         }
     }
+
+    @Test
+    fun `client configs are isolated`() {
+        // when client 1 has restricted unit access
+        put(
+            "/client-config",
+            client1ManagerId,
+            mapOf("restrictUnitAccess" to true),
+        )
+
+        // then this applies to client 1
+        get("/client-config", client1ManagerId).bodyAsMap["restrictUnitAccess"] shouldBe true
+
+        // and not to client 2
+        get("/client-config", client2ManagerId).bodyAsMap["restrictUnitAccess"] shouldBe false
+    }
 }
