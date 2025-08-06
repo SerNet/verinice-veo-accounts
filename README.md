@@ -60,10 +60,9 @@ instance. This requires docker to be installed. To use an external RabbitMQ inst
 Launch and visit <http://localhost:8099/swagger-ui.html>
 
 ## Code format
-Spotless is used for linting and license-gradle-plugin is used to apply license headers. The following task applies
-spotless code format & adds missing license headers to new files:
+Spotless is used for linting and license headers:
 
-    ./gradlew formatApply
+    ./gradlew spotlessApply
 
 The Kotlin lint configuration does not allow wildcard imports. Spotless cannot fix wildcard imports automatically, so
 you should set up your IDE to avoid them.

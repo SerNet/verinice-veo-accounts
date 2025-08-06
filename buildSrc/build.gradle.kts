@@ -1,0 +1,12 @@
+plugins {
+    `kotlin-dsl`
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies{
+    implementation("com.diffplug.spotless:spotless-lib-extra:3.3.0")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
+}
