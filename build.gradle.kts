@@ -38,30 +38,65 @@ dependencies {
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("ch.qos.logback.contrib:logback-json-classic:0.1.5")
     runtimeOnly("ch.qos.logback.contrib:logback-jackson:0.1.5")
-
-    val kotestVersion = "5.9.1"
-    testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
-    testImplementation("io.kotest:kotest-property-jvm:$kotestVersion")
-
-    testImplementation("io.mockk:mockk:1.14.5")
-    testImplementation("org.springframework.security:spring-security-test")
-
-    testImplementation("org.testcontainers:rabbitmq:1.21.3")
-
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    testImplementation("org.keycloak:keycloak-authz-client:26.0.4")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-    }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    if (name == "test") {
-        filter {
-            excludeTestsMatching("org.veo.accounts.rest.*")
+@Suppress("UnstableApiUsage")
+testing {
+    suites {
+        configureEach {
+            dependencies {
+                implementation("io.kotest:kotest-assertions-core-jvm:5.9.1")
+                implementation("io.kotest:kotest-runner-junit5-jvm:5.9.1")
+                implementation("io.kotest:kotest-assertions-core-jvm:5.9.1")
+                implementation("io.kotest:kotest-property-jvm:5.9.1")
+            }
+        }
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+            dependencies {
+                implementation("io.mockk:mockk:1.14.5")
+            }
+        }
+        register<JvmTestSuite>("restTest") {
+            useJUnitJupiter()
+            dependencies {
+                implementation(project())
+                implementation("org.testcontainers:rabbitmq:1.21.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+                implementation("org.keycloak:keycloak-authz-client:26.0.4")
+                implementation("org.springframework.boot:spring-boot-starter-test") {
+                    exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+                }
+            }
+            configurations {
+                named(sources.implementationConfigurationName) {
+                    extendsFrom(getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME))
+                }
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                        description = "Runs REST API integration tests"
+                        group = "verification"
+                        inputs.property("veoAccountsBaseUrl") { System.getenv("VEO_ACCOUNTS_RESTTEST_BASEURL") }.optional(true)
+                        systemProperties(
+                            System.getProperties().mapKeys { it.key as String }.filterKeys {
+                                listOf(
+                                    "http.proxyHost",
+                                    "http.proxyPort",
+                                    "http.nonProxyHosts",
+                                    "https.proxyHost",
+                                    "https.proxyPort",
+                                    "http.nonProxyHosts",
+                                ).contains(it)
+                            },
+                        )
+                        // Enable Origin header for CORS tests
+                        systemProperty("sun.net.http.allowRestrictedHeaders", "true")
+                    }
+                }
+            }
         }
     }
 }
@@ -71,37 +106,6 @@ kotlin {
         allWarningsAsErrors = true
         freeCompilerArgs = listOf("-Xjsr305=strict ", "-Xannotation-default-target=param-property")
     }
-}
-
-tasks.register("restTest", Test::class.java) {
-    description = "Runs REST API integration tests"
-    group = "verification"
-
-    shouldRunAfter("test")
-
-    filter {
-        includeTestsMatching("org.veo.accounts.rest.*")
-    }
-
-    inputs
-        .property("veoAccountsBaseUrl") {
-            System.getenv("VEO_ACCOUNTS_RESTTEST_BASEURL")
-        }.optional(true)
-
-    systemProperties(
-        System.getProperties().mapKeys { it.key as String }.filterKeys {
-            listOf(
-                "http.proxyHost",
-                "http.proxyPort",
-                "http.nonProxyHosts",
-                "https.proxyHost",
-                "https.proxyPort",
-                "http.nonProxyHosts",
-            ).contains(it)
-        },
-    )
-    // Enable Origin header for CORS tests
-    systemProperty("sun.net.http.allowRestrictedHeaders", "true")
 }
 
 spotless {
