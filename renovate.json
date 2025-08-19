@@ -20,6 +20,12 @@
       ]
     },
     {
+      "groupName": "Kotest",
+      "matchPackageNames": [
+        "/^io.kotest:/"
+      ]
+    },
+    {
       "postUpgradeTasks": {
         "commands": [
           "./gradlew spotlessApply"
