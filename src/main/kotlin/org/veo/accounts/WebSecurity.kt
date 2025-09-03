@@ -77,6 +77,7 @@ class WebSecurity(
 
                 authorize(GET, "/**", hasRole(Role.READ.roleName))
                 authorize(POST, "/**", hasRole(Role.CREATE.roleName))
+                authorize(PUT, "/admin/license", hasRole(Role.SET_LICENSE_KEY.roleName))
                 authorize(PUT, "/**", hasRole(Role.UPDATE.roleName))
                 authorize(DELETE, "/**", hasRole(Role.DELETE.roleName))
             }

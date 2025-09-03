@@ -20,6 +20,7 @@ package org.veo.accounts.rest
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.Test
+import org.veo.accounts.Role
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
 import org.veo.accounts.Role.READ
@@ -27,6 +28,8 @@ import org.veo.accounts.Role.UPDATE
 import org.veo.accounts.asListOfMaps
 import org.veo.accounts.asMap
 import java.util.UUID.randomUUID
+import kotlin.collections.mapOf
+import kotlin.collections.plus
 
 class SecurityRestTest : AbstractRestTest() {
     private val randomUuid = randomUUID()
@@ -44,10 +47,11 @@ class SecurityRestTest : AbstractRestTest() {
         post("/access-groups", expectedStatus = 401)
         put("/access-groups/$randomUuid", expectedStatus = 401)
         delete("/access-groups/$randomUuid", expectedStatus = 401)
+        putRaw("/admin/license", expectedStatus = 401, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
     }
 
     @Test
-    fun `CRUD managers have full access`() {
+    fun `CRUD managers have full access apart from putting licenses`() {
         val managerId = createManager(createVeoClientGroup())
 
         get("/", managerId, 200).rawBody shouldBe "[]"
@@ -61,6 +65,7 @@ class SecurityRestTest : AbstractRestTest() {
         post("/access-groups", managerId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
         put("/access-groups/$randomUuid", managerId, expectedStatus = 400).rawBody shouldMatch Regex("Required request body is missing.*")
         delete("/access-groups/$randomUuid", managerId, 404).rawBody shouldBe "Access group $randomUuid not found"
+        putRaw("/admin/license", managerId, expectedStatus = 403, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
     }
 
     @Test
@@ -78,6 +83,7 @@ class SecurityRestTest : AbstractRestTest() {
         put("/access-groups/$randomUuid", readerId, expectedStatus = 403)
         delete("/$randomUuid", readerId, 403)
         delete("/access-groups/$randomUuid", readerId, 403)
+        putRaw("/admin/license", readerId, expectedStatus = 403, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
     }
 
     @Test
@@ -95,6 +101,7 @@ class SecurityRestTest : AbstractRestTest() {
         put("/access-groups/$randomUuid", creatorId, expectedStatus = 403)
         delete("/$randomUuid", creatorId, 403)
         delete("/access-groups/$randomUuid", creatorId, 403)
+        putRaw("/admin/license", creatorId, expectedStatus = 403, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
     }
 
     @Test
@@ -111,6 +118,7 @@ class SecurityRestTest : AbstractRestTest() {
         post("/", updaterId, expectedStatus = 403)
         post("/access-groups", updaterId, expectedStatus = 403)
         delete("/$randomUuid", updaterId, 403)
+        putRaw("/admin/license", updaterId, expectedStatus = 403, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
     }
 
     @Test
@@ -127,6 +135,30 @@ class SecurityRestTest : AbstractRestTest() {
         put("/access-groups/$randomUuid", deleterId, expectedStatus = 403)
         post("/", deleterId, expectedStatus = 403)
         post("/access-groups", deleterId, expectedStatus = 403)
+        putRaw("/admin/license", deleterId, expectedStatus = 403, headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")))
+    }
+
+    @Test
+    fun `license key setters have limited access`() {
+        val licenseKeySetterId = createManager(createVeoClientGroup(), roles = listOf(Role.SET_LICENSE_KEY))
+
+        putRaw(
+            "/admin/license",
+            licenseKeySetterId,
+            expectedStatus = 400,
+            headers = mapOf("Content-Type" to listOf("application/pkcs7-mime")),
+        ).rawBody shouldMatch
+            Regex("Required request body is missing.*")
+
+        get("/", licenseKeySetterId, 403)
+        get("/$randomUuid", licenseKeySetterId, 403)
+        get("/access-groups", licenseKeySetterId, 403)
+        get("/access-groups/$randomUuid", licenseKeySetterId, 403)
+        put("/$randomUuid", licenseKeySetterId, null, 403)
+        put("/access-groups/$randomUuid", licenseKeySetterId, expectedStatus = 403)
+        post("/", licenseKeySetterId, expectedStatus = 403)
+        post("/access-groups", licenseKeySetterId, expectedStatus = 403)
+        delete("/$randomUuid", licenseKeySetterId, 403)
     }
 
     @Test
@@ -139,7 +171,7 @@ class SecurityRestTest : AbstractRestTest() {
     }
 
     @Test
-    fun `API key does not work for account & group management`() {
+    fun `API key does not work for account, group, and license management`() {
         val headers = mapOf("Authorization" to listOf(clientInitApiKey))
 
         get("/", headers = headers, expectedStatus = 401)
@@ -153,6 +185,7 @@ class SecurityRestTest : AbstractRestTest() {
         post("/access-groups", headers = headers, expectedStatus = 401)
         put("/access-groups/$randomUuid", headers = headers, expectedStatus = 401)
         delete("/access-groups/$randomUuid", headers = headers, expectedStatus = 401)
+        putRaw("/admin/license", headers = headers + mapOf("Content-Type" to listOf("application/pkcs7-mime")), expectedStatus = 401)
     }
 
     @Test

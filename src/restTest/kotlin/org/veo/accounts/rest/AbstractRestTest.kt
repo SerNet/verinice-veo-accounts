@@ -194,6 +194,14 @@ abstract class AbstractRestTest {
         headers: Map<String, List<String>> = emptyMap(),
     ): Response = exchange(HttpMethod.PUT, url, authAccountId, serialize(body), headers, expectedStatus)
 
+    protected fun putRaw(
+        url: String,
+        authAccountId: String? = null,
+        body: String? = null,
+        expectedStatus: Int? = 204,
+        headers: Map<String, List<String>> = emptyMap(),
+    ): Response = exchange(HttpMethod.PUT, url, authAccountId, body, headers, expectedStatus)
+
     protected fun delete(
         url: String,
         authAccountId: String? = null,

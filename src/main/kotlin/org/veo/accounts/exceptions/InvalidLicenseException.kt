@@ -1,6 +1,6 @@
 /**
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2025  Jochen Kemnade
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,15 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts
+package org.veo.accounts.exceptions
 
-enum class Role(
-    val roleName: String,
-) {
-    CREATE("account:create"),
-    READ("account:read"),
-    UPDATE("account:update"),
-    DELETE("account:delete"),
-    UNIT_ACCESS_RESTRICTION("unit_access_restriction"),
-    SET_LICENSE_KEY("license-key:set"),
-}
+import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
+
+class InvalidLicenseException(
+    msg: String,
+) : AbstractMappedException(msg, UNPROCESSABLE_ENTITY)

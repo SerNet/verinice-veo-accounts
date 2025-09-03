@@ -1,6 +1,6 @@
 /**
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2025  Jochen Kemnade
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,12 @@
  */
 package org.veo.accounts
 
-enum class Role(
-    val roleName: String,
-) {
-    CREATE("account:create"),
-    READ("account:read"),
-    UPDATE("account:update"),
-    DELETE("account:delete"),
-    UNIT_ACCESS_RESTRICTION("unit_access_restriction"),
-    SET_LICENSE_KEY("license-key:set"),
-}
+import java.time.Instant
+
+data class License(
+    val customerNo: String,
+    val totalClients: Integer,
+    val totalUnits: Integer,
+    val totalUsers: Integer,
+    val validUntil: Instant,
+)
