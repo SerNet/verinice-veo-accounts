@@ -27,6 +27,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.amqp.rabbit.annotation.RabbitListener
+import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.GroupService
 import java.util.UUID
@@ -114,6 +115,29 @@ class MessageSubscriberTest {
 
         // then the client is deleted
         verify { groupService.deleteClient(VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24"))) }
+    }
+
+    @Test
+    fun `handles unit deletion`() {
+        every { groupService.removeUnitRights(any(), any()) } just Runs
+
+        // when a unit deletion message is received
+        sut.handleMessage(
+            message(
+                "eventType" to "unit_deletion",
+                "clientId" to "cc12aad0-b9fb-46a0-9beb-489ed40ebb24",
+                "unitId" to "e9aba324-9ba1-4b2f-9b5b-1d67b3394d08",
+                "version" to 23,
+            ),
+        )
+
+        // then permissions for the unit are removed from all access groups
+        verify {
+            groupService.removeUnitRights(
+                UnitId("e9aba324-9ba1-4b2f-9b5b-1d67b3394d08"),
+                VeoClientId(UUID.fromString("cc12aad0-b9fb-46a0-9beb-489ed40ebb24")),
+            )
+        }
     }
 
     private fun message(vararg properties: Pair<String, Any>): String =

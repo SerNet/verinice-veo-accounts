@@ -27,6 +27,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.GroupService
 import java.util.UUID
@@ -53,6 +54,7 @@ class MessageSubscriber(
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
                 key = [
                     "\${veo.accounts.rabbitmq.routing_key_prefix}client_change",
+                    "\${veo.accounts.rabbitmq.routing_key_prefix}unit_deletion",
                 ],
             ),
         ],
@@ -78,6 +80,7 @@ class MessageSubscriber(
                 log.debug { "Received message with '$it' event" }
                 when (it) {
                     "client_change" -> handleClientChange(content)
+                    "unit_deletion" -> handleUnitDeletion(content)
                     else -> throw NotImplementedError("Unsupported event type $it")
                 }
             }
@@ -107,5 +110,21 @@ class MessageSubscriber(
             "DEACTIVATION" -> groupService.deactivateClient(client)
             "DELETION" -> groupService.deleteClient(client)
         }
+    }
+
+    private fun handleUnitDeletion(content: JsonNode) {
+        val client =
+            content
+                .get("clientId")
+                .asText()
+                .let { UUID.fromString(it) }
+                .let { VeoClientId(it) }
+        val unit =
+            content
+                .get("unitId")
+                .asText()
+                .let { UUID.fromString(it) }
+                .let { UnitId(it) }
+        groupService.removeUnitRights(unit, client)
     }
 }

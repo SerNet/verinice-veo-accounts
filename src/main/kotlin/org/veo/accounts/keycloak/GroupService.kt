@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup
 import org.veo.accounts.dtos.AccessGroupSurrogateId
+import org.veo.accounts.dtos.UnitAccessRights
+import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
@@ -230,4 +232,24 @@ class GroupService(
                 ?.let { listOf(it) + it.subGroups }
                 ?.firstOrNull { it.name == groupName }
         }
+
+    fun removeUnitRights(
+        unit: UnitId,
+        client: VeoClientId,
+    ) {
+        findAccessGroups(client).forEach { group ->
+            UnitAccessRights
+                .byAttributes(group.attributes)
+                .takeIf { unit in it.value }
+                ?.withoutUnit(unit)
+                ?.toAttributes()
+                ?.also {
+                    updateAccessGroup(
+                        AccessGroupSurrogateId.byGroupName(group.name)!!,
+                        it,
+                        client,
+                    )
+                }
+        }
+    }
 }

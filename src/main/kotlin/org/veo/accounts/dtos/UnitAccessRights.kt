@@ -42,6 +42,11 @@ data class UnitAccessRights(
         READ_WRITE,
     }
 
+    fun withoutUnit(id: UnitId): UnitAccessRights =
+        UnitAccessRights(
+            value.filterKeys { it != id },
+        )
+
     companion object {
         fun byAttributes(attributes: Map<String, List<String>>): UnitAccessRights =
             UnitAccessRights(
