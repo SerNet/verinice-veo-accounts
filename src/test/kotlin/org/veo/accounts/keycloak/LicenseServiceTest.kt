@@ -25,10 +25,16 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.keycloak.admin.client.resource.ClientScopeResource
+import org.keycloak.admin.client.resource.ClientScopesResource
+import org.keycloak.admin.client.resource.ProtocolMappersResource
 import org.keycloak.admin.client.resource.RealmResource
+import org.keycloak.representations.idm.ClientScopeRepresentation
+import org.keycloak.representations.idm.ProtocolMapperRepresentation
 import org.keycloak.representations.idm.RealmRepresentation
 import org.veo.accounts.exceptions.InvalidLicenseException
 
@@ -81,6 +87,40 @@ class LicenseServiceTest {
             """.trimIndent()
         val realmSlot = slot<RealmRepresentation>()
 
+        val veoLicenseId = "3667214c-a0bb-4770-a2bf-0f645701c759"
+        val protocolMapperId = "25d1e05c-bf1b-4f42-aa69-10e6cbb47e9b"
+
+        val totalUnitsConfig =
+            mockk<MutableMap<String, String>> {
+                every { put("claim.value", "0") } returns null
+            }
+
+        val totalUnits =
+            mockk<ProtocolMapperRepresentation> {
+                every { id } returns protocolMapperId
+                every { name } returns "total units"
+                every { config } returns totalUnitsConfig
+            }
+        val veoLicense =
+            mockk<ClientScopeRepresentation> {
+                every { id } returns veoLicenseId
+                every { name } returns "veo-license"
+                every { protocolMappers } returns listOf(totalUnits)
+            }
+
+        val protocolMappersResource =
+            mockk<ProtocolMappersResource> {
+                every { update(protocolMapperId, totalUnits) } just runs
+            }
+        val clientScopesResource =
+            mockk<ClientScopesResource> {
+                every { findAll() } returns listOf(veoLicense)
+                every { this@mockk.get(veoLicenseId) } returns
+                    mockk<ClientScopeResource> {
+                        every { protocolMappers } returns protocolMappersResource
+                    }
+            }
+
         val realmResource =
             mockk<RealmResource> {
                 every { update(capture(realmSlot)) } just Runs
@@ -88,6 +128,7 @@ class LicenseServiceTest {
                     RealmRepresentation().apply {
                         attributes = emptyMap()
                     }
+                every { clientScopes() } returns clientScopesResource
             }
 
         every { facade.perform<Unit>(any()) } answers {
@@ -97,6 +138,8 @@ class LicenseServiceTest {
         sut.saveLicense(licenseString)
 
         verify { realmResource.update(any()) }
+        verify { totalUnitsConfig.put("claim.value", "0") }
+        verify { protocolMappersResource.update(protocolMapperId, totalUnits) }
         assert(realmSlot.captured.attributes["veo-license"] == licenseString)
     }
 

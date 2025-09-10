@@ -61,6 +61,12 @@ class LicenseService(
                 it.attributes = it.attributesOrEmpty + mapOf("veo-license" to licenseString)
                 update(it)
             }
+            clientScopes().findAll().first { it.name == "veo-license" }.also { licenseScope ->
+                licenseScope.protocolMappers.first { it.name == "total units" }.apply {
+                    config["claim.value"] = license.totalUnits.toString()
+                    clientScopes().get(licenseScope.id).protocolMappers.update(id, this)
+                }
+            }
         }
     }
 
