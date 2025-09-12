@@ -54,6 +54,18 @@ class MessageSubscriber(
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
                 key = [
                     "\${veo.accounts.rabbitmq.routing_key_prefix}client_change",
+                ],
+            ), QueueBinding(
+                value =
+                    Queue(
+                        value = "\${veo.accounts.rabbitmq.queues.veo}",
+                        exclusive = "false",
+                        durable = "true",
+                        autoDelete = "\${veo.accounts.rabbitmq.queue.autoDelete}",
+                        arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
+                    ),
+                exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo}", type = "topic"),
+                key = [
                     "\${veo.accounts.rabbitmq.routing_key_prefix}unit_deletion",
                 ],
             ),
