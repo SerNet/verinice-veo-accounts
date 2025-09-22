@@ -18,10 +18,9 @@
 package org.veo.accounts.keycloak
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.mail.Session
-import jakarta.mail.internet.MimeMessage
 import mu.KotlinLogging.logger
 import org.bouncycastle.asn1.cms.ContentInfo
+import org.bouncycastle.cms.CMSProcessableByteArray
 import org.bouncycastle.cms.CMSSignedData
 import org.bouncycastle.cms.SignerInformation
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder
@@ -32,7 +31,6 @@ import org.veo.accounts.License
 import org.veo.accounts.exceptions.InvalidLicenseException
 import java.security.cert.CertificateFactory
 import java.time.Instant
-import java.util.Properties
 import kotlin.collections.plus
 import kotlin.getValue
 
@@ -75,13 +73,10 @@ class LicenseService(
                         it.readObject() as ContentInfo
                     }
                 val signedData = CMSSignedData(contentInfo.encoded)
-                val contentBytes = signedData.encoded
+                val signedContent = signedData.signedContent as CMSProcessableByteArray
 
-                val props = Properties()
-                val session = Session.getDefaultInstance(props, null)
-                val message = MimeMessage(session, contentBytes.inputStream())
                 signers = signedData.signerInfos.signers
-                objectMapper.readValue(message.inputStream, License::class.java)
+                objectMapper.readValue(signedContent.inputStream, License::class.java)
             } catch (e: Exception) {
                 log.error("Failed to read license", e)
                 throw InvalidLicenseException("Request body does not represent a valid license.")
