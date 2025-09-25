@@ -26,6 +26,7 @@
       ]
     },
     {
+      "groupName": "Spotless",
       "postUpgradeTasks": {
         "commands": [
           "./gradlew spotlessApply"
