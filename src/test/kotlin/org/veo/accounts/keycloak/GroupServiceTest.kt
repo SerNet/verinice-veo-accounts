@@ -24,7 +24,11 @@ import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.keycloak.admin.client.resource.GroupResource
+import org.keycloak.admin.client.resource.GroupsResource
+import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.GroupRepresentation
+import org.veo.accounts.AssignableGroup
 import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
@@ -94,5 +98,83 @@ class GroupServiceTest {
             )
         }
         verify(exactly = 0) { sut.updateAccessGroup(accessGroup2SurrogateId, any(), any()) }
+    }
+
+    @Test
+    fun `removes global write access`() {
+        val veoWriteAccessId = UUID.randomUUID().toString()
+
+        val veoWriteAccess =
+            mockk<GroupRepresentation> {
+                every { name } returns AssignableGroup.VEO_WRITE_ACCESS.groupName
+                every { id } returns veoWriteAccessId
+                every { realmRoles } returns listOf("veo-write")
+                every { realmRoles = any() } just Runs
+            }
+
+        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
+
+        val groupResource =
+            mockk<GroupResource> {
+                every { update(any()) } just Runs
+            }
+
+        val realmResource =
+            mockk<RealmResource> {
+                every { groups() } returns
+                    mockk<GroupsResource> {
+                        every { group(veoWriteAccessId) } returns groupResource
+                    }
+            }
+        every { facade.perform<Unit>(any()) } answers {
+            val block = arg<RealmResource.() -> Any>(0)
+            realmResource.block()
+        }
+
+        sut.setGlobalWriteAccessEnabled(false)
+
+        verify {
+            veoWriteAccess.realmRoles = listOf()
+            groupResource.update(veoWriteAccess)
+        }
+    }
+
+    @Test
+    fun `adds global write access`() {
+        val veoWriteAccessId = UUID.randomUUID().toString()
+
+        val veoWriteAccess =
+            mockk<GroupRepresentation> {
+                every { name } returns AssignableGroup.VEO_WRITE_ACCESS.groupName
+                every { id } returns veoWriteAccessId
+                every { realmRoles } returns listOf()
+                every { realmRoles = any() } just Runs
+            }
+
+        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
+
+        val groupResource =
+            mockk<GroupResource> {
+                every { update(any()) } just Runs
+            }
+
+        val realmResource =
+            mockk<RealmResource> {
+                every { groups() } returns
+                    mockk<GroupsResource> {
+                        every { group(veoWriteAccessId) } returns groupResource
+                    }
+            }
+        every { facade.perform<Unit>(any()) } answers {
+            val block = arg<RealmResource.() -> Any>(0)
+            realmResource.block()
+        }
+
+        sut.setGlobalWriteAccessEnabled(true)
+
+        verify {
+            veoWriteAccess.realmRoles = listOf("veo-write")
+            groupResource.update(veoWriteAccess)
+        }
     }
 }

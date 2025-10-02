@@ -252,4 +252,18 @@ class GroupService(
                 }
         }
     }
+
+    fun setGlobalWriteAccessEnabled(flag: Boolean) {
+        getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS).also { group ->
+            val roleName = "veo-write"
+            val existingRoles = group.realmRoles.orEmpty()
+            val hasRole = roleName in existingRoles
+            if (flag != hasRole) {
+                group.realmRoles = if (flag) existingRoles + roleName else existingRoles - roleName
+                facade.perform {
+                    groups().group(group.id).update(group)
+                }
+            }
+        }
+    }
 }

@@ -34,16 +34,21 @@ import org.keycloak.admin.client.resource.ClientScopesResource
 import org.keycloak.admin.client.resource.ProtocolMappersResource
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.ClientScopeRepresentation
+import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.ProtocolMapperRepresentation
 import org.keycloak.representations.idm.RealmRepresentation
+import org.veo.accounts.AssignableGroup
 import org.veo.accounts.exceptions.InvalidLicenseException
+import org.veo.accounts.systemmessages.SystemMessageService
 
 private val om = jacksonObjectMapper().registerModule(JavaTimeModule())
 
 class LicenseServiceTest {
     private val facade = mockk<KeycloakFacade>()
+    private val groupService = mockk<GroupService>()
+    private val systemMessageService = mockk<SystemMessageService>()
 
-    private val sut = LicenseService(facade, om)
+    private val sut = LicenseService(facade, om, groupService, systemMessageService)
 
     @Test
     fun `license can be saved`() {
@@ -135,11 +140,15 @@ class LicenseServiceTest {
             val block = arg<RealmResource.() -> Any>(0)
             realmResource.block()
         }
+        every { systemMessageService.setLicenseMessages(any()) } just Runs
+        every { groupService.setGlobalWriteAccessEnabled(any()) } just Runs
         sut.saveLicense(licenseString)
 
         verify { realmResource.update(any()) }
         verify { totalUnitsConfig.put("claim.value", "0") }
         verify { protocolMappersResource.update(protocolMapperId, totalUnits) }
+        verify { systemMessageService.setLicenseMessages(setOf()) }
+        verify { groupService.setGlobalWriteAccessEnabled(true) }
         assert(realmSlot.captured.attributes["veo-license"] == licenseString)
     }
 

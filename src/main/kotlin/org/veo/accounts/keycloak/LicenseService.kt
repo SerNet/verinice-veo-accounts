@@ -30,17 +30,36 @@ import org.veo.accounts.AdminController
 import org.veo.accounts.License
 import org.veo.accounts.exceptions.InvalidLicenseException
 import org.veo.accounts.exceptions.MissingLicenseException
+import org.veo.accounts.systemmessages.LicenseMessage
+import org.veo.accounts.systemmessages.MessageLevel
+import org.veo.accounts.systemmessages.SystemMessageService
 import java.security.cert.CertificateFactory
+import java.time.Duration
 import java.time.Instant
 import kotlin.collections.plus
 import kotlin.getValue
 
 private val log = logger {}
 
+private val LICENSE_INITIAL =
+    LicenseMessage(
+        "In Ihrem System ist keine Lizenz hinterlegt. Bitte kaufen Sie eine Lizenz.",
+        "There is no license available in your system. Please purchase a license.",
+        MessageLevel.URGENT,
+    )
+private val LICENSE_EXPIRED =
+    LicenseMessage(
+        "Ihre Lizenz ist abgelaufen. Bitte kaufen Sie eine neue Lizenz.",
+        "Your license is expired. Please purchase a new one.",
+        MessageLevel.URGENT,
+    )
+
 @Component
 class LicenseService(
     private val keycloakFacade: KeycloakFacade,
     private val objectMapper: ObjectMapper,
+    private val groupService: GroupService,
+    private val systemMessageService: SystemMessageService,
 ) {
     private val verifier by lazy {
         CertificateFactory
@@ -69,6 +88,7 @@ class LicenseService(
                 }
             }
         }
+        checkLicense(license)
     }
 
     fun findInstalledLicense(): License? =
@@ -108,5 +128,38 @@ class LicenseService(
         }
 
         return license
+    }
+
+    fun checkInstalledLicense() {
+        checkLicense(findInstalledLicense())
+    }
+
+    fun checkLicense(license: License?) {
+        if (license == null) {
+            systemMessageService.setLicenseMessages(setOf(LICENSE_INITIAL))
+            groupService.setGlobalWriteAccessEnabled(false)
+        } else {
+            val licenseValidRemainingDays = Duration.between(Instant.now(), license.validUntil).toDays()
+            if (licenseValidRemainingDays < 0) {
+                // license expired
+                systemMessageService.setLicenseMessages(setOf(LICENSE_EXPIRED))
+                groupService.setGlobalWriteAccessEnabled(false)
+            } else if (licenseValidRemainingDays < 7) {
+                // license expiring soon
+                systemMessageService.setLicenseMessages(
+                    setOf(
+                        LicenseMessage(
+                            "Ihre Lizenz läuft in $licenseValidRemainingDays Tagen ab. Bitte kaufen Sie bald eine neue Lizenz.",
+                            "Your license expires in $licenseValidRemainingDays days. Please purchase a new one soon.",
+                            MessageLevel.WARNING,
+                        ),
+                    ),
+                )
+                groupService.setGlobalWriteAccessEnabled(true)
+            } else {
+                systemMessageService.setLicenseMessages(setOf())
+                groupService.setGlobalWriteAccessEnabled(true)
+            }
+        }
     }
 }

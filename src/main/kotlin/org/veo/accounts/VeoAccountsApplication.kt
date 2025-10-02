@@ -31,8 +31,11 @@ import io.swagger.v3.oas.annotations.security.OAuthFlows
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.web.client.RestTemplate
 
 const val SECURITY_SCHEME_OAUTH = "OAuth2"
 const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
@@ -77,6 +80,7 @@ const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
                 ),
         ),
 )
+@EnableScheduling
 class VeoAccountsApplication {
     @Bean
     @Primary
@@ -84,6 +88,9 @@ class VeoAccountsApplication {
         ObjectMapper()
             .findAndRegisterModules()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+    @Bean
+    fun restTemplate(builder: RestTemplateBuilder): RestTemplate = builder.build()
 }
 
 fun main(args: Array<String>) {
