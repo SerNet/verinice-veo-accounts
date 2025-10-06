@@ -95,6 +95,7 @@ testing {
                         )
                         // Enable Origin header for CORS tests
                         systemProperty("sun.net.http.allowRestrictedHeaders", "true")
+                        systemProperty("user.language", "en")
                     }
                 }
             }
