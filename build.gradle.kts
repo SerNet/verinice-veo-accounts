@@ -55,7 +55,7 @@ testing {
         val test by getting(JvmTestSuite::class) {
             useJUnitJupiter()
             dependencies {
-                implementation("io.mockk:mockk:1.14.5")
+                implementation("io.mockk:mockk:1.14.6")
             }
         }
         register<JvmTestSuite>("restTest") {
