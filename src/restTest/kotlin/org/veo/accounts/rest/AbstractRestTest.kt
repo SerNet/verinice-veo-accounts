@@ -22,6 +22,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.extension.ExtendWith
 import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,6 +37,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait.forListeningPort
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
+import org.veo.accounts.GlobalTestRealmExtension
 import org.veo.accounts.Role
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
@@ -51,6 +53,7 @@ import kotlin.Int.Companion.MAX_VALUE
 
 @ActiveProfiles(value = ["resttest", "local"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
+@ExtendWith(GlobalTestRealmExtension::class)
 abstract class AbstractRestTest {
     private val createdVeoClients = mutableListOf<VeoClientId>()
 
