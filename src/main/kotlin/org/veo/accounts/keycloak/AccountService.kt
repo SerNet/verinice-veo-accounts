@@ -49,6 +49,7 @@ class AccountService(
     private val userSuperGroupName: String,
     private val facade: KeycloakFacade,
     private val groupService: GroupService,
+    private val licenseService: LicenseService,
     @Value("\${veo.accounts.keycloak.mailing.enabled}")
     private val mailingEnabled: Boolean,
     @Value("\${veo.accounts.keycloak.mailing.actionsRedirectUrl}")
@@ -85,6 +86,7 @@ class AccountService(
 
     fun createInitialAccount(dto: CreateInitialAccountDto): AccountId =
         facade.performSynchronized(dto.clientId) {
+            checkGlobalMaxUsersNotExhausted()
             groupService.getClientGroup(dto.clientId)
             if (findAccounts(dto.clientId).isNotEmpty()) {
                 throw ConflictException("Target client already contains accounts, cannot create initial account")
@@ -100,10 +102,12 @@ class AccountService(
         authAccount: AuthenticatedAccount,
     ): AccountId =
         facade.performSynchronized(authAccount) {
+            licenseService.getInstalledLicense()
             dto
                 .apply {
                     if (enabled.value) {
                         checkMaxUsersNotExhausted(authAccount)
+                        checkGlobalMaxUsersNotExhausted()
                     }
                 }.let { dtoToUser(it, authAccount) }
                 .also { log.info { "Creating new account ${it.username} in ${authAccount.veoClient}" } }
@@ -128,6 +132,7 @@ class AccountService(
             .apply {
                 if (!isEnabled && dto.enabled.value) {
                     checkMaxUsersNotExhausted(authAccount)
+                    checkGlobalMaxUsersNotExhausted()
                 }
             }.also { log.info { "Updating account ${it.username} in ${authAccount.veoClient}" } }
             .apply { update(dto) }
@@ -189,6 +194,17 @@ class AccountService(
                 throw ExceedingMaxUsersException(it)
             }
         }
+
+    private fun RealmResource.checkGlobalMaxUsersNotExhausted() {
+        val licensedMax = licenseService.getLicensedTotalUsers()
+        val currentlyEnabled =
+            users()
+                .search("", 0, Int.MAX_VALUE)
+                .count { it.isEnabled }
+        if (currentlyEnabled >= licensedMax) {
+            throw ExceedingMaxUsersException(licensedMax)
+        }
+    }
 
     private fun getMaxUsers(authAccount: AuthenticatedAccount): Int =
         groupService

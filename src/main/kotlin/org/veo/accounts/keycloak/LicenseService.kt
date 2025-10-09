@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component
 import org.veo.accounts.AdminController
 import org.veo.accounts.License
 import org.veo.accounts.exceptions.InvalidLicenseException
+import org.veo.accounts.exceptions.MissingLicenseException
 import java.security.cert.CertificateFactory
 import java.time.Instant
 import kotlin.collections.plus
@@ -69,6 +70,16 @@ class LicenseService(
             }
         }
     }
+
+    fun findInstalledLicense(): License? =
+        keycloakFacade.perform {
+            val licenseString = toRepresentation().attributes["veo-license"]
+            if (licenseString == null) null else parseLicense(licenseString)
+        }
+
+    fun getInstalledLicense(): License = findInstalledLicense() ?: throw MissingLicenseException()
+
+    fun getLicensedTotalUsers(): Int = getInstalledLicense().totalUsers.toInt()
 
     private fun parseLicense(licenseString: String): License {
         val signers: Collection<SignerInformation>
