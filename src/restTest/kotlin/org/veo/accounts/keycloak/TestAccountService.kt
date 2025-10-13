@@ -23,7 +23,6 @@ import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.veo.accounts.Role
@@ -32,10 +31,7 @@ import java.util.UUID.randomUUID
 
 @Component
 @Profile("resttest")
-class TestAccountService(
-    @Value("\${veo.resttest.clientId}")
-    private val clientId: String,
-) {
+class TestAccountService {
     @Autowired
     private lateinit var facade: KeycloakFacade
 
@@ -113,11 +109,14 @@ class TestAccountService(
     private fun RealmResource.assignRoles(
         accountId: String,
         roles: List<Role>,
-    ) = users()
-        .get(accountId)
-        .roles()
-        .clientLevel(clientId)
-        .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }
+    ) {
+        val clientUuid = clients().findAll().find { it.clientId == "veo-accounts" }!!.id
+        users()
+            .get(accountId)
+            .roles()
+            .clientLevel(clientUuid)
+            .apply { add(listAvailable().filter { roles.map(Role::roleName).contains(it.name) }) }
+    }
 
     fun getAccountGroups(accountId: String): List<String> =
         facade.perform {

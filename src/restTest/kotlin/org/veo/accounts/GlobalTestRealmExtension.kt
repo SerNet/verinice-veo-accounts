@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace
 import org.junit.jupiter.api.extension.ExtensionContext.Store
 import org.keycloak.OAuth2Constants
+import org.keycloak.admin.client.JacksonProvider
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.idm.ClientRepresentation
@@ -97,7 +98,9 @@ class GlobalTestRealmExtension : BeforeAllCallback {
                     "veo.accounts.keycloak.realm",
                     "rest-test-${UUID.randomUUID().toString().take(8)}",
                 )
-
+        if (!testRealmName.startsWith("rest-test")) {
+            throw IllegalStateException("Test realm name must start with 'rest-test'")
+        }
         val masterServerUrl =
             System.getenv("VEO_ACCOUNTS_KEYCLOAK_SERVERURL")
                 ?: System.getProperty("veo.accounts.keycloak.serverUrl", "https://auth.staging.verinice.com/auth/")
@@ -126,6 +129,13 @@ class GlobalTestRealmExtension : BeforeAllCallback {
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .resteasyClient(buildClient())
                 .build()
+
+        val maxRealms = 50
+        val currentRealmCount = keycloakAdminMaster.realms().findAll().size
+        if (currentRealmCount > maxRealms) {
+            keycloakAdminMaster.close()
+            throw IllegalStateException("Too many realms found in Keycloak instance ($currentRealmCount > $maxRealms)")
+        }
 
         val keycloakAdminSource =
             KeycloakBuilder
@@ -174,21 +184,11 @@ class GlobalTestRealmExtension : BeforeAllCallback {
                     .resteasyClient(buildClient())
                     .build()
 
-            val createdClientId =
-                keycloakAdminTestRealm
-                    .realm(testRealmName)
-                    .clients()
-                    .findAll()
-                    .find { it.clientId == "veo-accounts" }
-                    ?.id
-                    ?: throw IllegalStateException("Client 'veo-accounts' not found in realm $testRealmName")
-
             createTestLicense(keycloakAdminTestRealm, testRealmName)
 
             System.getProperties().putAll(
                 mapOf(
                     "veo.accounts.keycloak.realm" to testRealmName,
-                    "veo.resttest.clientId" to createdClientId,
                 ),
             )
         } catch (e: Exception) {
@@ -201,7 +201,7 @@ class GlobalTestRealmExtension : BeforeAllCallback {
     }
 
     private fun safeDeleteRealm(realmName: String) {
-        if (realmName == "verinice-veo" || !Regex("^rest-test-[0-9]+$").matches(realmName)) {
+        if (!realmName.startsWith("rest-test")) {
             log.warn { "⚠️ Skipping deletion of protected or invalid realm: $realmName" }
             return
         }
@@ -224,7 +224,15 @@ class GlobalTestRealmExtension : BeforeAllCallback {
             .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
             .resteasyClient(buildClient())
             .build()
-            .use { it.realm(realmName).remove() }
+            .use {
+                try {
+                    it.realm(realmName).remove()
+                    log.info { "✅ Realm $realmName deleted successfully" }
+                } catch (e: Exception) {
+                    log.error(e) { "❌ Failed to delete realm: $realmName" }
+                    throw e
+                }
+            }
     }
 
     private fun cleanupTestRealms() =
@@ -260,6 +268,7 @@ class GlobalTestRealmExtension : BeforeAllCallback {
 
         return (ClientBuilder.newBuilder() as ResteasyClientBuilder)
             .apply { proxyHost?.let { defaultProxy(it, proxyPort, "http") } }
+            .register(JacksonProvider::class.java, 100)
             .build()
     }
 
