@@ -288,4 +288,6 @@ class AccountService(
             groups = users().get(id.toString()).groups().map { it.name }
         }
     }
+
+    fun getNumberOfUsers() = facade.perform { users().count() }
 }

@@ -36,17 +36,20 @@ import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.ClientScopeRepresentation
 import org.keycloak.representations.idm.ProtocolMapperRepresentation
 import org.keycloak.representations.idm.RealmRepresentation
+import org.veo.accounts.License
 import org.veo.accounts.exceptions.InvalidLicenseException
+import org.veo.accounts.systemmessages.LicenseMessage
+import org.veo.accounts.systemmessages.MessageLevel
 import org.veo.accounts.systemmessages.VeoApiService
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 private val om = jacksonObjectMapper().registerModule(JavaTimeModule())
 
 class LicenseServiceTest {
     private val facade = mockk<KeycloakFacade>()
-    private val groupService = mockk<GroupService>()
-    private val veoApiService = mockk<VeoApiService>()
-
-    private val sut = LicenseService(facade, om, groupService, veoApiService)
+    private val licenseVerifier = mockk<LicenseVerifier>()
+    private val sut = LicenseService(facade, om, licenseVerifier)
 
     @Test
     fun `license can be saved`() {
@@ -138,15 +141,14 @@ class LicenseServiceTest {
             val block = arg<RealmResource.() -> Any>(0)
             realmResource.block()
         }
-        every { veoApiService.setLicenseMessages(any()) } just Runs
-        every { groupService.setGlobalWriteAccessEnabled(any()) } just Runs
+        every { licenseVerifier.checkLicense(License("1234", 0, 0, 0, Instant.parse("3000-01-01T00:00:00Z"))) } just Runs
+
         sut.saveLicense(licenseString)
 
         verify { realmResource.update(any()) }
         verify { totalUnitsConfig.put("claim.value", "0") }
         verify { protocolMappersResource.update(protocolMapperId, totalUnits) }
-        verify { veoApiService.setLicenseMessages(setOf()) }
-        verify { groupService.setGlobalWriteAccessEnabled(true) }
+        verify { licenseVerifier.checkLicense(License("1234", 0, 0, 0, Instant.parse("3000-01-01T00:00:00Z"))) }
         assert(realmSlot.captured.attributes["veo-license"] == licenseString)
     }
 

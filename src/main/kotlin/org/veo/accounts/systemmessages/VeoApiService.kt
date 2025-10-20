@@ -29,7 +29,9 @@ class VeoApiService(
     @Value("\${veo.accounts.veo.apiurl}")
     private val veoApiUrl: String,
     @Value("\${veo.accounts.veo.systemMessagesApiKey}")
-    private val apiKey: String,
+    private val apiKeySystemMessages: String,
+    @Value("\${veo.accounts.veo.unitCountApiKey}")
+    private val apiKeyUnitCount: String,
     private val restTemplate: RestTemplate,
 ) {
     fun setLicenseMessages(messages: Set<LicenseMessage>) {
@@ -72,10 +74,25 @@ class VeoApiService(
         )
     }
 
+    fun getNumberOfUnits() =
+        restTemplate
+            .exchange(
+                "$veoApiUrl/admin/unit-count",
+                HttpMethod.GET,
+                HttpEntity<Unit>(
+                    object : HttpHeaders() {
+                        init {
+                            set("x-api-key", apiKeyUnitCount)
+                        }
+                    },
+                ),
+                Long::class.java,
+            ).body!!
+
     fun createHeaders(): HttpHeaders =
         object : HttpHeaders() {
             init {
-                set("x-api-key", apiKey)
+                set("x-api-key", apiKeySystemMessages)
             }
         }
 }

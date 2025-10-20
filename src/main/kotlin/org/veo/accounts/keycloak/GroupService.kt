@@ -30,7 +30,9 @@ import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
 import kotlin.getValue
 
+const val CLIENT_GROUP_PREFIX = "veo_client:"
 private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
+
 private val log = logger {}
 
 @Component
@@ -266,4 +268,6 @@ class GroupService(
             }
         }
     }
+
+    fun getNumberOfClients(): Long = facade.perform { groups().count(CLIENT_GROUP_PREFIX)["count"]!! }
 }

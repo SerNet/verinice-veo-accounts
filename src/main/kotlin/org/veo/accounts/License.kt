@@ -21,8 +21,8 @@ import java.time.Instant
 
 data class License(
     val customerNo: String,
-    val totalClients: Integer,
-    val totalUnits: Integer,
-    val totalUsers: Integer,
+    val totalClients: Int,
+    val totalUnits: Int,
+    val totalUsers: Int,
     val validUntil: Instant,
 )

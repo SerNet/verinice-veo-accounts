@@ -50,7 +50,8 @@ import java.util.Locale
  */
 class VeoApiServiceTest {
     private val apiUrl = "http://api.veo.example/veo"
-    private val apiKey = "secret"
+    private val apiKeySystemMessages = "secret"
+    private val apiKeyUnitCount = "private"
 
     private val restTemplate =
         mockk<RestTemplate> {
@@ -68,7 +69,7 @@ class VeoApiServiceTest {
             } returns ResponseEntity(HttpStatus.CREATED)
         }
 
-    private val sut = spyk(VeoApiService(apiUrl, apiKey, restTemplate))
+    private val sut = spyk(VeoApiService(apiUrl, apiKeySystemMessages, apiKeyUnitCount, restTemplate))
 
     @Test
     fun `can add license messages`() {
@@ -89,7 +90,7 @@ class VeoApiServiceTest {
                         setOf("license"),
                         MessageLevel.INFO,
                     ),
-                    HttpHeaders().also { it.set("x-api-key", apiKey) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
                 ),
                 Void::class.java,
             )
@@ -120,7 +121,7 @@ class VeoApiServiceTest {
                 "$apiUrl/admin/messages/1",
                 HttpMethod.DELETE,
                 HttpEntity<Unit>(
-                    HttpHeaders().also { it.set("x-api-key", apiKey) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
                 ),
                 Void::class.java,
             )
@@ -135,7 +136,7 @@ class VeoApiServiceTest {
                         setOf("license"),
                         MessageLevel.INFO,
                     ),
-                    HttpHeaders().also { it.set("x-api-key", apiKey) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
                 ),
                 Void::class.java,
             )

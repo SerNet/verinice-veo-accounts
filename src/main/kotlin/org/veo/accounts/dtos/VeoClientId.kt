@@ -19,10 +19,10 @@ package org.veo.accounts.dtos
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
+import org.veo.accounts.keycloak.CLIENT_GROUP_PREFIX
 import java.util.UUID
 
 private const val UUID_PATTERN = """[a-fA-F\d]{8}(?:-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}"""
-private const val CLIENT_GROUP_PREFIX = "veo_client:"
 private val CLIENT_GROUP_PATH_REGEX = Regex("^/$CLIENT_GROUP_PREFIX($UUID_PATTERN)$")
 
 /**

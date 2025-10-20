@@ -19,13 +19,15 @@ package org.veo.accounts
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.veo.accounts.keycloak.LicenseService
+import org.veo.accounts.keycloak.LicenseVerifier
 
 @Component
 class LicenseVerificationJob(
+    private val licenseVerifier: LicenseVerifier,
     private val licenseService: LicenseService,
 ) {
     @Scheduled(fixedRateString = "1h")
     fun checkLicense() {
-        licenseService.checkInstalledLicense()
+        licenseVerifier.checkLicense(licenseService.findInstalledLicense())
     }
 }
