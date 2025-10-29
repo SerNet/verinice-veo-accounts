@@ -23,6 +23,7 @@ import jakarta.ws.rs.core.Response
 import mu.KotlinLogging.logger
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS
+import org.keycloak.admin.client.JacksonProvider
 import org.keycloak.admin.client.KeycloakBuilder.builder
 import org.keycloak.admin.client.resource.RealmResource
 import org.springframework.beans.factory.annotation.Value
@@ -109,8 +110,10 @@ class KeycloakFacade(
 
     private fun buildClient(): Client =
         (ClientBuilder.newBuilder() as ResteasyClientBuilder)
-            .apply { proxyHost?.let { defaultProxy(it, proxyPort, "http") } }
-            .build()
+            .apply {
+                proxyHost?.let { defaultProxy(it, proxyPort, "http") }
+                register(JacksonProvider::class.java, 100)
+            }.build()
 
     /**
      * Exception type for unexpected things that went wrong when talking to keycloak. This is used so no details
