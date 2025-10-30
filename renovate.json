@@ -38,6 +38,12 @@
       "matchPackageNames": [
         "/^com.diffplug.spotless/"
       ]
+    },
+    {
+      "matchPackageNames": [
+        "eclipse-temurin"
+      ],
+      "allowedVersions": "25-jdk"
     }
   ]
 }
