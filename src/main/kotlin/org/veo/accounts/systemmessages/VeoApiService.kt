@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class VeoApiService(
-    @Value("\${veo.accounts.veo.apiurl}")
+    @Value($$"#{'${veo.accounts.veo.apiurl}'.replaceAll('/$', '')}")
     private val veoApiUrl: String,
     @Value("\${veo.accounts.veo.systemMessagesApiKey}")
     private val apiKeySystemMessages: String,
