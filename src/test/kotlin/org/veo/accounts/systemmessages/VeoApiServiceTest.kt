@@ -48,7 +48,7 @@ import java.util.Locale
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-class SystemMessageServiceTest {
+class VeoApiServiceTest {
     private val apiUrl = "http://api.veo.example/veo"
     private val apiKey = "secret"
 
@@ -68,7 +68,7 @@ class SystemMessageServiceTest {
             } returns ResponseEntity(HttpStatus.CREATED)
         }
 
-    private val sut = spyk(SystemMessageService(apiUrl, apiKey, restTemplate))
+    private val sut = spyk(VeoApiService(apiUrl, apiKey, restTemplate))
 
     @Test
     fun `can add license messages`() {

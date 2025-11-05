@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
 @Service
-class SystemMessageService(
+class VeoApiService(
     @Value("\${veo.accounts.veo.apiurl}")
     private val veoApiUrl: String,
     @Value("\${veo.accounts.veo.systemMessagesApiKey}")

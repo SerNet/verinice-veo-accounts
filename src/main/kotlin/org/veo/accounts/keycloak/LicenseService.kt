@@ -32,7 +32,7 @@ import org.veo.accounts.exceptions.InvalidLicenseException
 import org.veo.accounts.exceptions.MissingLicenseException
 import org.veo.accounts.systemmessages.LicenseMessage
 import org.veo.accounts.systemmessages.MessageLevel
-import org.veo.accounts.systemmessages.SystemMessageService
+import org.veo.accounts.systemmessages.VeoApiService
 import java.security.cert.CertificateFactory
 import java.time.Duration
 import java.time.Instant
@@ -59,7 +59,7 @@ class LicenseService(
     private val keycloakFacade: KeycloakFacade,
     private val objectMapper: ObjectMapper,
     private val groupService: GroupService,
-    private val systemMessageService: SystemMessageService,
+    private val veoApiService: VeoApiService,
 ) {
     private val verifier by lazy {
         CertificateFactory
@@ -136,17 +136,17 @@ class LicenseService(
 
     fun checkLicense(license: License?) {
         if (license == null) {
-            systemMessageService.setLicenseMessages(setOf(LICENSE_INITIAL))
+            veoApiService.setLicenseMessages(setOf(LICENSE_INITIAL))
             groupService.setGlobalWriteAccessEnabled(false)
         } else {
             val licenseValidRemainingDays = Duration.between(Instant.now(), license.validUntil).toDays()
             if (licenseValidRemainingDays < 0) {
                 // license expired
-                systemMessageService.setLicenseMessages(setOf(LICENSE_EXPIRED))
+                veoApiService.setLicenseMessages(setOf(LICENSE_EXPIRED))
                 groupService.setGlobalWriteAccessEnabled(false)
             } else if (licenseValidRemainingDays < 7) {
                 // license expiring soon
-                systemMessageService.setLicenseMessages(
+                veoApiService.setLicenseMessages(
                     setOf(
                         LicenseMessage(
                             "Ihre Lizenz läuft in $licenseValidRemainingDays Tagen ab. Bitte kaufen Sie bald eine neue Lizenz.",
@@ -157,7 +157,7 @@ class LicenseService(
                 )
                 groupService.setGlobalWriteAccessEnabled(true)
             } else {
-                systemMessageService.setLicenseMessages(setOf())
+                veoApiService.setLicenseMessages(setOf())
                 groupService.setGlobalWriteAccessEnabled(true)
             }
         }
