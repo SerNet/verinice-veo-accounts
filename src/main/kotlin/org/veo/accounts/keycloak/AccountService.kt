@@ -197,11 +197,7 @@ class AccountService(
 
     private fun RealmResource.checkGlobalMaxUsersNotExhausted() {
         val licensedMax = licenseService.getLicensedTotalUsers()
-        val currentlyEnabled =
-            users()
-                .search("", 0, Int.MAX_VALUE)
-                .count { it.isEnabled }
-        if (currentlyEnabled >= licensedMax) {
+        if (countEnabledUsers() >= licensedMax) {
             throw ExceedingMaxUsersException(licensedMax)
         }
     }
@@ -289,5 +285,10 @@ class AccountService(
         }
     }
 
-    fun getNumberOfUsers() = facade.perform { users().count() }
+    fun countEnabledUsers() =
+        facade.perform {
+            users()
+                .search("", 0, Int.MAX_VALUE)
+                .count { it.isEnabled }
+        }
 }

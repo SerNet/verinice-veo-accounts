@@ -52,7 +52,7 @@ class LicenseVerifier(
             var writeAccess = true
             val messages = HashSet<LicenseMessage>()
             val numberOfClients = groupService.getNumberOfClients()
-            val numberOfUsers = accountService.getNumberOfUsers()
+            val numberOfUsers = accountService.countEnabledUsers()
             val numberOfUnits = veoApiService.getNumberOfUnits()
 
             if (numberOfClients > license.totalClients) {
