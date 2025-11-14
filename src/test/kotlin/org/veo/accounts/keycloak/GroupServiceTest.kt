@@ -27,7 +27,12 @@ import org.junit.jupiter.api.Test
 import org.keycloak.admin.client.resource.GroupResource
 import org.keycloak.admin.client.resource.GroupsResource
 import org.keycloak.admin.client.resource.RealmResource
+import org.keycloak.admin.client.resource.RoleMappingResource
+import org.keycloak.admin.client.resource.RoleResource
+import org.keycloak.admin.client.resource.RoleScopeResource
+import org.keycloak.admin.client.resource.RolesResource
 import org.keycloak.representations.idm.GroupRepresentation
+import org.keycloak.representations.idm.RoleRepresentation
 import org.veo.accounts.AssignableGroup
 import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.UnitId
@@ -112,18 +117,33 @@ class GroupServiceTest {
                 every { realmRoles = any() } just Runs
             }
 
-        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
+        val veoWrite = mockk<RoleRepresentation>()
 
-        val groupResource =
-            mockk<GroupResource> {
-                every { update(any()) } just Runs
+        val roleScopeResource =
+            mockk<RoleScopeResource> {
+                every { remove(listOf(veoWrite)) } just Runs
             }
+
+        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
 
         val realmResource =
             mockk<RealmResource> {
                 every { groups() } returns
                     mockk<GroupsResource> {
-                        every { group(veoWriteAccessId) } returns groupResource
+                        every { group(veoWriteAccessId) } returns
+                            mockk<GroupResource> {
+                                every { roles() } returns
+                                    mockk<RoleMappingResource> {
+                                        every { realmLevel() } returns roleScopeResource
+                                    }
+                            }
+                    }
+                every { roles() } returns
+                    mockk<RolesResource> mock@{
+                        every { this@mock.get("veo-write") } returns
+                            mockk<RoleResource> {
+                                every { toRepresentation() } returns veoWrite
+                            }
                     }
             }
         every { facade.perform<Unit>(any()) } answers {
@@ -134,8 +154,7 @@ class GroupServiceTest {
         sut.setGlobalWriteAccessEnabled(false)
 
         verify {
-            veoWriteAccess.realmRoles = listOf()
-            groupResource.update(veoWriteAccess)
+            roleScopeResource.remove(listOf(veoWrite))
         }
     }
 
@@ -151,20 +170,39 @@ class GroupServiceTest {
                 every { realmRoles = any() } just Runs
             }
 
-        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
+        val veoWrite = mockk<RoleRepresentation>()
 
-        val groupResource =
-            mockk<GroupResource> {
-                every { update(any()) } just Runs
+        val roleScopeResource =
+            mockk<RoleScopeResource> {
+                every { add(listOf(veoWrite)) } just Runs
             }
+
+        every { sut.getAssignableGroup(AssignableGroup.VEO_WRITE_ACCESS) } returns veoWriteAccess
 
         val realmResource =
             mockk<RealmResource> {
                 every { groups() } returns
                     mockk<GroupsResource> {
-                        every { group(veoWriteAccessId) } returns groupResource
+                        every { group(veoWriteAccessId) } returns
+                            mockk<GroupResource> {
+                                every<RoleMappingResource> { roles() } returns
+                                    mockk<RoleMappingResource> {
+                                        every<RoleScopeResource> { realmLevel() } returns roleScopeResource
+                                    }
+                            }
+                    }
+                every { roles() } returns
+                    mockk<RolesResource> {
+                        every { roles() } returns
+                            mockk<RolesResource> mock@{
+                                every { this@mock.get("veo-write") } returns
+                                    mockk<RoleResource> {
+                                        every { toRepresentation() } returns veoWrite
+                                    }
+                            }
                     }
             }
+
         every { facade.perform<Unit>(any()) } answers {
             val block = arg<RealmResource.() -> Any>(0)
             realmResource.block()
@@ -173,8 +211,7 @@ class GroupServiceTest {
         sut.setGlobalWriteAccessEnabled(true)
 
         verify {
-            veoWriteAccess.realmRoles = listOf("veo-write")
-            groupResource.update(veoWriteAccess)
+            roleScopeResource.add(listOf(veoWrite))
         }
     }
 }

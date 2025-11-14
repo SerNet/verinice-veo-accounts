@@ -18,7 +18,9 @@
 package org.veo.accounts.keycloak
 
 import mu.KotlinLogging.logger
+import org.keycloak.admin.client.resource.RoleScopeResource
 import org.keycloak.representations.idm.GroupRepresentation
+import org.keycloak.representations.idm.RoleRepresentation
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup
@@ -28,7 +30,6 @@ import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
-import kotlin.getValue
 
 const val CLIENT_GROUP_PREFIX = "veo_client:"
 private const val ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED = "veo-accounts.deactivated"
@@ -261,9 +262,14 @@ class GroupService(
             val existingRoles = group.realmRoles.orEmpty()
             val hasRole = roleName in existingRoles
             if (flag != hasRole) {
-                group.realmRoles = if (flag) existingRoles + roleName else existingRoles - roleName
                 facade.perform {
-                    groups().group(group.id).update(group)
+                    val role = roles().get(roleName).toRepresentation()
+                    val roleScopeResource = groups().group(group.id).roles().realmLevel()
+                    if (flag) {
+                        roleScopeResource.add(listOf(role))
+                    } else {
+                        roleScopeResource.remove(listOf(role))
+                    }
                 }
             }
         }
