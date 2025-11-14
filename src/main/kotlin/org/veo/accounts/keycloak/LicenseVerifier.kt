@@ -17,6 +17,8 @@
  */
 package org.veo.accounts.keycloak
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.License
 import org.veo.accounts.systemmessages.LicenseMessage
@@ -37,14 +39,29 @@ private val LICENSE_EXPIRED =
         "Your license is expired. Please purchase a new one.",
         MessageLevel.URGENT,
     )
+private val DEVELOPER_MODE =
+    LicenseMessage(
+        "Das System läuft im Entwicklermodus, der Betrieb ist nicht sicher. Für den produktiven Einsatz wechseln Sie bitte in den normalen Betriebsmodus.",
+        "The system is running in developer mode, operation is not secure. For productive use, please switch to normal operating mode.",
+        MessageLevel.URGENT,
+    )
 
 @Component
 class LicenseVerifier(
     private val groupService: GroupService,
     private val veoApiService: VeoApiService,
     private val accountService: AccountService,
+    @Value("\${veo.accounts.developer.mode.enabled}")
+    private val isDeveloperMode: Boolean
 ) {
     fun checkLicense(license: License?) {
+        if (isDeveloperMode) {
+            // License verification is disabled for testing purposes
+            veoApiService.setLicenseMessages(setOf(DEVELOPER_MODE))
+            groupService.setGlobalWriteAccessEnabled(true)
+            return
+        }
+
         if (license == null) {
             veoApiService.setLicenseMessages(setOf(LICENSE_INITIAL))
             groupService.setGlobalWriteAccessEnabled(false)
