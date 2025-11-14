@@ -34,7 +34,7 @@ class LicenseVerifierTest {
     private val groupService = mockk<GroupService>()
     private val veoApiService = mockk<VeoApiService>()
     private val accountService = mockk<AccountService>()
-    private val sut = LicenseVerifier(groupService, veoApiService, accountService)
+    private val sut = LicenseVerifier(groupService, veoApiService, accountService, false)
 
     @Test
     fun `write access is removed if no license is present`() {
@@ -195,6 +195,28 @@ class LicenseVerifierTest {
                     LicenseMessage(
                         "Ihre Lizenz ist auf 0 Clients beschränkt, es wurden aber 1 angelegt.",
                         "Your license is restricted to 0 clients, but 1 were created.",
+                        MessageLevel.URGENT,
+                    ),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `write access is granted and warning shown when license verification is disabled`() {
+        val verifier = LicenseVerifier(groupService, veoApiService, accountService, true)
+        every { groupService.setGlobalWriteAccessEnabled(true) } just Runs
+        every { veoApiService.setLicenseMessages(any()) } just Runs
+
+        verifier.checkLicense(null)
+
+        verify {
+            groupService.setGlobalWriteAccessEnabled(true)
+            veoApiService.setLicenseMessages(
+                setOf(
+                    LicenseMessage(
+                        "Das System läuft im Entwicklermodus, der Betrieb ist nicht sicher. Für den produktiven Einsatz wechseln Sie bitte in den normalen Betriebsmodus.",
+                        "The system is running in developer mode, operation is not secure. For productive use, please switch to normal operating mode.",
                         MessageLevel.URGENT,
                     ),
                 ),
