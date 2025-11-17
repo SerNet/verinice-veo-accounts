@@ -21,6 +21,7 @@ import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RoleScopeResource
 import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.RoleRepresentation
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.veo.accounts.AssignableGroup
@@ -28,6 +29,7 @@ import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.UnitAccessRights
 import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
+import org.veo.accounts.exceptions.ExceedingMaxClientsException
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
 
@@ -39,6 +41,9 @@ private val log = logger {}
 @Component
 class GroupService(
     private val facade: KeycloakFacade,
+    private val licenseService: LicenseService,
+    @Value("\${veo.accounts.developer.mode.enabled}")
+    private val isDeveloperMode: Boolean,
 ) {
     fun findAccessGroups(client: VeoClientId): List<GroupRepresentation> =
         facade.perform {
@@ -127,6 +132,8 @@ class GroupService(
         maxUnits: Int,
         maxUsers: Int,
     ) = facade.performSynchronized(client) {
+        validateClientLimit()
+
         log.info("Creating veo client group ${client.groupName}")
         GroupRepresentation()
             .apply {
@@ -220,6 +227,24 @@ class GroupService(
                 }
                 remove()
             }
+        }
+
+    private fun validateClientLimit() {
+        if (isDeveloperMode) return
+        val clientsMax = licenseService.getLicensedTotalClients()
+        val currentClientCount = getNumberOfActiveClients()
+        if (currentClientCount >= clientsMax) {
+            throw ExceedingMaxClientsException(clientsMax)
+        }
+    }
+
+    fun getNumberOfActiveClients(): Int =
+        facade.perform {
+            groups()
+                .groups(CLIENT_GROUP_PREFIX, 0, Int.MAX_VALUE, false)
+                .count { group ->
+                    group.attributes?.get(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED)?.firstOrNull() != "true"
+                }
         }
 
     private fun getGroup(groupName: String) = findGroup(groupName, true) ?: throw IllegalStateException("Group '$groupName' not found")

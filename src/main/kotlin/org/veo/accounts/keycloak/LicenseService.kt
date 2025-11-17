@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import org.veo.accounts.AdminController
 import org.veo.accounts.License
+import org.veo.accounts.exceptions.ExceedingMaxClientsException
 import org.veo.accounts.exceptions.InvalidLicenseException
 import org.veo.accounts.exceptions.MissingLicenseException
 import java.security.cert.CertificateFactory
@@ -83,6 +84,8 @@ class LicenseService(
     fun getInstalledLicense(): License = findInstalledLicense() ?: throw MissingLicenseException()
 
     fun getLicensedTotalUsers(): Int = getInstalledLicense().totalUsers.toInt()
+
+    fun getLicensedTotalClients(): Int = getInstalledLicense().totalClients.toInt()
 
     private fun parseLicense(licenseString: String): License {
         val signers: Collection<SignerInformation>

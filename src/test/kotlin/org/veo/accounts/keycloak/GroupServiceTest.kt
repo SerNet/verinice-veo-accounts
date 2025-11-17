@@ -41,8 +41,9 @@ import java.util.UUID
 
 class GroupServiceTest {
     private val facade = mockk<KeycloakFacade>()
+    private val licenseService = mockk<LicenseService>()
 
-    private val sut = spyk(GroupService(facade))
+    private val sut = spyk(GroupService(facade, licenseService, false))
 
     @Test
     fun `removes unit from access groups`() {
