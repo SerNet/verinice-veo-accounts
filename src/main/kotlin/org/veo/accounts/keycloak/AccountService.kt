@@ -56,6 +56,8 @@ class AccountService(
     private val mailActionsRedirectUrl: String,
     @Value("\${veo.accounts.keycloak.clients.auth.name}")
     private val userAuthKeycloakClient: String,
+    @Value("\${veo.accounts.developer.mode.enabled}")
+    private val isDeveloperMode: Boolean,
 ) {
     fun findAllAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
         facade.perform {
@@ -102,7 +104,6 @@ class AccountService(
         authAccount: AuthenticatedAccount,
     ): AccountId =
         facade.performSynchronized(authAccount) {
-            licenseService.getInstalledLicense()
             dto
                 .apply {
                     if (enabled.value) {
@@ -196,6 +197,7 @@ class AccountService(
         }
 
     private fun RealmResource.checkGlobalMaxUsersNotExhausted() {
+        if (isDeveloperMode) return
         val licensedMax = licenseService.getLicensedTotalUsers()
         if (countEnabledUsers() >= licensedMax) {
             throw ExceedingMaxUsersException(licensedMax)

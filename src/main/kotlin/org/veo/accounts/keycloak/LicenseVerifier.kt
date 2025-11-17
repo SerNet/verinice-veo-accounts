@@ -17,8 +17,8 @@
  */
 package org.veo.accounts.keycloak
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
 import org.veo.accounts.License
 import org.veo.accounts.systemmessages.LicenseMessage
@@ -52,7 +52,7 @@ class LicenseVerifier(
     private val veoApiService: VeoApiService,
     private val accountService: AccountService,
     @Value("\${veo.accounts.developer.mode.enabled}")
-    private val isDeveloperMode: Boolean
+    private val isDeveloperMode: Boolean,
 ) {
     fun checkLicense(license: License?) {
         if (isDeveloperMode) {
