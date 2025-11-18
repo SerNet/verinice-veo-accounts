@@ -180,6 +180,7 @@ http_rest_tests:
     VEO_ACCOUNTS_RABBITMQ_ROUTING_KEY_PREFIX: VEO_TEST_PIPELINE_${CI_PIPELINE_ID}.
     VEO_ACCOUNTS_RABBITMQ_QUEUE_AUTODELETE: 'true'
     VEO_ACCOUNTS_AUTH_APIKEYS_CLIENTINIT: $CLIENT_INIT_API_KEY
+    VEO_ACCOUNTS_DEVELOPER_MODE_ENABLED: 'true'
   script:
     - ./gradlew -i -Dhttp.nonProxyHosts="localhost|veo-accounts" -PciBuildNumber=$CI_PIPELINE_ID -PciJobName=$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME restTest
   interruptible: true
