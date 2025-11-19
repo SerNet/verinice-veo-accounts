@@ -27,9 +27,12 @@ import org.veo.accounts.dtos.FirstName
 import org.veo.accounts.dtos.Language
 import org.veo.accounts.dtos.LastName
 import org.veo.accounts.dtos.Username
+import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.dtos.request.CreateAccountDto
+import org.veo.accounts.dtos.request.CreateInitialAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.FullAccountDto
+import java.util.UUID
 import java.util.UUID.randomUUID
 
 fun fullAccountDto(
@@ -72,6 +75,22 @@ fun createAccountDto(
     AssignableGroupSet(groups),
     AccessGroupSurrogateIdSet(accessGroups),
     Enabled(enabled),
+)
+
+fun createInitialAccountDto(
+    veoClientId: VeoClientId = VeoClientId(UUID.randomUUID()),
+    emailAddress: String = "katie@test.test",
+    username: String = "ksmith",
+    firstName: String = "Katie",
+    lastName: String = "Smith",
+    language: String? = "en",
+) = CreateInitialAccountDto(
+    veoClientId,
+    Username(username),
+    EmailAddress(emailAddress),
+    FirstName(firstName),
+    LastName(lastName),
+    language?.let { Language(it) },
 )
 
 fun updateAccountDto(

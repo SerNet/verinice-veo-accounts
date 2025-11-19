@@ -107,8 +107,8 @@ class AccountService(
             dto
                 .apply {
                     if (enabled.value) {
-                        checkMaxUsersNotExhausted(authAccount)
                         checkGlobalMaxUsersNotExhausted()
+                        checkMaxUsersNotExhausted(authAccount)
                     }
                 }.let { dtoToUser(it, authAccount) }
                 .also { log.info { "Creating new account ${it.username} in ${authAccount.veoClient}" } }
