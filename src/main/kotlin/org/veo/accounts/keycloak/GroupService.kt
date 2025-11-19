@@ -299,6 +299,4 @@ class GroupService(
             }
         }
     }
-
-    fun getNumberOfClients(): Long = facade.perform { groups().count(CLIENT_GROUP_PREFIX)["count"]!! }
 }

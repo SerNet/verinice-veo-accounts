@@ -39,7 +39,7 @@ class LicenseVerifierTest {
     @Test
     fun `write access is removed if no license is present`() {
         every { accountService.countEnabledUsers() } returns 1
-        every { groupService.getNumberOfClients() } returns 1
+        every { groupService.getNumberOfActiveClients() } returns 1
         every { groupService.setGlobalWriteAccessEnabled(false) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 1
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -64,7 +64,7 @@ class LicenseVerifierTest {
     fun `write access is granted if client, units, and users stay within license boundaries`() {
         val license = License("1", 1, 1, 1, Instant.parse("3000-01-01T00:00:00Z"))
         every { accountService.countEnabledUsers() } returns 1
-        every { groupService.getNumberOfClients() } returns 1
+        every { groupService.getNumberOfActiveClients() } returns 1
         every { groupService.setGlobalWriteAccessEnabled(true) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 1
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -81,7 +81,7 @@ class LicenseVerifierTest {
     fun `write access is removed if license expires soon`() {
         val license = License("1", 1, 1, 1, Instant.now().plus(3, ChronoUnit.DAYS))
         every { accountService.countEnabledUsers() } returns 0
-        every { groupService.getNumberOfClients() } returns 0
+        every { groupService.getNumberOfActiveClients() } returns 0
         every { groupService.setGlobalWriteAccessEnabled(true) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 0
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -106,7 +106,7 @@ class LicenseVerifierTest {
     fun `write access is removed if license is expired`() {
         val license = License("1", 1, 1, 1, Instant.parse("2000-01-01T00:00:00Z"))
         every { accountService.countEnabledUsers() } returns 0
-        every { groupService.getNumberOfClients() } returns 0
+        every { groupService.getNumberOfActiveClients() } returns 0
         every { groupService.setGlobalWriteAccessEnabled(false) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 0
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -131,7 +131,7 @@ class LicenseVerifierTest {
     fun `write access is removed if number of units exceeds license`() {
         val license = License("1", 0, 0, 0, Instant.parse("3000-01-01T00:00:00Z"))
         every { accountService.countEnabledUsers() } returns 0
-        every { groupService.getNumberOfClients() } returns 0
+        every { groupService.getNumberOfActiveClients() } returns 0
         every { groupService.setGlobalWriteAccessEnabled(false) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 1
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -156,7 +156,7 @@ class LicenseVerifierTest {
     fun `write access is removed if number of users exceeds license`() {
         val license = License("1", 0, 0, 0, Instant.parse("3000-01-01T00:00:00Z"))
         every { accountService.countEnabledUsers() } returns 1
-        every { groupService.getNumberOfClients() } returns 0
+        every { groupService.getNumberOfActiveClients() } returns 0
         every { groupService.setGlobalWriteAccessEnabled(false) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 0
         every { veoApiService.setLicenseMessages(any()) } just Runs
@@ -181,7 +181,7 @@ class LicenseVerifierTest {
     fun `write access is removed if number of clients exceeds license`() {
         val license = License("1", 0, 0, 0, Instant.parse("3000-01-01T00:00:00Z"))
         every { accountService.countEnabledUsers() } returns 0
-        every { groupService.getNumberOfClients() } returns 1
+        every { groupService.getNumberOfActiveClients() } returns 1
         every { groupService.setGlobalWriteAccessEnabled(false) } just Runs
         every { veoApiService.getNumberOfUnits() } returns 0
         every { veoApiService.setLicenseMessages(any()) } just Runs
