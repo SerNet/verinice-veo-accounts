@@ -17,7 +17,6 @@
  */
 package org.veo.accounts.keycloak
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging.logger
 import org.bouncycastle.asn1.cms.ContentInfo
 import org.bouncycastle.cms.CMSProcessableByteArray
@@ -32,6 +31,7 @@ import org.veo.accounts.License
 import org.veo.accounts.exceptions.ExceedingMaxClientsException
 import org.veo.accounts.exceptions.InvalidLicenseException
 import org.veo.accounts.exceptions.MissingLicenseException
+import tools.jackson.databind.ObjectMapper
 import java.security.cert.CertificateFactory
 import java.time.Instant
 import kotlin.collections.plus

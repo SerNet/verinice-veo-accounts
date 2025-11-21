@@ -39,7 +39,7 @@ class AdminController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun saveLicense(
         @RequestBody licenseString: String,
-    ): ResponseEntity<String?> {
+    ): ResponseEntity<String> {
         licenseService.saveLicense(licenseString)
         return ResponseEntity.noContent().build()
     }

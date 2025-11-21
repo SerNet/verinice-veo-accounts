@@ -17,19 +17,18 @@
  */
 package org.veo.accounts.rest
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.extension.ExtendWith
 import org.keycloak.representations.idm.GroupRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -46,12 +45,14 @@ import org.veo.accounts.VeoAccountsApplication
 import org.veo.accounts.WebSecurity
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.TestAccountService
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.Int.Companion.MAX_VALUE
 
 @ActiveProfiles(value = ["resttest", "local"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 abstract class AbstractRestTest {
     private val createdVeoClients = mutableListOf<VeoClientId>()
 
@@ -100,7 +101,7 @@ abstract class AbstractRestTest {
     /** Prefix usernames & email addresses with this to keep simultaneous rest-test runs on the same keycloak instance isolated. */
     protected val prefix = "veo-accounts-rest-test-run-${randomUUID().toString().substring(0,7)}"
 
-    private val baseUrl: String by lazy { (configuredBaseUrl ?: testRestTemplate.rootUri).trimEnd('/') }
+    private val baseUrl: String by lazy { (configuredBaseUrl ?: testRestTemplate.rootUri)!!.trimEnd('/') }
 
     @AfterEach
     fun teardown() {
@@ -277,7 +278,7 @@ abstract class AbstractRestTest {
     ) = HttpHeaders()
         .apply { set("Content-Type", "application/json") }
         .apply { authAccountId?.let { set("Authorization", "Bearer " + getToken(it)) } }
-        .apply { headerMap.forEach { (key, values) -> set(key, values) } }
+        .apply { headerMap.forEach { (key, values) -> put(key, values) } }
 
     private fun getToken(authAccountId: String): String =
         testAuthenticator.getToken(

@@ -55,8 +55,7 @@ class BadRequestRestTest : AbstractRestTest() {
               }
             """,
             400,
-        ).rawBody shouldBe "Illegal unquoted character ((CTRL-CHAR, code 10)): has to be escaped using backslash to be included in " +
-            "string value"
+        ).rawBody shouldBe "Invalid request body: JSON syntax error at line 6, column 38"
     }
 
     @Test

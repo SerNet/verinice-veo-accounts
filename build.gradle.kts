@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "3.5.8"
+    id("org.springframework.boot") version "4.0.0"
 
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
@@ -26,13 +26,14 @@ dependencies {
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
     implementation("org.keycloak:keycloak-admin-client:26.0.7")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.82")
 
@@ -68,6 +69,7 @@ testing {
                 implementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
+                implementation("org.springframework.boot:spring-boot-resttestclient")
             }
             configurations {
                 named(sources.implementationConfigurationName) {

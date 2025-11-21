@@ -17,8 +17,6 @@
  */
 package org.veo.accounts.messaging
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.annotation.Argument
 import org.springframework.amqp.rabbit.annotation.Exchange
@@ -30,6 +28,8 @@ import org.springframework.stereotype.Component
 import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.GroupService
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -76,7 +76,7 @@ class MessageSubscriber(
             om
                 .readTree(message)
                 .get("content")
-                .asText()
+                .asString()
                 .let(om::readTree)
                 .let { handleMessage(it) }
         } catch (ex: Throwable) {
@@ -87,7 +87,7 @@ class MessageSubscriber(
     private fun handleMessage(content: JsonNode) {
         content
             .get("eventType")
-            .asText()
+            .asString()
             .let {
                 log.debug { "Received message with '$it' event" }
                 when (it) {
@@ -102,10 +102,10 @@ class MessageSubscriber(
         val client =
             content
                 .get("clientId")
-                .asText()
+                .asString()
                 .let { UUID.fromString(it) }
                 .let { VeoClientId(it) }
-        when (content.get("type").asText()) {
+        when (content.get("type").asString()) {
             "ACTIVATION" -> groupService.activateClient(client)
             "CREATION" ->
                 groupService.createClient(
@@ -128,13 +128,13 @@ class MessageSubscriber(
         val client =
             content
                 .get("clientId")
-                .asText()
+                .asString()
                 .let { UUID.fromString(it) }
                 .let { VeoClientId(it) }
         val unit =
             content
                 .get("unitId")
-                .asText()
+                .asString()
                 .let { UUID.fromString(it) }
                 .let { UnitId(it) }
         groupService.removeUnitRights(unit, client)

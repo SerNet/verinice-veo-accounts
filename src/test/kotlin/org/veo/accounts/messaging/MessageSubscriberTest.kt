@@ -17,7 +17,6 @@
  */
 package org.veo.accounts.messaging
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.Runs
@@ -30,6 +29,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.GroupService
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.util.UUID
 import kotlin.reflect.full.functions
 

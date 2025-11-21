@@ -19,11 +19,6 @@
 
 package org.veo.accounts
 
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.ResponseEntity
@@ -32,6 +27,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.veo.accounts.exceptions.AbstractMappedException
+import tools.jackson.core.exc.StreamReadException
+import tools.jackson.databind.DatabindException
+import tools.jackson.databind.exc.MismatchedInputException
+import tools.jackson.databind.exc.ValueInstantiationException
+import tools.jackson.module.kotlin.KotlinInvalidNullException
 
 @ControllerAdvice
 class ExceptionHandler {
@@ -53,14 +53,14 @@ class ExceptionHandler {
         ex.cause
             .let { cause ->
                 when (cause) {
-                    is MissingKotlinParameterException -> "${cause.parameter.name} must not be null"
+                    is KotlinInvalidNullException -> "${cause.kotlinPropertyName} must not be null"
                     is ValueInstantiationException -> cause.cause?.message
                     is MismatchedInputException ->
                         cause
                             .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
-                    is JsonMappingException ->
+                    is DatabindException ->
                         cause.originalMessage
-                    is JsonParseException ->
+                    is StreamReadException ->
                         cause
                             .location
                             .run { "Invalid request body: JSON syntax error at line $lineNr, column $columnNr" }

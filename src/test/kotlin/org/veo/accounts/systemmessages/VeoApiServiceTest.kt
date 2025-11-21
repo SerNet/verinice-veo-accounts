@@ -90,7 +90,7 @@ class VeoApiServiceTest {
                         setOf("license"),
                         MessageLevel.INFO,
                     ),
-                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) },
                 ),
                 Void::class.java,
             )
@@ -121,7 +121,7 @@ class VeoApiServiceTest {
                 "$apiUrl/admin/messages/1",
                 HttpMethod.DELETE,
                 HttpEntity<Unit>(
-                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) },
                 ),
                 Void::class.java,
             )
@@ -136,7 +136,7 @@ class VeoApiServiceTest {
                         setOf("license"),
                         MessageLevel.INFO,
                     ),
-                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) } as MultiValueMap<String, String>,
+                    HttpHeaders().also { it.set("x-api-key", apiKeySystemMessages) },
                 ),
                 Void::class.java,
             )

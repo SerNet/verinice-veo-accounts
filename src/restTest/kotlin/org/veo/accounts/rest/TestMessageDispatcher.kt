@@ -17,10 +17,10 @@
  */
 package org.veo.accounts.rest
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 val om = jacksonObjectMapper()
 

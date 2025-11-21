@@ -17,10 +17,10 @@
  */
 package org.veo.accounts.rest
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.ResponseEntity
 import org.veo.accounts.asListOfMaps
 import org.veo.accounts.asMap
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 private val objectMapper = jacksonObjectMapper()
 

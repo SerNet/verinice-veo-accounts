@@ -17,8 +17,6 @@
  */
 package org.veo.accounts.keycloak
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.Runs
@@ -41,10 +39,11 @@ import org.veo.accounts.exceptions.InvalidLicenseException
 import org.veo.accounts.systemmessages.LicenseMessage
 import org.veo.accounts.systemmessages.MessageLevel
 import org.veo.accounts.systemmessages.VeoApiService
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-private val om = jacksonObjectMapper().registerModule(JavaTimeModule())
+private val om = jacksonObjectMapper()
 
 class LicenseServiceTest {
     private val facade = mockk<KeycloakFacade>()
