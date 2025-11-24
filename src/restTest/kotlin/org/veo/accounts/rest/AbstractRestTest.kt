@@ -37,7 +37,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait.forListeningPort
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
-import org.veo.accounts.GlobalTestRealmExtension
 import org.veo.accounts.Role
 import org.veo.accounts.Role.CREATE
 import org.veo.accounts.Role.DELETE
@@ -53,7 +52,6 @@ import kotlin.Int.Companion.MAX_VALUE
 
 @ActiveProfiles(value = ["resttest", "local"])
 @SpringBootTest(classes = [VeoAccountsApplication::class, WebSecurity::class], webEnvironment = RANDOM_PORT)
-@ExtendWith(GlobalTestRealmExtension::class)
 abstract class AbstractRestTest {
     private val createdVeoClients = mutableListOf<VeoClientId>()
 
