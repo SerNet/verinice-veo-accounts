@@ -63,7 +63,7 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:rabbitmq:1.21.3")
+                implementation("org.testcontainers:rabbitmq:1.21.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
                 implementation("org.keycloak:keycloak-authz-client:26.0.7")
                 implementation("org.springframework.boot:spring-boot-starter-test") {
