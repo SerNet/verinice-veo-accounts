@@ -83,9 +83,9 @@ class LicenseService(
 
     fun getInstalledLicense(): License = findInstalledLicense() ?: throw MissingLicenseException()
 
-    fun getLicensedTotalUsers(): Int = getInstalledLicense().totalUsers.toInt()
+    fun getLicensedTotalUsers(): Int = getInstalledLicense().totalUsers
 
-    fun getLicensedTotalClients(): Int = getInstalledLicense().totalClients.toInt()
+    fun getLicensedTotalClients(): Int = getInstalledLicense().totalClients
 
     private fun parseLicense(licenseString: String): License {
         val signers: Collection<SignerInformation>

@@ -272,12 +272,12 @@ class AccountService(
     private fun RealmResource.sendEmail(accountId: String) =
         accountId
             .let { users().get(accountId).toRepresentation() }
-            .apply { if (!isEnabled) return }
-            .run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
-            .also { log.debug { "Determined email actions for user $accountId: $it" } }
-            .also { log.debug { "Mailing keycloak client: $userAuthKeycloakClient" } }
-            .also { log.debug { "Mailing actions redirect URL: $mailActionsRedirectUrl" } }
-            .let { actions ->
+            .takeIf { it.isEnabled }
+            ?.run { requiredActions + if (!isEmailVerified) listOf("VERIFY_EMAIL") else emptyList() }
+            ?.also { log.debug { "Determined email actions for user $accountId: $it" } }
+            ?.also { log.debug { "Mailing keycloak client: $userAuthKeycloakClient" } }
+            ?.also { log.debug { "Mailing actions redirect URL: $mailActionsRedirectUrl" } }
+            ?.let { actions ->
                 if (mailingEnabled) users().get(accountId).executeActionsEmail(userAuthKeycloakClient, mailActionsRedirectUrl, actions)
             }
 

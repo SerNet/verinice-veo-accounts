@@ -34,5 +34,5 @@ class Response(
 
     fun getHeader(name: String): String? = entity.headers[name]?.firstOrNull()
 
-    private fun parseBody(): Any = objectMapper.readValue(rawBody, Object::class.java)
+    private fun parseBody(): Any = objectMapper.readValue(rawBody, Any::class.java)
 }

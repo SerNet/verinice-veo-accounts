@@ -72,7 +72,7 @@ class WebSecurity(
                     POST,
                     "/initial",
                 ) { _, context ->
-                    AuthorizationDecision(context.request?.getHeader("Authorization") == clientInitApiKey)
+                    AuthorizationDecision(context.request.getHeader("Authorization") == clientInitApiKey)
                 }
 
                 authorize(GET, "/**", hasRole(Role.READ.roleName))
