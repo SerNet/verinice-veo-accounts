@@ -39,5 +39,5 @@ data class AccountId(
 
 @Component
 private class AccountConverter : Converter<String, AccountId> {
-    override fun convert(source: String): AccountId? = AccountId(source)
+    override fun convert(source: String): AccountId = AccountId(source)
 }

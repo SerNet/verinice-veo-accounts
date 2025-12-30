@@ -39,5 +39,5 @@ data class UnitId(
 
 @Component
 private class UnitIdConverter : Converter<String, UnitId> {
-    override fun convert(source: String): UnitId? = UnitId(source)
+    override fun convert(source: String): UnitId = UnitId(source)
 }

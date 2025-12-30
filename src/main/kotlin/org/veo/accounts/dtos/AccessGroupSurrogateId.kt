@@ -52,5 +52,5 @@ data class AccessGroupSurrogateId(
 
 @Component
 private class AccessGroupIdConverter : Converter<String, AccessGroupSurrogateId> {
-    override fun convert(source: String): AccessGroupSurrogateId? = AccessGroupSurrogateId(UUID.fromString(source))
+    override fun convert(source: String): AccessGroupSurrogateId = AccessGroupSurrogateId(UUID.fromString(source))
 }
