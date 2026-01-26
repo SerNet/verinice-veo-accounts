@@ -53,18 +53,32 @@ class ExceptionHandler {
         ex.cause
             .let { cause ->
                 when (cause) {
-                    is KotlinInvalidNullException -> "${cause.kotlinPropertyName} must not be null"
-                    is ValueInstantiationException -> cause.cause?.message
-                    is MismatchedInputException ->
+                    is KotlinInvalidNullException -> {
+                        "${cause.kotlinPropertyName} must not be null"
+                    }
+
+                    is ValueInstantiationException -> {
+                        cause.cause?.message
+                    }
+
+                    is MismatchedInputException -> {
                         cause
                             .run { originalMessage?.replace(targetType.name, targetType.simpleName) }
-                    is DatabindException ->
+                    }
+
+                    is DatabindException -> {
                         cause.originalMessage
-                    is StreamReadException ->
+                    }
+
+                    is StreamReadException -> {
                         cause
                             .location
                             .run { "Invalid request body: JSON syntax error at line $lineNr, column $columnNr" }
-                    else -> cause?.message
+                    }
+
+                    else -> {
+                        cause?.message
+                    }
                 }
             }
             ?: ex.message

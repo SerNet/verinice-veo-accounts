@@ -106,21 +106,33 @@ class MessageSubscriber(
                 .let { UUID.fromString(it) }
                 .let { VeoClientId(it) }
         when (content.get("type").asString()) {
-            "ACTIVATION" -> groupService.activateClient(client)
-            "CREATION" ->
+            "ACTIVATION" -> {
+                groupService.activateClient(client)
+            }
+
+            "CREATION" -> {
                 groupService.createClient(
                     client,
                     content.get("maxUnits").asInt(),
                     content.get("maxUsers").asInt(),
                 )
-            "MODIFICATION" ->
+            }
+
+            "MODIFICATION" -> {
                 groupService.updateClient(
                     client,
                     content.get("maxUnits")?.asInt(),
                     content.get("maxUsers")?.asInt(),
                 )
-            "DEACTIVATION" -> groupService.deactivateClient(client)
-            "DELETION" -> groupService.deleteClient(client)
+            }
+
+            "DEACTIVATION" -> {
+                groupService.deactivateClient(client)
+            }
+
+            "DELETION" -> {
+                groupService.deleteClient(client)
+            }
         }
     }
 
