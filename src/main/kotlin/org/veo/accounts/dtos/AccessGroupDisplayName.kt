@@ -1,4 +1,4 @@
-/**
+/*
  * verinice.veo accounts
  * Copyright (C) 2022  Jonas Jordan
  *
