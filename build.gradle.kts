@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "2.3.0"
     kotlin("plugin.spring") version "2.3.0"
 
-    id("com.diffplug.spotless") version "8.2.0"
+    id("com.diffplug.spotless") version "8.2.1"
     jacoco
     id("com.gorylenko.gradle-git-properties") version "2.5.4"
 }
