@@ -17,9 +17,9 @@
  */
 package org.veo.accounts.keycloak
 
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import jakarta.ws.rs.ClientErrorException
 import jakarta.ws.rs.NotFoundException
-import mu.KotlinLogging.logger
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Value

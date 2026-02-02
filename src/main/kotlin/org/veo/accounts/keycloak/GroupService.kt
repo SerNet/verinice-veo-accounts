@@ -17,10 +17,8 @@
  */
 package org.veo.accounts.keycloak
 
-import mu.KotlinLogging.logger
-import org.keycloak.admin.client.resource.RoleScopeResource
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import org.keycloak.representations.idm.GroupRepresentation
-import org.keycloak.representations.idm.RoleRepresentation
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
@@ -79,7 +77,7 @@ class GroupService(
     ): AccessGroupSurrogateId =
         facade.performSynchronized(client) {
             val surrogateId = AccessGroupSurrogateId()
-            log.info("Creating access group $surrogateId")
+            log.info { "Creating access group $surrogateId" }
             groups()
                 .group(getClientGroup(client).id)
                 .subGroup(
@@ -97,7 +95,7 @@ class GroupService(
         client: VeoClientId,
     ): Unit =
         facade.performSynchronized(client) {
-            log.info("Updating access group $surrogateId")
+            log.info { "Updating access group $surrogateId" }
             groups().group(getAccessGroup(surrogateId, client).id).run {
                 val rep = toRepresentation()
                 rep.attributes = rep.attributes + newAttributes
@@ -134,7 +132,7 @@ class GroupService(
     ) = facade.performSynchronized(client) {
         validateClientLimit()
 
-        log.info("Creating veo client group ${client.groupName}")
+        log.info { "Creating veo client group ${client.groupName}" }
         GroupRepresentation()
             .apply {
                 name = client.groupName
@@ -147,7 +145,7 @@ class GroupService(
                     log.error { "Keycloak response: ${readEntity(String::class.java)}" }
                     throw InternalError()
                 }
-                log.info("Created veo client group $client")
+                log.info { "Created veo client group $client" }
             }
     }
 
@@ -220,7 +218,7 @@ class GroupService(
 
     fun deleteClient(client: VeoClientId) =
         facade.performSynchronized(client) {
-            log.info("Deleting veo client group ${client.groupName}")
+            log.info { "Deleting veo client group ${client.groupName}" }
             groups().group(getClientGroup(client).id).run {
                 members().forEach {
                     users().delete(it.id)

@@ -17,7 +17,7 @@
  */
 package org.veo.accounts.keycloak
 
-import mu.KotlinLogging.logger
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import org.bouncycastle.asn1.cms.ContentInfo
 import org.bouncycastle.cms.CMSProcessableByteArray
 import org.bouncycastle.cms.CMSSignedData
@@ -101,7 +101,7 @@ class LicenseService(
                 signers = signedData.signerInfos.signers
                 objectMapper.readValue(signedContent.inputStream, License::class.java)
             } catch (e: Exception) {
-                log.error("Failed to read license", e)
+                log.error(e) { "Failed to read license" }
                 throw InvalidLicenseException("Request body does not represent a valid license.")
             }
 

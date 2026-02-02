@@ -17,10 +17,10 @@
  */
 package org.veo.accounts.keycloak
 
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import jakarta.ws.rs.client.Client
 import jakarta.ws.rs.client.ClientBuilder
 import jakarta.ws.rs.core.Response
-import mu.KotlinLogging.logger
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS
 import org.keycloak.admin.client.JacksonProvider
@@ -83,7 +83,7 @@ class KeycloakFacade(
             throw ex
         } catch (ex: Throwable) {
             // everything else may contain secrets and must not pass
-            log.error("Unexpected keycloak communication error", ex)
+            log.error(ex) { "Unexpected keycloak communication error" }
             throw KeycloakException()
         }
 
