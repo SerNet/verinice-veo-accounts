@@ -49,7 +49,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                     ),
                 headers =
                     mapOf(
-                        "Authorization" to listOf(clientInitApiKey),
+                        "X-API-KEY" to listOf(clientInitApiKey),
                     ),
             ).bodyAsMap["id"] as String
 
@@ -84,7 +84,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 ),
             headers =
                 mapOf(
-                    "Authorization" to listOf(clientInitApiKey),
+                    "X-API-KEY" to listOf(clientInitApiKey),
                 ),
             expectedStatus = 409,
         ).rawBody shouldBe "Target client already contains accounts, cannot create initial account"
@@ -106,7 +106,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 ),
             headers =
                 mapOf(
-                    "Authorization" to listOf(clientInitApiKey),
+                    "X-API-KEY" to listOf(clientInitApiKey),
                 ),
             expectedStatus = 422,
         ).rawBody shouldBe "Client $randomUUID not found"
@@ -127,7 +127,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 ),
             headers =
                 mapOf(
-                    "Authorization" to listOf(clientInitApiKey),
+                    "X-API-KEY" to listOf(clientInitApiKey),
                 ),
         )
 
@@ -144,7 +144,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 ),
             headers =
                 mapOf(
-                    "Authorization" to listOf(clientInitApiKey),
+                    "X-API-KEY" to listOf(clientInitApiKey),
                 ),
             expectedStatus = 409,
         ).rawBody shouldBe "Username or email address already taken"
@@ -162,7 +162,7 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
                 ),
             headers =
                 mapOf(
-                    "Authorization" to listOf(clientInitApiKey),
+                    "X-API-KEY" to listOf(clientInitApiKey),
                 ),
             expectedStatus = 409,
         ).rawBody shouldBe "Username or email address already taken"

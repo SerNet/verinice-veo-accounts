@@ -39,6 +39,7 @@ import org.springframework.web.client.RestTemplate
 
 const val SECURITY_SCHEME_OAUTH = "OAuth2"
 const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
+const val HEADER_NAME_APIKEY = "X-API-KEY"
 
 @SpringBootApplication
 @SecurityScheme(
@@ -58,6 +59,7 @@ const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
     name = SECURITY_SCHEME_CLIENT_INIT_API_KEY,
     type = APIKEY,
     `in` = HEADER,
+    paramName = HEADER_NAME_APIKEY,
     description =
         "Client initialization API key - only subscription services should know this key. " +
             "It is required for creating the initial account for a client. " +

@@ -163,16 +163,19 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `API key works for initial account creation`() {
+        post("/initial", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
+            Regex("Required request body is missing.*")
+        // TODO: #4645 remove fallback to `Authorization` header
         post("/initial", headers = mapOf("Authorization" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
             Regex("Required request body is missing.*")
 
-        post("/initial", headers = mapOf("Authorization" to listOf("wrongKey")), expectedStatus = 401)
+        post("/initial", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
         post("/initial", expectedStatus = 401)
     }
 
     @Test
     fun `API key does not work for account, group, and license management`() {
-        val headers = mapOf("Authorization" to listOf(clientInitApiKey))
+        val headers = mapOf("X-API-KEY" to listOf(clientInitApiKey))
 
         get("/", headers = headers, expectedStatus = 401)
         get("/$randomUuid", headers = headers, expectedStatus = 401)
@@ -205,7 +208,11 @@ class SecurityRestTest : AbstractRestTest() {
 
         docs["components"].asMap()["securitySchemes"].asMap().let {
             it["OAuth2"].asMap()["type"] shouldBe "oauth2"
-            it["ClientInitApiKey"].asMap()["type"] shouldBe "apiKey"
+            it["ClientInitApiKey"].asMap().let {
+                it["type"] shouldBe "apiKey"
+                it["in"] shouldBe "header"
+                it["name"] shouldBe "X-API-KEY"
+            }
         }
 
         val endpointDocs =
