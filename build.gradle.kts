@@ -47,10 +47,10 @@ testing {
     suites {
         configureEach {
             dependencies {
-                implementation("io.kotest:kotest-assertions-core-jvm:6.1.9")
-                implementation("io.kotest:kotest-runner-junit5-jvm:6.1.9")
-                implementation("io.kotest:kotest-assertions-core-jvm:6.1.9")
-                implementation("io.kotest:kotest-property-jvm:6.1.9")
+                implementation("io.kotest:kotest-assertions-core-jvm:6.1.11")
+                implementation("io.kotest:kotest-runner-junit5-jvm:6.1.11")
+                implementation("io.kotest:kotest-assertions-core-jvm:6.1.11")
+                implementation("io.kotest:kotest-property-jvm:6.1.11")
             }
         }
         val test by getting(JvmTestSuite::class) {
