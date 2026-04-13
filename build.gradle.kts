@@ -32,7 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("io.github.oshai:kotlin-logging-jvm:8.0.01")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
