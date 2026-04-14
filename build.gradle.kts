@@ -35,7 +35,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.84")
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("ch.qos.logback.contrib:logback-json-classic:0.1.5")
