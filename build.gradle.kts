@@ -1,8 +1,8 @@
 plugins {
     id("org.springframework.boot") version "4.0.6"
 
-    kotlin("jvm") version "2.3.20"
-    kotlin("plugin.spring") version "2.3.20"
+    kotlin("jvm") version "2.3.21"
+    kotlin("plugin.spring") version "2.3.21"
 
     id("com.diffplug.spotless") version "8.4.0"
     jacoco
