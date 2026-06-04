@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.veo"
-version = "0.55.0"
+version = "0.55.1"
 
 java {
     toolchain {
@@ -40,6 +40,19 @@ dependencies {
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("ch.qos.logback.contrib:logback-json-classic:0.1.5")
     runtimeOnly("ch.qos.logback.contrib:logback-jackson:0.1.5")
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.apache.tomcat.embed" && requested.version == "11.0.21") {
+            useVersion("11.0.22")
+            because("Security fixes")
+        }
+        if (requested.group == "io.netty" && requested.version == "4.2.12.Final") {
+            useVersion("4.2.13.Final")
+            because("Security fixes")
+        }
+    }
 }
 
 @Suppress("UnstableApiUsage")
