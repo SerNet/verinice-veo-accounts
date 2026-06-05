@@ -17,8 +17,8 @@
  */
 package org.veo.accounts.exceptions
 
-import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
+import org.springframework.http.HttpStatus.UNPROCESSABLE_CONTENT
 
 class InvalidLicenseException(
     msg: String,
-) : AbstractMappedException(msg, UNPROCESSABLE_ENTITY)
+) : AbstractMappedException(msg, UNPROCESSABLE_CONTENT)
