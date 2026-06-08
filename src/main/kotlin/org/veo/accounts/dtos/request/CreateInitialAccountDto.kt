@@ -34,7 +34,7 @@ class CreateInitialAccountDto(
     val clientId: VeoClientId,
     val username: Username,
     val emailAddress: EmailAddress,
-    val firstName: FirstName,
-    val lastName: LastName,
+    val firstName: FirstName?,
+    val lastName: LastName?,
     val language: Language?,
 )

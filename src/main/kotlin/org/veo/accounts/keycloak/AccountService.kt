@@ -234,8 +234,8 @@ class AccountService(
         UserRepresentation().apply {
             username = dto.username.value
             email = dto.emailAddress.value
-            firstName = dto.firstName.value
-            lastName = dto.lastName.value
+            firstName = dto.firstName?.value
+            lastName = dto.lastName?.value
             singleAttribute<UserRepresentation>(ATTRIBUTE_LOCALE, dto.language?.value)
             groups = getGroupsForNewAccount(dto.clientId, AssignableGroupSet(setOf(VEO_WRITE_ACCESS)), emptySet(), true)
             isEnabled = true

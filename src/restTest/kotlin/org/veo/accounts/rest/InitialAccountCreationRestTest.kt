@@ -167,4 +167,21 @@ class InitialAccountCreationRestTest : AbstractRestTest() {
             expectedStatus = 409,
         ).rawBody shouldBe "Username or email address already taken"
     }
+
+    @Test
+    fun `first and last names are optional`() {
+        post(
+            "/initial",
+            body =
+                mapOf(
+                    "clientId" to client.clientId,
+                    "username" to "$prefix-anonymous",
+                    "emailAddress" to "$prefix-anonymous@initial.test",
+                ),
+            headers =
+                mapOf(
+                    "X-API-KEY" to listOf(clientInitApiKey),
+                ),
+        ).statusCode shouldBe 201
+    }
 }
