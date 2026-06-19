@@ -133,7 +133,7 @@ class ClientSeparationRestTest : AbstractRestTest() {
             "/",
             client1ManagerId,
             mapOf(
-                "username" to "good-guy",
+                "username" to "$prefix-good-guy",
                 "emailAddress" to "$prefix-good-guy@example",
                 "firstName" to "Guy",
                 "lastName" to "Good",
@@ -148,7 +148,7 @@ class ClientSeparationRestTest : AbstractRestTest() {
             "/",
             client2ManagerId,
             mapOf(
-                "username" to "bad-gal",
+                "username" to "$prefix-bad-gal",
                 "emailAddress" to "$prefix-bad-gal@example",
                 "firstName" to "Gabriella",
                 "lastName" to "Baden",
@@ -165,7 +165,7 @@ class ClientSeparationRestTest : AbstractRestTest() {
                 "/",
                 client2ManagerId,
                 mapOf(
-                    "username" to "new-guy",
+                    "username" to "$prefix-new-guy",
                     "emailAddress" to "$prefix-new-guy@example",
                     "firstName" to "Guy",
                     "lastName" to "Newman",
