@@ -165,7 +165,7 @@ http_rest_tests:
       # FIXME: Read this from CI/CD settings
       JDK_JAVA_OPTIONS: -Dhttp.proxyHost=$PROXY -Dhttp.proxyPort=3128 -Dhttps.proxyHost=${PROXY} -Dhttps.proxyPort=3128 -Dhttps.proxySet=true -Dhttp.proxySet=true
       SPRING_RABBITMQ_HOST: rabbitmq
-  - name: rabbitmq:3-management-alpine
+  - name: rabbitmq:4.0.5-management-alpine
     alias: rabbitmq
   variables:
     FF_NETWORK_PER_BUILD: 1
