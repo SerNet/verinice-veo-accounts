@@ -1,8 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":automergeAll",
+    ":automergePr"
+  ],
   "assignAutomerge": true,
-  "automerge": true,
-  "automergeType": "pr",
   "reviewers": [
     "JJ"
   ],
