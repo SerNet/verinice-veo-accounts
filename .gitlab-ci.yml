@@ -1,4 +1,4 @@
-image: eclipse-temurin:25-jdk
+image: eclipse-temurin:25-jdk@sha256:dfc0093e3dbf43dae57827111c6e374f5b44fac19a9451584b2b336b81474d64
 
 variables:
   ORG_GRADLE_PROJECT_ci: 'true'
@@ -60,7 +60,7 @@ build:
 determine-destinations:
   before_script: []
   image:
-    name: alpine/git
+    name: alpine/git@sha256:8d6ede0b29c666ac111c732468c4d758c1c08f054f211dd98f15d421a6ffab40
     entrypoint: [ "" ]
   stage: build
   script:
@@ -128,7 +128,7 @@ docker_image:
    - build
    - determine-destinations
   image:
-    name: gcr.io/kaniko-project/executor:v1.24.0-debug
+    name: gcr.io/kaniko-project/executor:v1.24.0-debug@sha256:2562c4fe551399514277ffff7dcca9a3b1628c4ea38cb017d7286dc6ea52f4cd
     entrypoint: [""]
 
   variables:
@@ -165,7 +165,7 @@ http_rest_tests:
       # FIXME: Read this from CI/CD settings
       JDK_JAVA_OPTIONS: -Dhttp.proxyHost=$PROXY -Dhttp.proxyPort=3128 -Dhttps.proxyHost=${PROXY} -Dhttps.proxyPort=3128 -Dhttps.proxySet=true -Dhttp.proxySet=true
       SPRING_RABBITMQ_HOST: rabbitmq
-  - name: rabbitmq:4.0.5-management-alpine
+  - name: rabbitmq:4.0.5-management-alpine@sha256:54759523c0b09074814b1233e6985babe9fd34e3462d2fea522361cb83b2fd76
     alias: rabbitmq
   variables:
     FF_NETWORK_PER_BUILD: 1
