@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
-    implementation("org.keycloak:keycloak-admin-client:26.0.10")
+    implementation("org.keycloak:keycloak-admin-client:26.0.11")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -78,7 +78,7 @@ testing {
                 implementation(project())
                 implementation("org.testcontainers:rabbitmq:1.21.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-                implementation("org.keycloak:keycloak-authz-client:26.0.10")
+                implementation("org.keycloak:keycloak-authz-client:26.0.11")
                 implementation("org.springframework.boot:spring-boot-starter-test") {
                     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
                 }
