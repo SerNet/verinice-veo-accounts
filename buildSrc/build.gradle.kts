@@ -8,5 +8,5 @@ repositories {
 
 dependencies{
     implementation("com.diffplug.spotless:spotless-lib-extra:4.8.0")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
 }
