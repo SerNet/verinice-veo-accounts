@@ -48,9 +48,9 @@ configurations.all {
             useVersion("11.0.22")
             because("Security fixes")
         }
-        if (requested.group == "io.netty" && requested.version == "4.2.12.Final") {
-            useVersion("4.2.13.Final")
-            because("Security fixes")
+        if (requested.group == "io.netty" && requested.version == "4.2.15.Final") {
+            useVersion("4.2.16.Final")
+            because("CVE-2026-5990")
         }
     }
 }
