@@ -34,6 +34,7 @@ import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -72,9 +73,7 @@ class WebSecurity(
                     POST,
                     "/initial",
                 ) { _, context ->
-                    AuthorizationDecision(
-                        context.request.getHeader(HEADER_NAME_APIKEY) == clientInitApiKey,
-                    )
+                    apiKey(context)
                 }
 
                 authorize(GET, "/**", hasRole(Role.READ.roleName))
@@ -107,6 +106,11 @@ class WebSecurity(
         }
         return http.build()
     }
+
+    private fun apiKey(context: RequestAuthorizationContext): AuthorizationDecision =
+        AuthorizationDecision(
+            context.request.getHeader(HEADER_NAME_APIKEY) == clientInitApiKey,
+        )
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
