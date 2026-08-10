@@ -1,6 +1,6 @@
 /*
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2026  Jonas Jordan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,16 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:Suppress("UNCHECKED_CAST")
+package org.veo.accounts.dtos.request
 
-package org.veo.accounts
+import io.swagger.v3.oas.annotations.media.Schema
+import org.veo.accounts.dtos.DomainProducts
 
-// Convenience functions for casting things in deserialized JSON response bodies.
-
-fun Any?.asMap(): MutableMap<String, Any> = this as MutableMap<String, Any>
-
-fun Any?.asNestedMap(): MutableMap<String, MutableMap<String, Any>> = this as MutableMap<String, MutableMap<String, Any>>
-
-fun Any?.asList(): MutableList<*> = this as MutableList<*>
-
-fun Any?.asListOfMaps(): MutableList<MutableMap<String, Any>> = this as MutableList<MutableMap<String, Any>>
+@Schema(
+    description =
+        "Veo client information for creation and modification. Veo client ID is absent because it is generated / part of the URL.",
+)
+class ClientRequestDto(
+    val name: String,
+    val maxUsers: Int,
+    val maxUnits: Int,
+    val domainProducts: DomainProducts,
+)

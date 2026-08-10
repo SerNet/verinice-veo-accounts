@@ -1,6 +1,6 @@
 /*
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2026  Jonas Jordan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,30 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.veo.accounts.rest
+package org.veo.accounts.messaging
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.veo.accounts.dtos.DomainProducts
+import org.veo.accounts.dtos.VeoClientId
 import tools.jackson.module.kotlin.jacksonObjectMapper
 
-val om = jacksonObjectMapper()
+private val om = jacksonObjectMapper()
 
 @Component
-@Deprecated("#5046")
-class TestMessageDispatcher(
+class MessageDispatcher(
     @Value("\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}")
     private val exchange: String,
     @Value("\${veo.accounts.rabbitmq.routing_key_prefix}")
     private val subscriptionRoutingKeyPrefix: String,
     private val rabbitTemplate: RabbitTemplate,
 ) {
-    fun sendMessage(
-        routingKey: String,
-        content: Map<String, *>,
-    ) {
+    fun sendClientChangeMessage(content: ClientChange) {
         send(
-            "$subscriptionRoutingKeyPrefix$routingKey",
+            "${subscriptionRoutingKeyPrefix}client_change",
             om.writeValueAsString(content),
         )
     }
@@ -52,5 +50,27 @@ class TestMessageDispatcher(
             routingKey,
             om.writeValueAsString(mapOf("content" to content)),
         )
+    }
+
+    data class ClientChange(
+        val type: Type,
+        val clientId: VeoClientId,
+        val name: String? = null,
+        val maxUnits: Int? = null,
+        val maxUsers: Int? = null,
+        val domainProducts: DomainProducts? = null,
+    ) {
+        val eventType = "client_change"
+
+        @Deprecated("#5046")
+        val source = "veo-accounts"
+
+        enum class Type {
+            CREATION,
+            MODIFICATION,
+            DEACTIVATION,
+            ACTIVATION,
+            DELETION,
+        }
     }
 }

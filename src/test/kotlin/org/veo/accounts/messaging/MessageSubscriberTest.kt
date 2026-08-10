@@ -35,6 +35,8 @@ import kotlin.reflect.full.functions
 
 private val om = jacksonObjectMapper()
 
+@Suppress("DEPRECATION")
+@Deprecated("#5046")
 class MessageSubscriberTest {
     private val groupService = mockk<GroupService>()
     private val sut = MessageSubscriber(groupService)

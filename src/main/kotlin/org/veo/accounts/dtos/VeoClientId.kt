@@ -19,6 +19,8 @@ package org.veo.accounts.dtos
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.core.convert.converter.Converter
+import org.springframework.stereotype.Component
 import org.veo.accounts.keycloak.CLIENT_GROUP_PREFIX
 import java.util.UUID
 
@@ -49,4 +51,9 @@ data class VeoClientId(
                 .let { CLIENT_GROUP_PATH_REGEX.matchEntire(it) }
                 ?.let { VeoClientId(UUID.fromString(it.groups[1]!!.value)) }
     }
+}
+
+@Component
+private class VeoClientIdConverter : Converter<String, VeoClientId> {
+    override fun convert(source: String): VeoClientId = VeoClientId(UUID.fromString(source))
 }

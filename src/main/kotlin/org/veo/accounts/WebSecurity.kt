@@ -75,6 +75,11 @@ class WebSecurity(
                 ) { _, context ->
                     apiKey(context)
                 }
+                authorize(
+                    "/clients/**",
+                ) { _, context ->
+                    apiKey(context)
+                }
 
                 authorize(GET, "/**", hasRole(Role.READ.roleName))
                 authorize(POST, "/**", hasRole(Role.CREATE.roleName))

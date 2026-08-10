@@ -90,6 +90,8 @@ class MessageSubscriber(
             .asString()
             .let {
                 log.debug { "Received message with '$it' event" }
+                // TODO #5046 remove client_change handling and suppression
+                @Suppress("DEPRECATION")
                 when (it) {
                     "client_change" -> handleClientChange(content)
                     "unit_deletion" -> handleUnitDeletion(content)
@@ -98,7 +100,13 @@ class MessageSubscriber(
             }
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("#5046")
     private fun handleClientChange(content: JsonNode) {
+        // ignore self-sent messages
+        if (content.get("source")?.stringValue() == "veo-accounts") {
+            return
+        }
         val client =
             content
                 .get("clientId")

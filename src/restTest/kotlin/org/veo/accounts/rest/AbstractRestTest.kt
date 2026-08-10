@@ -17,6 +17,8 @@
  */
 package org.veo.accounts.rest
 
+import io.kotest.assertions.assertSoftly
+import io.kotest.inspectors.forOne
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
@@ -46,6 +48,7 @@ import org.veo.accounts.WebSecurity
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.TestAccountService
 import tools.jackson.module.kotlin.jacksonObjectMapper
+import java.util.UUID
 import java.util.UUID.randomUUID
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.Int.Companion.MAX_VALUE
@@ -65,8 +68,12 @@ abstract class AbstractRestTest {
     @Autowired
     private lateinit var testAuthenticator: TestAuthenticator
 
+    @Suppress("DEPRECATION")
     @Autowired
     private lateinit var testMessageDispatcher: TestMessageDispatcher
+
+    @Autowired
+    private lateinit var testMessageSubscriber: TestMessageSubscriber
 
     @Value("\${veo.resttest.baseUrl:#{null}}")
     private var configuredBaseUrl: String? = null
@@ -108,18 +115,57 @@ abstract class AbstractRestTest {
         createdVeoClients
             .filter { findGroup(it.groupName) != null }
             .forEach {
-                sendMessage(
-                    "client_change",
-                    mapOf(
-                        "clientId" to it.clientId,
-                        "eventType" to "client_change",
-                        "type" to "DELETION",
-                    ),
-                ) { findGroup(it.groupName) shouldBe null }
+                delete(
+                    "/clients/${it.clientId}",
+                    headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+                    expectedStatus = null,
+                )
             }
+        testMessageSubscriber.receivedMessages.clear()
+    }
+
+    protected fun awaitMessage(assertions: Map<String, *>.() -> Unit) {
+        await().atMost(5, SECONDS).until {
+            testMessageSubscriber.receivedMessages.forOne { m -> assertSoftly { assertions(m) } }
+            true
+        }
     }
 
     protected fun createVeoClientGroup(
+        maxUsers: Int = MAX_VALUE,
+        maxUnits: Int = MAX_VALUE,
+        name: String = "Test client",
+        products: Map<String, List<String>> = emptyMap(),
+    ): VeoClientId =
+        post(
+            "/clients",
+            body =
+                mapOf(
+                    "name" to name,
+                    "maxUnits" to maxUnits,
+                    "maxUsers" to maxUsers,
+                    "domainProducts" to products,
+                ),
+            headers =
+                mapOf(
+                    "X-API-KEY" to listOf(clientInitApiKey),
+                ),
+            expectedStatus = 201,
+        ).bodyAsMap["id"]
+            .let { VeoClientId(UUID.fromString(it as String)) }
+            .apply {
+                awaitMessage {
+                    get("eventType") shouldBe "client_change"
+                    get("type") shouldBe "CREATION"
+                    get("clientId") shouldBe clientId.toString()
+                    get("maxUsers") shouldBe maxUsers
+                    get("maxUnits") shouldBe maxUnits
+                }
+            }.also { createdVeoClients.add(it) }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("#5046")
+    protected fun createVeoClientGroupUsingEvent(
         maxUsers: Int = MAX_VALUE,
         maxUnits: Int = MAX_VALUE,
     ): VeoClientId =
@@ -211,6 +257,7 @@ abstract class AbstractRestTest {
         headers: Map<String, List<String>> = emptyMap(),
     ): Response = exchange(HttpMethod.DELETE, url, authAccountId, null, headers, expectedStatus)
 
+    @Deprecated("#5046")
     protected fun sendMessage(
         routingKey: String,
         content: Map<String, *>,

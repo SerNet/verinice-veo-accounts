@@ -1,6 +1,6 @@
 /*
  * verinice.veo accounts
- * Copyright (C) 2022  Jonas Jordan
+ * Copyright (C) 2026  Jonas Jordan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,19 @@
  */
 package org.veo.accounts.rest
 
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.veo.accounts.asList
+import org.veo.accounts.asListOfMaps
+import org.veo.accounts.asMap
+import org.veo.accounts.asNestedMap
 import org.veo.accounts.dtos.VeoClientId
+import java.util.UUID
 
-@Suppress("DEPRECATION")
-@Deprecated("verinice-veo#5046")
-class ClientChangeRestTest : AbstractRestTest() {
+class ClientManagementRestTest : AbstractRestTest() {
     lateinit var client: VeoClientId
     lateinit var managerId: String
 
@@ -33,10 +38,18 @@ class ClientChangeRestTest : AbstractRestTest() {
 
     @BeforeEach
     fun setup() {
-        client = createVeoClientGroupUsingEvent(10, 13)
+        client =
+            createVeoClientGroup(
+                10,
+                13,
+                "management test client",
+                mapOf(
+                    "someDomain" to listOf("someProfile"),
+                ),
+            )
         managerId = createManager(client)
 
-        otherClient = createVeoClientGroupUsingEvent()
+        otherClient = createVeoClientGroup(name = "other client")
         otherManagerId = createManager(otherClient)
     }
 
@@ -50,37 +63,34 @@ class ClientChangeRestTest : AbstractRestTest() {
 
     @Test
     fun `updates client`() {
-        // when updating max units
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "MODIFICATION",
-                "maxUnits" to 25,
-            ),
-        ) {
-            // then only max units is updated
-            findGroup(client.groupName)!!.apply {
-                attributes["maxUnits"] shouldBe listOf("25")
-                attributes["maxUsers"] shouldBe listOf("10")
-            }
+        // when updating max units and max users
+        put(
+            "/clients/${client.clientId}",
+            body =
+                mapOf(
+                    "name" to "new name",
+                    "maxUnits" to 25,
+                    "maxUsers" to 16,
+                    "domainProducts" to mapOf("anotherDomain" to listOf("anotherProfile")),
+                ),
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+        )
+
+        // then the values have been updated
+        findGroup(client.groupName)!!.apply {
+            attributes["maxUnits"] shouldBe listOf("25")
+            attributes["maxUsers"] shouldBe listOf("16")
         }
-        // when updating max users
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "MODIFICATION",
-                "maxUsers" to 16,
-            ),
-        ) {
-            // then only max users is updated
-            findGroup(client.groupName)!!.apply {
-                attributes["maxUnits"] shouldBe listOf("25")
-                attributes["maxUsers"] shouldBe listOf("16")
-            }
+
+        // and a modification event has been sent
+        awaitMessage {
+            get("eventType") shouldBe "client_change"
+            get("type") shouldBe "MODIFICATION"
+            get("clientId") shouldBe client.clientId.toString()
+            get("name") shouldBe "new name"
+            get("maxUsers") shouldBe 16
+            get("maxUnits") shouldBe 25
+            get("domainProducts").asMap()["anotherDomain"].asList().first() shouldBe "anotherProfile"
         }
     }
 
@@ -135,21 +145,25 @@ class ClientChangeRestTest : AbstractRestTest() {
         accountInGroup(otherClientAccountId, "veo-user") shouldBe true
 
         // when deactivating the main client
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "DEACTIVATION",
-            ),
-        ) {
-            // then the accounts are removed from veo-user group
-            accountInGroup(danAccountId, "veo-user") shouldBe false
-            accountInGroup(sydAccountId, "veo-user") shouldBe false
-        }
+        post(
+            "/clients/${client.clientId}/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        )
+
+        // then the accounts are removed from veo-user group
+        accountInGroup(danAccountId, "veo-user") shouldBe false
+        accountInGroup(sydAccountId, "veo-user") shouldBe false
 
         // and the other client's accounts are still in the veo-user group
         accountInGroup(otherClientAccountId, "veo-user") shouldBe true
+
+        // and the deactivation event has been sent
+        awaitMessage {
+            get("eventType") shouldBe "client_change"
+            get("type") shouldBe "DEACTIVATION"
+            get("clientId") shouldBe client.clientId.toString()
+        }
 
         // when creating a new user in the deactivated veo client group
         val timAccountId =
@@ -171,18 +185,22 @@ class ClientChangeRestTest : AbstractRestTest() {
         // accountInGroup(timAccountId, "veo-user") shouldBe false
 
         // when activating the main client again
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "ACTIVATION",
-            ),
-        ) {
-            // then the accounts are back in the veo-user group
-            accountInGroup(danAccountId, "veo-user") shouldBe true
-            accountInGroup(sydAccountId, "veo-user") shouldBe true
-            accountInGroup(timAccountId, "veo-user") shouldBe true
+        post(
+            "/clients/${client.clientId}/activation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        )
+
+        // then the accounts are back in the veo-user group
+        accountInGroup(danAccountId, "veo-user") shouldBe true
+        accountInGroup(sydAccountId, "veo-user") shouldBe true
+        accountInGroup(timAccountId, "veo-user") shouldBe true
+
+        // and the activation event has been sent
+        awaitMessage {
+            get("eventType") shouldBe "client_change"
+            get("type") shouldBe "ACTIVATION"
+            get("clientId") shouldBe client.clientId.toString()
         }
 
         // when creating a new user in the activated veo client group
@@ -204,36 +222,30 @@ class ClientChangeRestTest : AbstractRestTest() {
         accountInGroup(catAccountId, "veo-user") shouldBe true
 
         // when deactivating the client again
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "DEACTIVATION",
-            ),
-        ) {
-            // then all accounts are removed from the veo-user group
-            accountInGroup(danAccountId, "veo-user") shouldBe false
-            accountInGroup(sydAccountId, "veo-user") shouldBe false
-            accountInGroup(timAccountId, "veo-user") shouldBe false
-            accountInGroup(catAccountId, "veo-user") shouldBe false
-        }
+        post(
+            "/clients/${client.clientId}/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        )
+
+        // then all accounts are removed from the veo-user group
+        accountInGroup(danAccountId, "veo-user") shouldBe false
+        accountInGroup(sydAccountId, "veo-user") shouldBe false
+        accountInGroup(timAccountId, "veo-user") shouldBe false
+        accountInGroup(catAccountId, "veo-user") shouldBe false
 
         // when activating the client again
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "ACTIVATION",
-            ),
-        ) {
-            // then all accounts are back in the veo-user group
-            accountInGroup(danAccountId, "veo-user") shouldBe true
-            accountInGroup(sydAccountId, "veo-user") shouldBe true
-            accountInGroup(timAccountId, "veo-user") shouldBe true
-            accountInGroup(catAccountId, "veo-user") shouldBe true
-        }
+        post(
+            "/clients/${client.clientId}/activation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        )
+
+        // then all accounts are back in the veo-user group
+        accountInGroup(danAccountId, "veo-user") shouldBe true
+        accountInGroup(sydAccountId, "veo-user") shouldBe true
+        accountInGroup(timAccountId, "veo-user") shouldBe true
+        accountInGroup(catAccountId, "veo-user") shouldBe true
     }
 
     @Test
@@ -289,23 +301,26 @@ class ClientChangeRestTest : AbstractRestTest() {
         accountExists(otherClientAccountId) shouldBe true
 
         // when deleting the main client
-        sendMessage(
-            "client_change",
-            mapOf(
-                "eventType" to "client_change",
-                "clientId" to client.clientId,
-                "type" to "DELETION",
-            ),
-        ) {
-            // then the  client and accounts are gone
-            findGroup(client.groupName) shouldBe null
-            accountExists(managerId) shouldBe false
-            accountExists(clientAccount1Id) shouldBe false
-            accountExists(clientAccount2Id) shouldBe false
-        }
+        delete(
+            "/clients/${client.clientId}",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+        )
+
+        // then the  client and accounts are gone
+        findGroup(client.groupName) shouldBe null
+        accountExists(managerId) shouldBe false
+        accountExists(clientAccount1Id) shouldBe false
+        accountExists(clientAccount2Id) shouldBe false
 
         // and the other client's accounts are still there
         accountExists(otherManagerId) shouldBe true
         accountExists(otherClientAccountId) shouldBe true
+
+        // and the deletion event has been sent
+        awaitMessage {
+            get("eventType") shouldBe "client_change"
+            get("type") shouldBe "DELETION"
+            get("clientId") shouldBe client.clientId.toString()
+        }
     }
 }

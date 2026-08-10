@@ -17,6 +17,8 @@
  */
 package org.veo.accounts.rest
 
+import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.withClue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.Test
@@ -162,10 +164,40 @@ class SecurityRestTest : AbstractRestTest() {
     }
 
     @Test
-    fun `API key works for initial account creation`() {
+    fun `API key works for client management`() {
+        val randomId = randomUUID()
+
+        post("/clients", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
+            Regex("Required request body is missing.*")
+        put("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
+            Regex("Required request body is missing.*")
+        post(
+            "/clients/$randomId/activation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 422,
+        ).rawBody shouldMatch
+            Regex("Client $randomId not found*")
+        post(
+            "/clients/$randomId/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 422,
+        ).rawBody shouldMatch
+            Regex("Client $randomId not found*")
+        delete("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 422).rawBody shouldMatch
+            Regex("Client $randomId not found*")
         post("/initial", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
             Regex("Required request body is missing.*")
 
+        post("/clients", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
+        post("/clients", expectedStatus = 401)
+        put("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
+        put("/clients/$randomId", expectedStatus = 401)
+        post("/clients/$randomId/activation", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
+        post("/clients/$randomId/activation", expectedStatus = 401)
+        post("/clients/$randomId/deactivation", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
+        post("/clients/$randomId/deactivation", expectedStatus = 401)
+        delete("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
+        delete("/clients/$randomId", expectedStatus = 401)
         post("/initial", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
         post("/initial", expectedStatus = 401)
     }
@@ -226,11 +258,24 @@ class SecurityRestTest : AbstractRestTest() {
                 }
             }
 
-        endpointDocs.forEach {
-            if (it.path == "/initial" && it.httpMethod == "post") {
-                it.securitySchemes shouldBe listOf("ClientInitApiKey")
-            } else {
-                it.securitySchemes shouldBe listOf("OAuth2")
+        assertSoftly {
+            endpointDocs.forEach {
+                val endpoint = "${it.httpMethod.uppercase()} ${it.path}"
+                withClue(endpoint) {
+                    if (listOf(
+                            "POST /clients",
+                            "PUT /clients/{clientId}",
+                            "POST /clients/{clientId}/deactivation",
+                            "POST /clients/{clientId}/activation",
+                            "DELETE /clients/{clientId}",
+                            "POST /initial",
+                        ).contains(endpoint)
+                    ) {
+                        it.securitySchemes shouldBe listOf("ClientInitApiKey")
+                    } else {
+                        it.securitySchemes shouldBe listOf("OAuth2")
+                    }
+                }
             }
         }
     }
