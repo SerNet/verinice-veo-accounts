@@ -165,9 +165,6 @@ class SecurityRestTest : AbstractRestTest() {
     fun `API key works for initial account creation`() {
         post("/initial", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
             Regex("Required request body is missing.*")
-        // TODO: #4645 remove fallback to `Authorization` header
-        post("/initial", headers = mapOf("Authorization" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
-            Regex("Required request body is missing.*")
 
         post("/initial", headers = mapOf("X-API-KEY" to listOf("wrongKey")), expectedStatus = 401)
         post("/initial", expectedStatus = 401)
