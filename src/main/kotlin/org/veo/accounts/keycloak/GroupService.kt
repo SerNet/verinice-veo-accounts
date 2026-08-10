@@ -27,6 +27,7 @@ import org.veo.accounts.dtos.AccessGroupSurrogateId
 import org.veo.accounts.dtos.UnitAccessRights
 import org.veo.accounts.dtos.UnitId
 import org.veo.accounts.dtos.VeoClientId
+import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ExceedingMaxClientsException
 import org.veo.accounts.exceptions.ResourceNotFoundException
 import org.veo.accounts.exceptions.UnprocessableDtoException
@@ -123,8 +124,7 @@ class GroupService(
         findGroup(client.groupName, briefRepresentation)
             ?: throw notFoundExConstructor("Client ${client.clientId} not found")
 
-    fun clientIsActive(veoClient: VeoClientId): Boolean =
-        getClientGroup(veoClient).attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
+    fun clientIsActive(veoClient: VeoClientId): Boolean = clientIsActive(getClientGroup(veoClient))
 
     fun createClient(
         client: VeoClientId,
@@ -241,9 +241,7 @@ class GroupService(
         facade.perform {
             groups()
                 .groups(CLIENT_GROUP_PREFIX, 0, Int.MAX_VALUE, false)
-                .count { group ->
-                    group.attributes?.get(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED)?.firstOrNull() != "true"
-                }
+                .count(::clientIsActive)
         }
 
     private fun getGroup(groupName: String) = findGroup(groupName, true) ?: throw IllegalStateException("Group '$groupName' not found")
@@ -298,4 +296,7 @@ class GroupService(
             }
         }
     }
+
+    private fun clientIsActive(clientGroup: GroupRepresentation): Boolean =
+        clientGroup.attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
 }
