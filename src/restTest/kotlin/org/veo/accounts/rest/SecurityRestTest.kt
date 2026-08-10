@@ -174,16 +174,16 @@ class SecurityRestTest : AbstractRestTest() {
         post(
             "/clients/$randomId/activation",
             headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
-            expectedStatus = 422,
+            expectedStatus = 404,
         ).rawBody shouldMatch
             Regex("Client $randomId not found*")
         post(
             "/clients/$randomId/deactivation",
             headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
-            expectedStatus = 422,
+            expectedStatus = 404,
         ).rawBody shouldMatch
             Regex("Client $randomId not found*")
-        delete("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 422).rawBody shouldMatch
+        delete("/clients/$randomId", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 404).rawBody shouldMatch
             Regex("Client $randomId not found*")
         post("/initial", headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)), expectedStatus = 400).rawBody shouldMatch
             Regex("Required request body is missing.*")

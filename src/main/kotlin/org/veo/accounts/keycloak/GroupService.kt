@@ -118,9 +118,10 @@ class GroupService(
     fun getClientGroup(
         client: VeoClientId,
         briefRepresentation: Boolean = false,
+        notFoundExConstructor: (String) -> Throwable = ::UnprocessableDtoException,
     ): GroupRepresentation =
         findGroup(client.groupName, briefRepresentation)
-            ?: throw UnprocessableDtoException("Client ${client.clientId} not found")
+            ?: throw notFoundExConstructor("Client ${client.clientId} not found")
 
     fun clientIsActive(veoClient: VeoClientId): Boolean =
         getClientGroup(veoClient).attributes[ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED] != listOf("true")
@@ -151,7 +152,7 @@ class GroupService(
 
     fun activateClient(veoClient: VeoClientId) =
         facade.performSynchronized(veoClient) {
-            getClientGroup(veoClient)
+            getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
                 .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
                 .also { groups().group(it.id).update(it) }
                 .let { groups().group(it.id).members() }
@@ -162,7 +163,7 @@ class GroupService(
 
     fun deactivateClient(veoClient: VeoClientId) =
         facade.performSynchronized(veoClient) {
-            getClientGroup(veoClient)
+            getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
                 .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
                 .also { groups().group(it.id).update(it) }
                 .let { groups().group(it.id).members() }
@@ -178,7 +179,7 @@ class GroupService(
         maxUnits: Int?,
         maxUsers: Int?,
     ) = facade.performSynchronized(client) {
-        getClientGroup(client)
+        getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException)
             .apply {
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
                 maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
@@ -219,7 +220,7 @@ class GroupService(
     fun deleteClient(client: VeoClientId) =
         facade.performSynchronized(client) {
             log.info { "Deleting veo client group ${client.groupName}" }
-            groups().group(getClientGroup(client).id).run {
+            groups().group(getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException).id).run {
                 members().forEach {
                     users().delete(it.id)
                 }

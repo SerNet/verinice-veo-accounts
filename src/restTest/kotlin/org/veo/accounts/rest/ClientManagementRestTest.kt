@@ -323,4 +323,39 @@ class ClientManagementRestTest : AbstractRestTest() {
             get("clientId") shouldBe client.clientId.toString()
         }
     }
+
+    @Test
+    fun `non-existing clients are handled`() {
+        // given a random id
+        val randomId = UUID.randomUUID()
+
+        // expect that it cannot be used as a client ID
+        put(
+            "/clients/$randomId",
+            body =
+                mapOf(
+                    "name" to "non-existing client",
+                    "maxUnits" to 5,
+                    "maxUsers" to 10,
+                    "domainProducts" to mapOf("bad" to listOf("apple")),
+                ),
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 404,
+        ).rawBody shouldBe "Client $randomId not found"
+        post(
+            "/clients/$randomId/activation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 404,
+        ).rawBody shouldBe "Client $randomId not found"
+        post(
+            "/clients/$randomId/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 404,
+        ).rawBody shouldBe "Client $randomId not found"
+        delete(
+            "/clients/$randomId",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 404,
+        ).rawBody shouldBe "Client $randomId not found"
+    }
 }
