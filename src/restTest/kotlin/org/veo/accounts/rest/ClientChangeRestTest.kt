@@ -288,7 +288,19 @@ class ClientChangeRestTest : AbstractRestTest() {
         accountExists(otherManagerId) shouldBe true
         accountExists(otherClientAccountId) shouldBe true
 
-        // when deleting the main client
+        // when deactivating and deleting the main client
+        sendMessage(
+            "client_change",
+            mapOf(
+                "eventType" to "client_change",
+                "clientId" to client.clientId,
+                "type" to "DEACTIVATION",
+            ),
+        ) {
+            // then the  client and accounts are gone
+            accountInGroup(clientAccount1Id, "veo-user") shouldBe false
+            accountInGroup(clientAccount2Id, "veo-user") shouldBe false
+        }
         sendMessage(
             "client_change",
             mapOf(

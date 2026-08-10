@@ -152,7 +152,11 @@ class GroupService(
 
     fun activateClient(veoClient: VeoClientId) =
         facade.performSynchronized(veoClient) {
-            getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
+            val clientGroup = getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
+            if (clientIsActive(clientGroup)) {
+                throw ConflictException("Client is already active")
+            }
+            clientGroup
                 .apply { attributes.remove(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED) }
                 .also { groups().group(it.id).update(it) }
                 .let { groups().group(it.id).members() }
@@ -163,7 +167,11 @@ class GroupService(
 
     fun deactivateClient(veoClient: VeoClientId) =
         facade.performSynchronized(veoClient) {
-            getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
+            val clientGroup = getClientGroup(veoClient, notFoundExConstructor = ::ResourceNotFoundException)
+            if (!clientIsActive(clientGroup)) {
+                throw ConflictException("Client is already inactive")
+            }
+            clientGroup
                 .apply { singleAttribute(ATTRIBUTE_VEO_CLIENT_GROUP_DEACTIVATED, "true") }
                 .also { groups().group(it.id).update(it) }
                 .let { groups().group(it.id).members() }
@@ -179,7 +187,11 @@ class GroupService(
         maxUnits: Int?,
         maxUsers: Int?,
     ) = facade.performSynchronized(client) {
-        getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException)
+        val clientGroup = getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException)
+        if (!clientIsActive(clientGroup)) {
+            throw ConflictException("Cannot modify inactive client (must be activated first)")
+        }
+        clientGroup
             .apply {
                 maxUnits?.let { singleAttribute("maxUnits", it.toString()) }
                 maxUsers?.let { singleAttribute("maxUsers", it.toString()) }
@@ -219,8 +231,12 @@ class GroupService(
 
     fun deleteClient(client: VeoClientId) =
         facade.performSynchronized(client) {
+            val clientGroup = getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException)
+            if (clientIsActive(clientGroup)) {
+                throw ConflictException("Cannot delete active client (must be deactivated first)")
+            }
             log.info { "Deleting veo client group ${client.groupName}" }
-            groups().group(getClientGroup(client, notFoundExConstructor = ::ResourceNotFoundException).id).run {
+            groups().group(clientGroup.id).run {
                 members().forEach {
                     users().delete(it.id)
                 }

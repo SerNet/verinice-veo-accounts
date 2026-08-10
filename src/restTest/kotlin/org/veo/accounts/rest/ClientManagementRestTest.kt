@@ -300,7 +300,12 @@ class ClientManagementRestTest : AbstractRestTest() {
         accountExists(otherManagerId) shouldBe true
         accountExists(otherClientAccountId) shouldBe true
 
-        // when deleting the main client
+        // when deactivating and deleting the client
+        post(
+            "/clients/${client.clientId}/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        )
         delete(
             "/clients/${client.clientId}",
             headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
@@ -357,5 +362,46 @@ class ClientManagementRestTest : AbstractRestTest() {
             headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
             expectedStatus = 404,
         ).rawBody shouldBe "Client $randomId not found"
+    }
+
+    @Test
+    fun `status transitions are validated`() {
+        // expect that an active client cannot be activated or deleted
+        post(
+            "/clients/${client.clientId}/activation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 409,
+        ).rawBody shouldBe "Client is already active"
+        delete(
+            "/clients/${client.clientId}",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 409,
+        ).rawBody shouldBe "Cannot delete active client (must be deactivated first)"
+
+        // when the client is inactive
+        post(
+            "/clients/${client.clientId}/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 204,
+        ).rawBody
+
+        // then it cannot be modified or deactivated
+        post(
+            "/clients/${client.clientId}/deactivation",
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 409,
+        ).rawBody shouldBe "Client is already inactive"
+        put(
+            "/clients/${client.clientId}",
+            body =
+                mapOf(
+                    "name" to "inactive client",
+                    "maxUnits" to 1,
+                    "maxUsers" to 2,
+                    "domainProducts" to mapOf("in" to listOf("active")),
+                ),
+            headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+            expectedStatus = 409,
+        ).rawBody shouldBe "Cannot modify inactive client (must be activated first)"
     }
 }

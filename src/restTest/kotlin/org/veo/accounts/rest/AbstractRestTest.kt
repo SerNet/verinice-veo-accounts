@@ -115,6 +115,11 @@ abstract class AbstractRestTest {
         createdVeoClients
             .filter { findGroup(it.groupName) != null }
             .forEach {
+                post(
+                    "/clients/${it.clientId}/deactivation",
+                    headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
+                    expectedStatus = null,
+                )
                 delete(
                     "/clients/${it.clientId}",
                     headers = mapOf("X-API-KEY" to listOf(clientInitApiKey)),
