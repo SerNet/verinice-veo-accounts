@@ -17,7 +17,10 @@
  */
 package org.veo.accounts.messaging
 
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.dtos.DomainProducts
@@ -32,8 +35,14 @@ class MessageDispatcher(
     private val exchange: String,
     @Value("\${veo.accounts.rabbitmq.routing_key_prefix}")
     private val subscriptionRoutingKeyPrefix: String,
-    private val rabbitTemplate: RabbitTemplate,
+    connectionFactory: ConnectionFactory,
 ) {
+    // TODO #5046 use JacksonJsonMessageConverter globally as MessageConverter @Bean, replace this handwired RabbitTemplate with the autowired one
+    private val rabbitTemplate: RabbitTemplate =
+        RabbitTemplate(connectionFactory).apply {
+            messageConverter = JacksonJsonMessageConverter()
+        }
+
     fun sendClientChangeMessage(content: ClientChange) {
         send(
             "${subscriptionRoutingKeyPrefix}client_change",
@@ -48,7 +57,7 @@ class MessageDispatcher(
         rabbitTemplate.convertAndSend(
             exchange,
             routingKey,
-            om.writeValueAsString(mapOf("content" to content)),
+            mapOf("content" to content),
         )
     }
 
