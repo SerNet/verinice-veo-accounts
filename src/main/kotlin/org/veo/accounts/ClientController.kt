@@ -46,19 +46,15 @@ class ClientController(
     private val messageDispatcher: MessageDispatcher,
 ) {
     @Operation(
-        description = "Create or update a veo client",
+        description = "Create a veo client",
         responses = [
             ApiResponse(
                 responseCode = "201",
                 description = "Client created",
             ),
-            ApiResponse(
-                responseCode = "204",
-                description = "Client updated",
-            ),
         ],
     )
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createClient(
         @Valid

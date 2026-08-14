@@ -352,6 +352,7 @@ abstract class AbstractRestTest {
                             .asMap()["security"]
                             .asListOfMaps()
                             .flatMap { it.keys },
+                        endpointEntry.value.asNestedMap()["responses"]!!.keys,
                     )
                 }
             }
@@ -362,6 +363,7 @@ abstract class AbstractRestTest {
         val path: String,
         val httpMethod: String,
         val securitySchemes: List<String>,
+        val responseCodes: Set<String>,
     ) {
         override fun toString(): String = "${httpMethod.uppercase()} $path"
     }
