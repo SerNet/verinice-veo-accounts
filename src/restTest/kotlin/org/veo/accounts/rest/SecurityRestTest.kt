@@ -233,7 +233,8 @@ class SecurityRestTest : AbstractRestTest() {
 
     @Test
     fun `authorization methods are documented`() {
-        val docs = get("/v3/api-docs").bodyAsMap
+        val docsResponse = get("/v3/api-docs")
+        val docs = docsResponse.bodyAsMap
 
         docs["components"].asMap()["securitySchemes"].asMap().let {
             it["OAuth2"].asMap()["type"] shouldBe "oauth2"
@@ -244,23 +245,11 @@ class SecurityRestTest : AbstractRestTest() {
             }
         }
 
-        val endpointDocs =
-            docs["paths"].asMap().flatMap { pathEntry ->
-                pathEntry.value.asMap().map { endpointEntry ->
-                    EndpointDoc(
-                        pathEntry.key,
-                        endpointEntry.key,
-                        endpointEntry.value
-                            .asMap()["security"]
-                            .asListOfMaps()
-                            .flatMap { it.keys },
-                    )
-                }
-            }
+        val endpointDocs = parseEndpointDocs(docsResponse)
 
         assertSoftly {
             endpointDocs.forEach {
-                val endpoint = "${it.httpMethod.uppercase()} ${it.path}"
+                val endpoint = it.toString()
                 withClue(endpoint) {
                     if (listOf(
                             "POST /clients",
@@ -279,10 +268,4 @@ class SecurityRestTest : AbstractRestTest() {
             }
         }
     }
-
-    data class EndpointDoc(
-        val path: String,
-        val httpMethod: String,
-        val securitySchemes: List<String>,
-    )
 }

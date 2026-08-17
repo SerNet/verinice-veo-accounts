@@ -45,6 +45,9 @@ import org.veo.accounts.Role.READ
 import org.veo.accounts.Role.UPDATE
 import org.veo.accounts.VeoAccountsApplication
 import org.veo.accounts.WebSecurity
+import org.veo.accounts.asListOfMaps
+import org.veo.accounts.asMap
+import org.veo.accounts.asNestedMap
 import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.keycloak.TestAccountService
 import tools.jackson.module.kotlin.jacksonObjectMapper
@@ -337,4 +340,29 @@ abstract class AbstractRestTest {
             testAccountService.getUsername(authAccountId),
             testAccountService.testPassword,
         )
+
+    protected fun parseEndpointDocs(docs: Response): List<EndpointDoc> {
+        val endpointDocs =
+            docs.bodyAsMap["paths"].asMap().flatMap { pathEntry ->
+                pathEntry.value.asMap().map { endpointEntry ->
+                    EndpointDoc(
+                        pathEntry.key,
+                        endpointEntry.key,
+                        endpointEntry.value
+                            .asMap()["security"]
+                            .asListOfMaps()
+                            .flatMap { it.keys },
+                    )
+                }
+            }
+        return endpointDocs
+    }
+
+    data class EndpointDoc(
+        val path: String,
+        val httpMethod: String,
+        val securitySchemes: List<String>,
+    ) {
+        override fun toString(): String = "${httpMethod.uppercase()} $path"
+    }
 }
