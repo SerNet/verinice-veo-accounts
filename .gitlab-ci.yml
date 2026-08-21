@@ -22,10 +22,10 @@ include:
 
 stages:
   - build
-  - copy
   - check
   - docker_image
   - integration_test
+  - copy
   - deployment
 
 workflow:
