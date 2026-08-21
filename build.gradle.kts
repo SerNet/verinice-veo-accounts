@@ -52,6 +52,10 @@ configurations.all {
             useVersion("4.2.16.Final")
             because("CVE-2026-5990")
         }
+        if (requested.group == "com.rabbitmq" && requested.version == "5.31.0") {
+            useVersion("5.33.1")
+            because(" CWE-295")
+        }
     }
 }
 
