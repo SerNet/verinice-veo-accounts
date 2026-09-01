@@ -43,7 +43,7 @@ class TestMessageSubscriber {
                     ),
                 exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
                 key = [
-                    "\${veo.accounts.rabbitmq.routing_key_prefix}client_change",
+                    "\${veo.accounts.rabbitmq.routing_key_prefix}#",
                 ],
             ),
         ],

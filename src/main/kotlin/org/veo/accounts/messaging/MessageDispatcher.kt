@@ -43,22 +43,16 @@ class MessageDispatcher(
             messageConverter = JacksonJsonMessageConverter()
         }
 
-    fun sendClientChangeMessage(content: ClientChange) {
-        send(
-            "${subscriptionRoutingKeyPrefix}client_change",
-            om.writeValueAsString(content),
+    fun send(message: Message) {
+        rabbitTemplate.convertAndSend(
+            exchange,
+            "${subscriptionRoutingKeyPrefix}${message.eventType}",
+            mapOf("content" to om.writeValueAsString(message)),
         )
     }
 
-    private fun send(
-        routingKey: String,
-        content: String,
-    ) {
-        rabbitTemplate.convertAndSend(
-            exchange,
-            routingKey,
-            mapOf("content" to content),
-        )
+    sealed interface Message {
+        val eventType: String
     }
 
     data class ClientChange(
@@ -68,8 +62,8 @@ class MessageDispatcher(
         val maxUnits: Int? = null,
         val maxUsers: Int? = null,
         val domainProducts: DomainProducts? = null,
-    ) {
-        val eventType = "client_change"
+    ) : Message {
+        override val eventType = "client_change"
 
         @Deprecated("#5046")
         val source = "veo-accounts"

@@ -69,7 +69,7 @@ class ClientController(
                     maxUnits,
                     maxUsers,
                 )
-                messageDispatcher.sendClientChangeMessage(
+                messageDispatcher.send(
                     ClientChange(
                         ClientChange.Type.CREATION,
                         id,
@@ -106,7 +106,7 @@ class ClientController(
                     maxUnits,
                     maxUsers,
                 )
-                messageDispatcher.sendClientChangeMessage(
+                messageDispatcher.send(
                     ClientChange(
                         ClientChange.Type.MODIFICATION,
                         clientId,
@@ -125,7 +125,7 @@ class ClientController(
         @PathVariable clientId: VeoClientId,
     ) {
         groupService.deactivateClient(clientId)
-        messageDispatcher.sendClientChangeMessage(ClientChange(ClientChange.Type.DEACTIVATION, clientId))
+        messageDispatcher.send(ClientChange(ClientChange.Type.DEACTIVATION, clientId))
     }
 
     @PostMapping("{clientId}/activation")
@@ -134,7 +134,7 @@ class ClientController(
         @PathVariable clientId: VeoClientId,
     ) {
         groupService.activateClient(clientId)
-        messageDispatcher.sendClientChangeMessage(ClientChange(ClientChange.Type.ACTIVATION, clientId))
+        messageDispatcher.send(ClientChange(ClientChange.Type.ACTIVATION, clientId))
     }
 
     @DeleteMapping("{clientId}")
@@ -143,6 +143,6 @@ class ClientController(
         @PathVariable clientId: VeoClientId,
     ) {
         groupService.deleteClient(clientId)
-        messageDispatcher.sendClientChangeMessage(ClientChange(ClientChange.Type.DELETION, clientId))
+        messageDispatcher.send(ClientChange(ClientChange.Type.DELETION, clientId))
     }
 }
