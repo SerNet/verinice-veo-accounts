@@ -20,10 +20,10 @@ package org.veo.accounts.messaging
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.veo.accounts.dtos.DomainProducts
+import org.veo.accounts.dtos.Username
 import org.veo.accounts.dtos.VeoClientId
 import tools.jackson.module.kotlin.jacksonObjectMapper
 
@@ -75,5 +75,12 @@ class MessageDispatcher(
             ACTIVATION,
             DELETION,
         }
+    }
+
+    data class AccountDeletion(
+        val clientId: VeoClientId,
+        val username: Username,
+    ) : Message {
+        override val eventType = "account_deletion"
     }
 }

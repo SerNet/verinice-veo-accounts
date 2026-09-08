@@ -39,12 +39,15 @@ import org.veo.accounts.dtos.request.UpdateAccountDto
 import org.veo.accounts.dtos.response.AccountCreatedDto
 import org.veo.accounts.dtos.response.FullAccountDto
 import org.veo.accounts.keycloak.AccountService
+import org.veo.accounts.messaging.MessageDispatcher
+import org.veo.accounts.messaging.MessageDispatcher.AccountDeletion
 
 @RestController
 @RequestMapping("/")
 @SecurityRequirement(name = SECURITY_SCHEME_OAUTH)
 class AccountController(
     private val accountService: AccountService,
+    private val messageDispatcher: MessageDispatcher,
 ) {
     @Operation(description = "Get all accounts.")
     @GetMapping
@@ -93,5 +96,15 @@ class AccountController(
     fun deleteAccount(
         auth: Authentication,
         @PathVariable("id") id: AccountId,
-    ) = accountService.deleteAccount(id, auth.parseAccount())
+    ) {
+        val authAccount = auth.parseAccount()
+        accountService.deleteAccount(id, authAccount).apply {
+            messageDispatcher.send(
+                AccountDeletion(
+                    authAccount.veoClient,
+                    username,
+                ),
+            )
+        }
+    }
 }

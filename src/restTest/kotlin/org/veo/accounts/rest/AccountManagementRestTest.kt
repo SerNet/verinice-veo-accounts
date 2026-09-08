@@ -24,14 +24,17 @@ import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldMatch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.veo.accounts.dtos.VeoClientId
 import java.util.UUID.randomUUID
 
 class AccountManagementRestTest : AbstractRestTest() {
+    lateinit var client: VeoClientId
     lateinit var managerId: String
 
     @BeforeEach
     fun setup() {
-        managerId = createManager(createVeoClientGroup())
+        client = createVeoClientGroup()
+        managerId = createManager(client)
     }
 
     @Test
@@ -108,6 +111,11 @@ class AccountManagementRestTest : AbstractRestTest() {
         // and deleted
         delete("/$accountId", managerId)
         get("/$accountId", managerId, 404)
+        awaitMessage {
+            get("eventType") shouldBe "account_deletion"
+            get("clientId") shouldBe client.clientId.toString()
+            get("username") shouldBe "$prefix-hans"
+        }
     }
 
     @Test

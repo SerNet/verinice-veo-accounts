@@ -34,6 +34,7 @@ import org.veo.accounts.dtos.VeoClientId
 import org.veo.accounts.dtos.request.CreateAccountDto
 import org.veo.accounts.dtos.request.CreateInitialAccountDto
 import org.veo.accounts.dtos.request.UpdateAccountDto
+import org.veo.accounts.dtos.response.FullAccountDto
 import org.veo.accounts.exceptions.ConflictException
 import org.veo.accounts.exceptions.ExceedingMaxUsersException
 import org.veo.accounts.exceptions.ResourceNotFoundException
@@ -178,7 +179,7 @@ class AccountService(
         getAccount(id, authAccount)
             .also { log.info { "Deleting account ${it.username} in ${authAccount.veoClient}" } }
             .also { users().delete(id.toString()) }
-            .run { }
+            .let { FullAccountDto(it) }
     }
 
     private fun RealmResource.findAccounts(authAccount: AuthenticatedAccount): List<UserRepresentation> =
