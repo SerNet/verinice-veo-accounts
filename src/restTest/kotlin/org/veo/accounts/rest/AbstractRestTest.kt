@@ -133,9 +133,8 @@ abstract class AbstractRestTest {
     }
 
     protected fun awaitMessage(assertions: Map<String, *>.() -> Unit) {
-        await().atMost(5, SECONDS).until {
+        await().atMost(5, SECONDS).untilAsserted {
             testMessageSubscriber.receivedMessages.forOne { m -> assertSoftly { assertions(m) } }
-            true
         }
     }
 
