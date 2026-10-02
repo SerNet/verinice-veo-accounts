@@ -244,4 +244,24 @@ class AccountManagementRestTest : AbstractRestTest() {
         )
         delete("/$randId", managerId, 404)
     }
+
+    @Test
+    fun `account creation ignores unknown properties`() {
+        val accountId =
+            post(
+                "/",
+                managerId,
+                mapOf(
+                    "username" to "$prefix-hans",
+                    "emailAddress" to "$prefix-hans@test.test",
+                    "firstName" to "Hans",
+                    "lastName" to "Dance",
+                    "groups" to listOf("veo-write-access"),
+                    "enabled" to true,
+                    "language" to "de",
+                    "favoriteColor" to "purple",
+                ),
+            ).bodyAsMap["id"]
+        accountId shouldNotBe null
+    }
 }

@@ -17,8 +17,6 @@
  */
 package org.veo.accounts
 
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType.APIKEY
@@ -33,7 +31,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.client.RestTemplate
 
@@ -84,13 +81,6 @@ const val HEADER_NAME_APIKEY = "X-API-KEY"
 )
 @EnableScheduling
 class VeoAccountsApplication {
-    @Bean
-    @Primary
-    fun objectMapper(): ObjectMapper =
-        ObjectMapper()
-            .findAndRegisterModules()
-            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-
     @Bean
     fun restTemplate(builder: RestTemplateBuilder): RestTemplate = builder.build()
 }
