@@ -24,6 +24,9 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
 import org.veo.accounts.asMap
+import tools.jackson.module.kotlin.jacksonObjectMapper
+
+val om = jacksonObjectMapper()
 
 private val log = logger {}
 

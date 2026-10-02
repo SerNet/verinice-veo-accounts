@@ -35,14 +35,8 @@ class MessageDispatcher(
     private val exchange: String,
     @Value("\${veo.accounts.rabbitmq.routing_key_prefix}")
     private val subscriptionRoutingKeyPrefix: String,
-    connectionFactory: ConnectionFactory,
+    private val rabbitTemplate: RabbitTemplate,
 ) {
-    // TODO #5046 use JacksonJsonMessageConverter globally as MessageConverter @Bean, replace this handwired RabbitTemplate with the autowired one
-    private val rabbitTemplate: RabbitTemplate =
-        RabbitTemplate(connectionFactory).apply {
-            messageConverter = JacksonJsonMessageConverter()
-        }
-
     fun send(message: Message) {
         rabbitTemplate.convertAndSend(
             exchange,
@@ -64,9 +58,6 @@ class MessageDispatcher(
         val domainProducts: DomainProducts? = null,
     ) : Message {
         override val eventType = "client_change"
-
-        @Deprecated("#5046")
-        val source = "veo-accounts"
 
         enum class Type {
             CREATION,

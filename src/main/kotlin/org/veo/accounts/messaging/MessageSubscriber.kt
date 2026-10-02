@@ -45,19 +45,6 @@ class MessageSubscriber(
             QueueBinding(
                 value =
                     Queue(
-                        value = "\${veo.accounts.rabbitmq.queues.veo-subscriptions}",
-                        exclusive = "false",
-                        durable = "true",
-                        autoDelete = "\${veo.accounts.rabbitmq.queue.autoDelete}",
-                        arguments = [Argument(name = "x-dead-letter-exchange", value = "\${veo.accounts.rabbitmq.dlx}")],
-                    ),
-                exchange = Exchange(value = "\${veo.accounts.rabbitmq.exchanges.veo-subscriptions}", type = "topic"),
-                key = [
-                    "\${veo.accounts.rabbitmq.routing_key_prefix}client_change",
-                ],
-            ), QueueBinding(
-                value =
-                    Queue(
                         value = "\${veo.accounts.rabbitmq.queues.veo}",
                         exclusive = "false",
                         durable = "true",
@@ -90,58 +77,11 @@ class MessageSubscriber(
             .asString()
             .let {
                 log.debug { "Received message with '$it' event" }
-                // TODO #5046 remove client_change handling and suppression
-                @Suppress("DEPRECATION")
                 when (it) {
-                    "client_change" -> handleClientChange(content)
                     "unit_deletion" -> handleUnitDeletion(content)
                     else -> throw NotImplementedError("Unsupported event type $it")
                 }
             }
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("#5046")
-    private fun handleClientChange(content: JsonNode) {
-        // ignore self-sent messages
-        if (content.get("source")?.stringValue() == "veo-accounts") {
-            return
-        }
-        val client =
-            content
-                .get("clientId")
-                .asString()
-                .let { UUID.fromString(it) }
-                .let { VeoClientId(it) }
-        when (content.get("type").asString()) {
-            "ACTIVATION" -> {
-                groupService.activateClient(client)
-            }
-
-            "CREATION" -> {
-                groupService.createClient(
-                    client,
-                    content.get("maxUnits").asInt(),
-                    content.get("maxUsers").asInt(),
-                )
-            }
-
-            "MODIFICATION" -> {
-                groupService.updateClient(
-                    client,
-                    content.get("maxUnits")?.asInt(),
-                    content.get("maxUsers")?.asInt(),
-                )
-            }
-
-            "DEACTIVATION" -> {
-                groupService.deactivateClient(client)
-            }
-
-            "DELETION" -> {
-                groupService.deleteClient(client)
-            }
-        }
     }
 
     private fun handleUnitDeletion(content: JsonNode) {

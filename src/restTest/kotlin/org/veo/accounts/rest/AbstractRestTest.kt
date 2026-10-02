@@ -20,7 +20,6 @@ package org.veo.accounts.rest
 import io.kotest.assertions.assertSoftly
 import io.kotest.inspectors.forOne
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.keycloak.representations.idm.GroupRepresentation
@@ -70,10 +69,6 @@ abstract class AbstractRestTest {
 
     @Autowired
     private lateinit var testAuthenticator: TestAuthenticator
-
-    @Suppress("DEPRECATION")
-    @Autowired
-    private lateinit var testMessageDispatcher: TestMessageDispatcher
 
     @Autowired
     private lateinit var testMessageSubscriber: TestMessageSubscriber
@@ -170,26 +165,6 @@ abstract class AbstractRestTest {
                 }
             }.also { createdVeoClients.add(it) }
 
-    @Suppress("DEPRECATION")
-    @Deprecated("#5046")
-    protected fun createVeoClientGroupUsingEvent(
-        maxUsers: Int = MAX_VALUE,
-        maxUnits: Int = MAX_VALUE,
-    ): VeoClientId =
-        VeoClientId(randomUUID())
-            .apply {
-                sendMessage(
-                    "client_change",
-                    mapOf(
-                        "clientId" to clientId,
-                        "eventType" to "client_change",
-                        "maxUnits" to maxUnits,
-                        "maxUsers" to maxUsers,
-                        "type" to "CREATION",
-                    ),
-                ) { findGroup(groupName) shouldNotBe null }
-            }.also { createdVeoClients.add(it) }
-
     protected fun createAccessGroup(userId: String): String =
         post(
             "/access-groups",
@@ -263,23 +238,6 @@ abstract class AbstractRestTest {
         expectedStatus: Int? = 204,
         headers: Map<String, List<String>> = emptyMap(),
     ): Response = exchange(HttpMethod.DELETE, url, authAccountId, null, headers, expectedStatus)
-
-    @Deprecated("#5046")
-    protected fun sendMessage(
-        routingKey: String,
-        content: Map<String, *>,
-        completionAssertion: () -> Unit,
-    ) {
-        testMessageDispatcher.sendMessage(routingKey, content)
-        await().atMost(5, SECONDS).until {
-            try {
-                completionAssertion()
-                true
-            } catch (ex: Throwable) {
-                false
-            }
-        }
-    }
 
     protected fun accountExists(accountId: String): Boolean = testAccountService.findAccount(accountId) != null
 

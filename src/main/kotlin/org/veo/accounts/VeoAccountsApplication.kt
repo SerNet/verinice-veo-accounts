@@ -27,12 +27,18 @@ import io.swagger.v3.oas.annotations.info.License
 import io.swagger.v3.oas.annotations.security.OAuthFlow
 import io.swagger.v3.oas.annotations.security.OAuthFlows
 import io.swagger.v3.oas.annotations.security.SecurityScheme
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter
+import org.springframework.amqp.support.converter.MessageConverter
+import org.springframework.boot.amqp.autoconfigure.RabbitTemplateCustomizer
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.client.RestTemplate
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jsonMapper
 
 const val SECURITY_SCHEME_OAUTH = "OAuth2"
 const val SECURITY_SCHEME_CLIENT_INIT_API_KEY = "ClientInitApiKey"
@@ -83,6 +89,10 @@ const val HEADER_NAME_APIKEY = "X-API-KEY"
 class VeoAccountsApplication {
     @Bean
     fun restTemplate(builder: RestTemplateBuilder): RestTemplate = builder.build()
+
+    @Bean
+    fun rabbitTemplateCustomizer(jsonMapper: JsonMapper) =
+        RabbitTemplateCustomizer { it.messageConverter = JacksonJsonMessageConverter(jsonMapper) }
 }
 
 fun main(args: Array<String>) {
