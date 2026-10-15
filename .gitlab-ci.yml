@@ -174,7 +174,7 @@ http_rest_tests:
       VEO_ACCOUNTS_RABBITMQ_SUBSCRIBE: 'true'
       VEO_CORS_ORIGINS: 'https://*.verinice.example, https://frontend.somewhereelse.example'
       SPRING_RABBITMQ_HOST: rabbitmq
-  - name: rabbitmq:4.3.6-management-alpine@sha256:3ef7f7e89fed709a78f79b8b5f4e30e1312a1d4089da752e23595566d9d61a95
+  - name: rabbitmq:4.3.6-management-alpine@sha256:6e6e8952c2b56245de7ac61f06c9af9fdd38da675cd82cdbf7e3f30b33494dcc
     alias: rabbitmq
   variables:
     FF_NETWORK_PER_BUILD: 1
