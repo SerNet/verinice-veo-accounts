@@ -53,8 +53,16 @@ configurations.all {
             because("CVE-2026-5990")
         }
         if (requested.group == "com.rabbitmq" && requested.version == "5.31.0") {
-            useVersion("5.34.0")
-            because("CWE-295;CVE-2026-75516")
+            useVersion("5.37.0")
+            because("CWE-295;CVE-2026-75516,CVE-2026-106121,CVE-2026-106122,CVE-2026-106123")
+        }
+        if (requested.group == "tools.jackson.core" && requested.version == "3.1.5") {
+            useVersion("3.1.7")
+            because("CVE-2026-89407,CVE-2026-89425,CVE-2026-91776,CVE-2026-91777")
+        }
+        if (requested.group == "com.fasterxml.jackson.core" && requested.version == "2.22.1") {
+            useVersion("2.22.3")
+            because("CVE-2026-89407,CVE-2026-89425,CVE-2026-91776,CVE-2026-91777")
         }
     }
 }
