@@ -26,8 +26,8 @@ dependencies {
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
 
     // security overrides
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.3"))
-    implementation(platform("tools.jackson:jackson-bom:3.2.3"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.4"))
+    implementation(platform("tools.jackson:jackson-bom:3.2.4"))
     constraints {
         implementation("com.rabbitmq:amqp-client:5.37.0")
     }
